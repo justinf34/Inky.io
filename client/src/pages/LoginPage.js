@@ -1,12 +1,17 @@
 import React, { Component } from "react";
+import { Button } from "react-bootstrap";
 
 export default class LoginPage extends Component {
   render() {
     return (
       <div>
-        <a href="http://localhost:8888/auth/google" class="button">
-          Google Sign In
-        </a>
+        <Button
+          onClick={() =>
+            window.open("http://localhost:8888/auth/google", "_self")
+          }
+        >
+          Login
+        </Button>
       </div>
     );
   }
