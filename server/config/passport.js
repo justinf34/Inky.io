@@ -1,12 +1,25 @@
 const passport = require("passport");
 var GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
+const db = require("../config/db");
 
+// Don't really know how this works yet
 passport.serializeUser(function (user, done) {
-  done(null, user);
+  done(null, user.id);
 });
 
-passport.deserializeUser(function (user, done) {
-  done(null, user);
+// Don't really undesstand how this works yet
+passport.deserializeUser(function (id, done) {
+  const users = db.collection("Users");
+
+  users
+    .doc(id)
+    .get()
+    .then((user) => {
+      done(null, user.data());
+    })
+    .catch((e) => {
+      done(new Error("Failed to deserialize a user"));
+    });
 });
 
 passport.use(
@@ -16,13 +29,23 @@ passport.use(
       clientSecret: process.env.AUTH_SECRET,
       callbackURL: "http://localhost:8888/auth/google/callback",
     },
-    function (accessToken, refreshToken, profile, done) {
-      var userData = {
-        email: profile.emails[0].value,
-        name: profile.displayName,
-        token: accessToken,
-      };
-      done(null, userData);
+    async (request, accessToken, refreshToken, profile, done) => {
+      const users = db.collection("Users");
+
+      const user = await users.doc(profile.id).get();
+
+      if (!user.exists) {
+        const new_user = {
+          id: profile.id,
+          name: profile.id,
+          role: false,
+        };
+        //TODO: Handle errors
+        const res = await users.doc(profile.id).set(new_user);
+        done(null, new_user);
+      } else {
+        done(null, user.data());
+      }
     }
   )
 );

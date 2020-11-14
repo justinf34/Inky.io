@@ -1,14 +1,15 @@
-var admin = require("firebase-admin");
+const admin = require("firebase-admin");
 
-var serviceAccount = require("./serviceAccountKey.json");
+const serviceAccount = require("../serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://inkyio.firebaseio.com"
+  databaseURL: "https://inkyio.firebaseio.com",
 });
 
+const db = admin.firestore();
+// var db = admin.database();
+// var ref = db.ref().child("words");
+// ref.on("value", (snap) => console.log(snap.val()));
 
-var db = admin.database();
-var ref = db.ref().child('words');
-ref.on("value", snap => console.log(snap.val()))
-
+module.exports = db;
