@@ -7,12 +7,11 @@ import CanvasContainer from "./components/GameComponents/CanvasContainer";
 export default class App extends Component {
   render() {
     return (
-      // <Router>
-      //   <div className="App">
-      //     <HomePage />
-      //   </div>
-      // </Router>
-      <CanvasContainer />
+      <Router>
+        <div className="App">
+          <HomePage />
+        </div>
+      </Router>
     );
   }
 }
