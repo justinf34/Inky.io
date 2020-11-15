@@ -6,6 +6,7 @@
 }
 
 .content {
+  background-color: white;
   display: flex;
   flex-direction: column;
   width: 90%;
@@ -32,7 +33,17 @@
 
 .profile-picture {
   Width: 10%;
-  margin: 0px auto;
+  margin: 20px auto;
 }
 
+.card-header.collapsed {
+  background:#FFEDD2;
+}
 
+.card-header:not(.collapsed) {
+  background:#FFEDD2;
+}
+
+.card-body {
+  background:#FFEDD2;
+}

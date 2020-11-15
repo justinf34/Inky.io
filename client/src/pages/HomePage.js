@@ -20,6 +20,7 @@ export default class HomePage extends React.Component {
     }
     this.handleGameCodeChange = this.handleGameCodeChange.bind(this);
     this.handleJoinGameClicked = this.handleJoinGameClicked.bind(this);
+    this.handleLogoutClick = this.handleLogoutClick.bind(this);
   }
 
   componentDidMount() {
@@ -97,10 +98,10 @@ export default class HomePage extends React.Component {
             <img className="profile-picture" src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png" alt="pfp"></img>
 
             <div className='button-group'>
-              <Button onClick={this.handleLogoutClick}>Logout</Button>
-              <Button variant="outline-secondary" onClick="">Match History</Button>{' '}
-              <Button variant="outline-secondary">View Profile</Button>{' '}
-              <Button variant="info">Create Game</Button>{' '}
+              <Button variant="outline-danger" onClick={this.handleLogoutClick}>Logout</Button>
+              <Button variant="outline-dark" onClick={this.handleMatchHistoryClicked}>Match History</Button>{' '}
+              <Button variant="outline-dark" onClick={this.handleViewProfileClicked}>View Profile</Button>{' '}
+              <Button variant="info" onClick={this.handleCreateGameClicked}>Create Game</Button>{' '}
             </div>
 
             <InputGroup style={{ maxWidth: '70%', margin: '10px auto' }}>
