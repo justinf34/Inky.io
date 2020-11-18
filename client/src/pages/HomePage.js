@@ -1,7 +1,6 @@
 import React from "react";
 import LoginPage from "./LoginPage";
 import { Button } from "react-bootstrap";
-import CanvasContainer from "../components/GameComponents/CanvasContainer";
 
 class HomePage extends React.Component {
   state = {
@@ -55,8 +54,6 @@ class HomePage extends React.Component {
           <React.Fragment>
             <h1>You have logged-in successfully!</h1>
             <Button onClick={this.handleLogoutClick}>Logout</Button>
-
-            <CanvasContainer />
           </React.Fragment>
         )}
       </div>
