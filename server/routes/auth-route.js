@@ -8,7 +8,6 @@ router.get("/", (req, res) => {
 
 // when login is successful, retrieve user info
 router.get("/login/success", (req, res) => {
-  console.log("Here", req.user);
   if (req.user) {
     res.json({
       success: true,
