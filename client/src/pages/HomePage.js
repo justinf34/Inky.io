@@ -99,14 +99,10 @@ export default class HomePage extends React.Component {
               src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
               alt="pfp"
             ></img>
-            <NavBar
-              showCreateGame={true}
-              showHome={false}
-              logout={this.handleLogoutClick}
-              matchHistory={this.handleMatchHistoryClicked}
-              viewProfile={this.handleViewProfileClicked}
-            ></NavBar>
-
+            <NavBar showHome={false} logout={this.handleLogoutClick} />
+            <Button variant="info" onClick={this.handleCreateGameClicked}>
+              Create Game
+            </Button>
             <InputGroup style={{ maxWidth: "70%", margin: "10px auto" }}>
               <FormControl
                 placeholder="Enter lobby code to join a game"

@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
+import { Link } from "react-router-dom";
 export default class NavBar extends React.Component {
   constructor(props) {
     super(props);
@@ -9,27 +10,23 @@ export default class NavBar extends React.Component {
     return (
       <div className="button-group">
         {this.props.showHome ? (
-          <Button variant="outline-danger">Home</Button>
+          <Link to="/home">
+            <Button variant="info">Home</Button>
+          </Link>
         ) : (
           ""
         )}
-
-        <Button variant="outline-danger" onClick={this.props.logout}>
-          Logout
-        </Button>
-        <Button variant="outline-dark" onClick={this.props.matchHistory}>
-          Match History
-        </Button>
-        <Button variant="outline-dark" onClick={this.props.viewProfile}>
-          View Profile
-        </Button>
-        {this.props.showCreateGame ? (
-          <Button variant="info" onClick={this.handleCreateGameClicked}>
-            Create Game
+        <Link to="/history">
+          <Button variant="outline-dark">Match History</Button>
+        </Link>
+        <Link to="/profile">
+          <Button variant="outline-dark">View Profile</Button>
+        </Link>
+        <Link>
+          <Button variant="outline-danger" onClick={this.props.logout}>
+            Logout
           </Button>
-        ) : (
-          ""
-        )}
+        </Link>
       </div>
     );
   }
