@@ -19,6 +19,7 @@ const keys = require("./config/keys");
 const cors = require("cors");
 
 const db = require("./config/db");
+const socket_handler = require("./src/socket");
 
 app.use(
   cookieSession({
@@ -83,18 +84,7 @@ app.get("/testDB", (req, res) => {
     });
 });
 
-io.on("connection", (socket) => {
-  console.log("socket: a user connected");
-
-  socket.on("disconnect", () => {
-    console.log("socket: a user disconnected");
-  });
-
-  socket.on("draw", (msg) => {
-    console.log("draw: ", msg);
-    socket.broadcast.emit("draw", msg);
-  });
-});
+io.on("connection", socket_handler);
 
 let port = process.env.PORT || 8888;
 http.listen(port, (err) => {
