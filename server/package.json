@@ -20,7 +20,8 @@
     "nanoid": "^3.1.16",
     "passport": "^0.4.1",
     "passport-google-oauth": "^2.0.0",
-    "passport-google-oauth2": "^0.2.0"
+    "passport-google-oauth2": "^0.2.0",
+    "socket.io": "^3.0.1"
   },
   "devDependencies": {
     "dotenv": "^8.2.0"

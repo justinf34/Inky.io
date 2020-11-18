@@ -1,16 +1,23 @@
 require("dotenv").config();
 const cookieSession = require("cookie-session");
+
 const express = require("express");
 const app = express();
+var http = require("http").createServer(app);
+var io = require("socket.io")(http, { cors: true, origins: ["*:*"] });
+
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+
 const passport = require("passport");
 const passportSetup = require("./config/passport");
 const authRouter = require("./routes/auth-route");
 const lobbyRouter = require("./routes/lobby-route");
 const session = require("express-session");
+
 const keys = require("./config/keys");
 const cors = require("cors");
+
 const db = require("./config/db");
 
 app.use(
@@ -76,8 +83,21 @@ app.get("/testDB", (req, res) => {
     });
 });
 
+io.on("connection", (socket) => {
+  console.log("socket: a user connected");
+
+  socket.on("disconnect", () => {
+    console.log("socket: a user disconnected");
+  });
+
+  socket.on("draw", (msg) => {
+    console.log("draw: ", msg);
+    socket.broadcast.emit("draw", msg);
+  });
+});
+
 let port = process.env.PORT || 8888;
-app.listen(port, (err) => {
+http.listen(port, (err) => {
   if (err) throw err;
   console.log(`Listening on port ${port}...`);
 });
