@@ -1,12 +1,13 @@
-import React from 'react';
-import LoginPage from './LoginPage';
-import '../styles/HomePage.css'
-import Accordion from 'react-bootstrap/Accordion';
-import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
-import InputGroup from 'react-bootstrap/InputGroup'
-import FormControl from 'react-bootstrap/FormControl'
-import Toast from 'react-bootstrap/Toast'
+import React from "react";
+import LoginPage from "./LoginPage";
+import "../styles/HomePage.css";
+import Accordion from "react-bootstrap/Accordion";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
+import FormControl from "react-bootstrap/FormControl";
+import Toast from "react-bootstrap/Toast";
+import NavBar from "../components/NavBar";
 
 export default class HomePage extends React.Component {
   constructor(props) {
@@ -17,7 +18,7 @@ export default class HomePage extends React.Component {
       user: {},
       error: null,
       authenticated: false,
-    }
+    };
     this.handleGameCodeChange = this.handleGameCodeChange.bind(this);
     this.handleJoinGameClicked = this.handleJoinGameClicked.bind(this);
     this.handleLogoutClick = this.handleLogoutClick.bind(this);
@@ -62,7 +63,7 @@ export default class HomePage extends React.Component {
     // TODO: redirect to match history page
   }
 
-  handleViewProfileClicked(){
+  handleViewProfileClicked() {
     // TODO: redirect to profile page
   }
 
@@ -72,39 +73,41 @@ export default class HomePage extends React.Component {
 
   handleJoinGameClicked() {
     if (this.state.gameCode === "") return;
-      // TODO: if game exists, redirect them to game else do below
-      this.setState({
-        showRoomNotFound: true,
-      });
+    // TODO: if game exists, redirect them to game else do below
+    this.setState({
+      showRoomNotFound: true,
+    });
   }
 
   handleGameCodeChange(e) {
     this.setState({
-      gameCode: e.target.value  
-    })
+      gameCode: e.target.value,
+    });
   }
-
-  
 
   render() {
     const { authenticated } = this.state;
     return (
-      <div className='page'>
-        {!authenticated ? 
+      <div className="page">
+        {!authenticated ? (
           <LoginPage />
-        : 
-          <div className='content'>
+        ) : (
+          <div className="content">
             <h3>{this.props.username || "kirby placeholder"}</h3>
-            <img className="profile-picture" src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png" alt="pfp"></img>
+            <img
+              className="profile-picture"
+              src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
+              alt="pfp"
+            ></img>
+            <NavBar
+              showCreateGame={true}
+              showHome={false}
+              logout={this.handleLogoutClick}
+              matchHistory={this.handleMatchHistoryClicked}
+              viewProfile={this.handleViewProfileClicked}
+            ></NavBar>
 
-            <div className='button-group'>
-              <Button variant="outline-danger" onClick={this.handleLogoutClick}>Logout</Button>
-              <Button variant="outline-dark" onClick={this.handleMatchHistoryClicked}>Match History</Button>{' '}
-              <Button variant="outline-dark" onClick={this.handleViewProfileClicked}>View Profile</Button>{' '}
-              <Button variant="info" onClick={this.handleCreateGameClicked}>Create Game</Button>{' '}
-            </div>
-
-            <InputGroup style={{ maxWidth: '70%', margin: '10px auto' }}>
+            <InputGroup style={{ maxWidth: "70%", margin: "10px auto" }}>
               <FormControl
                 placeholder="Enter lobby code to join a game"
                 value={this.state.gameCode}
@@ -112,20 +115,25 @@ export default class HomePage extends React.Component {
                 aria-label="Lobby Code"
               />
               <InputGroup.Append>
-                <Button variant="success" onClick={this.handleJoinGameClicked}>Join Game</Button>
+                <Button variant="success" onClick={this.handleJoinGameClicked}>
+                  Join Game
+                </Button>
               </InputGroup.Append>
             </InputGroup>
 
-            <Toast 
-              onClose={() => this.setState({showRoomNotFound: false})} 
-              show={this.state.showRoomNotFound} 
-              delay={3000} autohide
-              style={{ maxHeight: 50}}
+            <Toast
+              onClose={() => this.setState({ showRoomNotFound: false })}
+              show={this.state.showRoomNotFound}
+              delay={3000}
+              autohide
+              style={{ maxHeight: 50 }}
             >
-              <Toast.Body>Couldn't find the room you're looking for. Sorry!</Toast.Body>
+              <Toast.Body>
+                Couldn't find the room you're looking for. Sorry!
+              </Toast.Body>
             </Toast>
 
-            <Accordion className='info'>
+            <Accordion className="info">
               <Card>
                 <Card.Header>
                   <Accordion.Toggle as={Button} variant="link" eventKey="0">
@@ -134,21 +142,22 @@ export default class HomePage extends React.Component {
                 </Card.Header>
                 <Accordion.Collapse eventKey="0">
                   <Card.Body>
-                    Create a game lobby and invite your friends to play or join 
-                    an existing lobby above. Adjust the settings to your liking 
-                    and start the game. When its your turn to draw, you will have 
-                    to choose one of the three words that appear and visualize 
-                    that word in a set amount of time. The more people that get 
-                    the word right, the more points you win! When somebody else 
-                    is drawing you have to type your guess into the chat to gain 
-                    points, be quick, the earlier you guess a word the more points 
-                    you get! Tip: hints will appear above the canvas as time passes.
+                    Create a game lobby and invite your friends to play or join
+                    an existing lobby above. Adjust the settings to your liking
+                    and start the game. When its your turn to draw, you will
+                    have to choose one of the three words that appear and
+                    visualize that word in a set amount of time. The more people
+                    that get the word right, the more points you win! When
+                    somebody else is drawing you have to type your guess into
+                    the chat to gain points, be quick, the earlier you guess a
+                    word the more points you get! Tip: hints will appear above
+                    the canvas as time passes.
                   </Card.Body>
                 </Accordion.Collapse>
               </Card>
             </Accordion>
           </div>
-        }
+        )}
       </div>
     );
   }
