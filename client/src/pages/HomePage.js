@@ -21,6 +21,7 @@ export default class HomePage extends React.Component {
     this.handleGameCodeChange = this.handleGameCodeChange.bind(this);
     this.handleJoinGameClicked = this.handleJoinGameClicked.bind(this);
     this.handleLogoutClick = this.handleLogoutClick.bind(this);
+    this.handleCreateGameClicked = this.handleCreateGameClicked.bind(this);
   }
 
   componentDidMount() {
@@ -67,7 +68,26 @@ export default class HomePage extends React.Component {
   }
 
   handleCreateGameClicked() {
-    // TODO: redirect to game lobby page
+    fetch(`http://localhost:8888/lobby/create?hostId=${this.state.user.id}&hostName=${this.state.user.name}`, {
+      method: "POST",
+      // credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        // "Access-Control-Allow-Credentials": true,
+      },
+    })
+    .then((response) => {
+      if (response.status === 200) return response.json();
+      throw new Error("failed create new room");
+    })
+    .then((responseJson) => {
+      console.log(responseJson)
+      // redirect to lobby
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   }
 
   handleJoinGameClicked() {
