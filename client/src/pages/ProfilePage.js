@@ -1,14 +1,13 @@
 import React from "react";
-
 import Button from "react-bootstrap/Button";
-
 import NavBar from "../components/NavBar";
 import "../styles/ProfilePage.css";
-export default class ProfilePage extends React.Component {
+import AuthContext from "../context/AuthContext";
+class ProfilePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      userUsername: "kirby placeholder",
+      userUsername: this.props.authCreds.auth.user.name,
       userImageDisplay:
         "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png",
     };
@@ -35,9 +34,6 @@ export default class ProfilePage extends React.Component {
             className="nav"
             showCreateGame={false}
             showHome={true}
-            logout={this.handleLogoutClick}
-            matchHistory={this.handleMatchHistoryClicked}
-            viewProfile={this.handleViewProfileClicked}
           ></NavBar>
           <div className="profilecontainer">
             <div className="profile">
@@ -79,3 +75,4 @@ export default class ProfilePage extends React.Component {
     );
   }
 }
+export default AuthContext(ProfilePage);
