@@ -9,13 +9,22 @@ export default class ProfilePage extends React.Component {
     super(props);
     this.state = {
       userUsername: "kirby placeholder",
-      userImage: "",
+      userImageDisplay:
+        "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png",
     };
     this.usernameChange = this.usernameChange.bind(this);
+    this.imageSelect = this.imageSelect.bind(this);
   }
   usernameChange(event) {
     this.setState({
       userUsername: event.target.value,
+    });
+  }
+  imageSelect(event) {
+    console.log(event.target.files[0]);
+    this.setState({
+      userImageDisplay: URL.createObjectURL(event.target.files[0]),
+      userImageFile: event.target.files[0],
     });
   }
   render() {
@@ -45,11 +54,19 @@ export default class ProfilePage extends React.Component {
                 <p>Display Icon: </p>
                 <img
                   className="profile-picture"
-                  src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
+                  src={this.state.userImageDisplay}
                   alt="pfp"
                 ></img>
-                <Button>Select File</Button>
-                <input type="file" id="myFile" name="filename" />
+                <label className="fileinput">
+                  <input
+                    type="file"
+                    id="myFile"
+                    name="filename"
+                    accept="image/*"
+                    onChange={this.imageSelect}
+                  />
+                  Select File
+                </label>
               </div>
               <Button variant="success" className="savebutton">
                 Save Changes

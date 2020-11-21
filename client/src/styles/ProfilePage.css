@@ -45,12 +45,36 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-basis: 0;
 }
 .nameTitle {
   width: 20%;
 }
 .nameInput {
   width: 80%;
+}
+.profile-picture {
+  max-width: 100%;
+}
+input[type="file"] {
+  display: none;
+}
+.fileinput {
+  background-color: #008cba;
+  border: 2px solid #008cba;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 12px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+.fileinput:hover {
+  background-color: white;
+  color: black;
 }
 
 .savebutton {
