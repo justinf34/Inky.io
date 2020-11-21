@@ -1,19 +1,23 @@
 import React, { Component } from "react";
 import "./App.css";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
+import ProtectedRoute from "./Utils/ProtectedRoute";
+import ProfilePage from "./pages/ProfilePage";
 export default class App extends Component {
   render() {
     return (
       <Router>
-        <div className="App">
-          <Switch>
-            <Route path="/" exact component={HomePage} />
-            <Route path="/profile" component={ProfilePage} />
-          </Switch>
-        </div>
+        <Switch>
+          <div className="App">
+            <Route exact path="/login">
+              <LoginPage />
+            </Route>
+            <ProtectedRoute exact path="/profile" component={ProfilePage} />
+            <ProtectedRoute exact path="/" component={HomePage} />
+          </div>
+        </Switch>
       </Router>
     );
   }
