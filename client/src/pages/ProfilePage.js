@@ -31,7 +31,7 @@ class ProfilePage extends React.Component {
 
   handleSubmit() {
     fetch(
-      `http://locahost:8888/profile/change/name?userID=${this.props.authCreds.auth.user.id}&newName=${this.state.userUsername}`,
+      `http://localhost:8888/profile/change/name?userID=${this.props.authCreds.auth.user.id}&newName=${this.state.userUsername}`,
       {
         method: "POST",
         // credentials: "include",
