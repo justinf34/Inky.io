@@ -17,8 +17,13 @@ export default function () {
     socket.on("draw", onDraw);
   }
 
+  function disconnect() {
+    socket.close();
+  }
+
   return {
     draw,
     registerDraw,
+    disconnect,
   };
 }

@@ -1,11 +1,11 @@
-.page {
+.game-lobby-page {
   height: 95vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-.content {
+.game-lobby-content {
   text-align: start;
   background-color: white;
   display: flex;
@@ -14,7 +14,7 @@
   max-width: 1200px;
   height: 90%;
   max-height: 90%;
-  margin:auto;
+  margin: auto;
   padding: 30px 50px;
   border: 1px solid;
   border-radius: 10px;
@@ -36,7 +36,6 @@
   display: flex;
   flex-direction: column;
   text-align: center;
-
 }
 
 .player-pfp {
