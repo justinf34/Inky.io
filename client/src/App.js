@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./Utils/ProtectedRoute";
 import ProfilePage from "./pages/ProfilePage";
+import AdminPage from "./pages/AdminPage";
 export default class App extends Component {
   render() {
     return (
@@ -16,6 +17,7 @@ export default class App extends Component {
             </Route>
             <ProtectedRoute exact path="/profile" component={ProfilePage} />
             <ProtectedRoute exact path="/" component={HomePage} />
+            <ProtectedRoute exact path="/report" component={AdminPage} />
           </div>
         </Switch>
       </Router>
