@@ -13,12 +13,14 @@ class ProfilePage extends React.Component {
     };
     this.usernameChange = this.usernameChange.bind(this);
     this.imageSelect = this.imageSelect.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
   usernameChange(event) {
     this.setState({
       userUsername: event.target.value,
     });
   }
+
   imageSelect(event) {
     console.log(event.target.files[0]);
     this.setState({
@@ -26,6 +28,33 @@ class ProfilePage extends React.Component {
       userImageFile: event.target.files[0],
     });
   }
+
+  handleSubmit() {
+    fetch(
+      `http://locahost:8888/profile/change/name?userID=${this.props.authCreds.auth.user.id}&newName=${this.state.userUsername}`,
+      {
+        method: "POST",
+        // credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          // "Access-Control-Allow-Credentials": true,
+        },
+      }
+    )
+      .then((response) => {
+        if (response.status === 200) return response.json();
+        throw new Error("failed create new room");
+      })
+      .then((responseJson) => {
+        console.log(responseJson);
+        // redirect to lobby
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   render() {
     return (
       <div className="page">
@@ -64,7 +93,11 @@ class ProfilePage extends React.Component {
                   Select File
                 </label>
               </div>
-              <Button variant="success" className="savebutton">
+              <Button
+                variant="success"
+                className="savebutton"
+                onClick={this.handleSubmit}
+              >
                 Save Changes
               </Button>
             </div>

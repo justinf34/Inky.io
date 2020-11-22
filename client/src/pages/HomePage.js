@@ -26,6 +26,7 @@ class HomePage extends React.Component {
   }
 
   handleCreateGameClicked() {
+    console.log("hello");
     const user = this.props.authCreds.auth.user;
     fetch(
       `http://localhost:8888/lobby/create?hostId=${user.id}&hostName=${user.name}`,
@@ -79,7 +80,7 @@ class HomePage extends React.Component {
 
           <NavBar
             showCreateGame={true}
-            creatGameClick={this.handleCreateGameClicked}
+            createGameClick={this.handleCreateGameClicked}
           ></NavBar>
           <InputGroup style={{ maxWidth: "70%", margin: "10px auto" }}>
             <FormControl
