@@ -1,19 +1,37 @@
 const router = require("express").Router();
 const db = require("../config/db");
 
-router.post("/report",(req, res) =>{
+
+router.get("/", (req, res) => {
+    res.send("This is the report endpoint gateway");
+  });
+
+router.get("/report",(req, res) =>{
         const reports = db.collection("Reports").get().then(snapshot=>{
-            snapshot.forEach(doc => {
-                console.log(doc.data());
-                res.json({
-                    document: doc.doc(),
-                    player: doc.data().name,
-                    reason: doc.data().reason,
-                    date: doc.data().date,
-                    lobbyID: doc.data().lobbyID,
-                  })
+                var documents = [];
+                var players = [];
+                var reasons = [];
+                var dates = [];
+                var lobbyIDs = [];
+            snapshot.forEach(doc => { 
+                documents.push(doc.id);
+                players.push(doc.data().name);
+                reasons.push(doc.data().reason);
+                dates.push(doc.data().date.toDate());
+                lobbyIDs.push(doc.data().lobbyID);
             })
+            res.json({
+                document: documents,
+                player: players,
+                reason: reasons,
+                date: dates,
+                lobbyID: lobbyIDs,
+              })
+        }).catch((error) =>
+        res.json({
+          message: error,
         })
+      );
 })
 
 router.post("/delete",(req, res) =>{
@@ -51,3 +69,5 @@ router.post("/chatLog",(req, res) =>{
 router.post("/ban",(req, res) =>{
     
 })
+
+module.exports = router;
