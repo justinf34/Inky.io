@@ -18,7 +18,6 @@ const session = require("express-session");
 const keys = require("./config/keys");
 const cors = require("cors");
 
-const db = require("./config/db");
 const socket_handler = require("./src/socket");
 
 app.use(
@@ -30,11 +29,13 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(bodyParser.urlencoded());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 app.use(bodyParser.json());
-
 app.use(passport.initialize());
-
 app.use(passport.session());
 
 app.use(
@@ -44,10 +45,6 @@ app.use(
     credentials: true,
   })
 );
-
-app.use("/auth", authRouter);
-
-app.use("/lobby", lobbyRouter);
 
 const authCheck = (req, res, next) => {
   if (!req.user) {
@@ -69,20 +66,8 @@ app.get("/", authCheck, (req, res) => {
   });
 });
 
-app.get("/testDB", (req, res) => {
-  const users = db.collection("Users");
-  users
-    .doc("26bvYOHnhbqaEf5KMEVS")
-    .get()
-    .then((doc) => {
-      if (!doc.exists) {
-        res.send("No such user!");
-      } else {
-        console.log(doc.data());
-        res.send(doc.data());
-      }
-    });
-});
+app.use("/auth", authRouter);
+app.use("/lobby", lobbyRouter);
 
 io.on("connection", socket_handler);
 
