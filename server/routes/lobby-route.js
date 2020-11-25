@@ -36,6 +36,41 @@ module.exports = function (Manager) {
       });
   });
 
+  router.post("/join2", (req, res) => {
+    const lobbies = db.collection("Lobbies");
+    lobbies
+      .doc(req.body.id)
+      .get()
+      .then((lobby) => {
+        if (!lobby.exists) {
+          res.json({
+            success: false,
+            message: "Cannot find lobby",
+          });
+        } else {
+          const data = lobby.data();
+          if (data.state === "IN_LOBBY") {
+            res.json({
+              success: true,
+              message: "found lobby",
+              ...data,
+            });
+          } else {
+            res.json({
+              success: false,
+              message: "Cannot connect to the lobby",
+            });
+          }
+        }
+      })
+      .catch((e) => {
+        res.json({
+          success: false,
+          message: e,
+        });
+      });
+  });
+
   router.post("/join", (req, res) => {
     db.collection("Lobbies")
       .where("code", "==", req.query.lobbyCode)
