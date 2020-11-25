@@ -26,9 +26,11 @@ class Game extends Component {
     const user = this.props.authCreds.auth.user;
 
     this.state.socket.on("join", this.onJoin);
-    this.state.socket.on("player-list-update", (players_list) => {
+    this.state.socket.on("player-list-update", (lobby) => {
       this.setState({
-        players: players_list,
+        host: lobby.host.id === user.id,
+        host_info: lobby.host,
+        players: lobby.players,
       });
     });
 
