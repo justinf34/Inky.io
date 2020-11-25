@@ -47,6 +47,10 @@ class HomePage extends React.Component {
       .then((responseJson) => {
         console.log(responseJson);
         // redirect to lobby
+        const location = {
+          pathname: `/game/${responseJson.code}`,
+        };
+        this.props.history.push(location);
       })
       .catch((error) => {
         console.log(error);

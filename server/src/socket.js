@@ -13,15 +13,11 @@ module.exports = function (socket) {
 
   socket.on("disconnecting", () => {
     const rooms = Object.keys(socket.rooms);
-    console.log(`socket: client ${socket.id} disconnected from `, rooms);
+    // console.log(`socket: client ${socket.id} disconnected from `, rooms);
   });
 
   socket.on("disconnect", () => {
     console.log("socket: a client disconected...");
-  });
-
-  socket.on("disconnect", () => {
-    console.log("socket: a user disconnected");
   });
 
   socket.on("draw", (msg) => {
