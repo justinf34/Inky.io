@@ -69,12 +69,18 @@ export default class AdminPage extends React.Component {
       dates : [],
       lobbyIDs : [],
     }
-    this.handleDeleteReport = this.deleteReport.bind(this);
-    this.handleBanPlayer = this.banPlayer.bind(this);
+    this.deleteReport = this.deleteReport.bind(this);
+    this.gettingReport = this.gettingReport.bind(this);
+    this.banPlayer = this.banPlayer.bind(this);
   }
   //TODO need to get Report data from database
   
   componentDidMount() {
+    this.gettingReport();
+  }
+
+  //Fetch reports
+  gettingReport(){
     fetch(
       'http://localhost:8888/report/report',
       {
@@ -104,11 +110,12 @@ export default class AdminPage extends React.Component {
       });
   }
 
-    deleteReport(reportID){
-      console.log("test")
-      /*
+  //Delete report
+    deleteReport(documentID){
+      console.log("delete Report")
+      
       fetch(
-        `http://localhost:8888/report/delete?reportID=${reportID}`,
+        `http://localhost:8888/report/delete?documentID=${documentID}`,
         {
           method: "POST",
           // credentials: "include",
@@ -125,30 +132,70 @@ export default class AdminPage extends React.Component {
         })
         .then((responseJson) => {
           console.log(responseJson);
+          if(responseJson.success){
+            this.setState({
+              documents: responseJson.document,
+              players: responseJson.player,
+              reasons: responseJson.reason,
+              dates: responseJson.date,
+              lobbyIDs: responseJson.lobbyID,
+            })
+          }
         })
         .catch((error) => {
           console.log(error);
-        });*/
+        });
     }
 
-    banPlayer(reportID){
-      console.log("test for ban player");
-      //this.deleteReport(reportID);
+    //Ban Player
+    banPlayer(documentID){
+      console.log("ban player")
+
+      fetch(
+        `http://localhost:8888/report/ban?documentID=${documentID}`,
+        {
+          method: "POST",
+          // credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            // "Access-Control-Allow-Credentials": true,
+          },
+        }
+      )
+        .then((response) => {
+          if (response.status === 200) return response.json();
+          throw new Error("failed create new room");
+        })
+        .then((responseJson) => {
+          console.log(responseJson);
+          if(responseJson.success){
+            this.setState({
+              documents: responseJson.document,
+              players: responseJson.player,
+              reasons: responseJson.reason,
+              dates: responseJson.date,
+              lobbyIDs: responseJson.lobbyID,
+            })
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });;
     }
     
     render() {
 
     var card = [];
     var i;
-    for (i = 0 ; i < 2 ; i++){
+    for (i = 0 ; i < this.state.documents.length ; i++){
       const date = new Date(this.state.dates[i]);
       card.push(<Card>
                 <div>
                   <div className = "myContainer">
                     <div className = 'PlayerName'> {"Player: "}{this.state.players[i]}</div>
-                    <div className = 'Date'> {"Date: "}{date.getFullYear()}/{date.getMonth()}/{date.getDate()}</div>
-                    <div className = 'Reason'> {"Reason: "}{this.state.reasons[i]}</div>
-                    
+                    <div className = 'Date'> {"Date: "}{date.getFullYear()}/{date.getMonth()+1}/{date.getDate()}</div>
+                    <div className = 'Reason'> {"Reason: "}{this.state.reasons[i]}</div>                    
                   </div>
                   <div className='button-group'>
                     <Overlay option = "delete" Title = "Delete Report" Body = "Are you sure that you wanna delete the report?" actionforyes = {this.deleteReport} actionforno = {()=>{}} documentID = {this.state.documents[i]}/>
