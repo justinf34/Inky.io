@@ -26,6 +26,11 @@ class Game extends Component {
     const user = this.props.authCreds.auth.user;
 
     this.state.socket.on("join", this.onJoin);
+    this.state.socket.on("player-list-update", (players_list) => {
+      this.setState({
+        players: players_list,
+      });
+    });
 
     this.state.socket.emit("join", {
       lobby_id: lobby_id,
@@ -59,7 +64,9 @@ class Game extends Component {
   pageManager() {
     // add spinner for connecting loading
     if (this.state.state === "IN_LOBBY")
-      return <GameLobbyPage host={this.state.host} />;
+      return (
+        <GameLobbyPage isHost={this.state.host} players={this.state.players} />
+      );
     if (this.state.state === "DISCONNECTED") return <Redirect to={"/"} />;
   }
 

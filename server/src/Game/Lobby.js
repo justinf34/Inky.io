@@ -39,13 +39,16 @@ class Lobby {
 
     // Handle the case when the user is the host
     if (user_id.id == this.host.id) {
+      console.log("Changing host....");
       this.hostChange();
     }
     return user_id;
   }
 
   hostChange() {
-    const next_host = this.players.values().next().value;
+    const next_hostId = this.connected_players.values().next().value;
+    const next_host = this.players.get(next_hostId);
+    console.log(`New host id: ${next_host}`);
     this.host = {
       id: next_host.id,
       name: next_host.name,

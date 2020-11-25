@@ -9,7 +9,7 @@ module.exports = function (Manager) {
       if (res.success) {
         socket.join(lobby_id);
         socket.emit("join", res);
-        socket.to(lobby_id).emit("player-join", res.lobby.players);
+        socket.to(lobby_id).emit("player-list-update", res.lobby.players);
       } else {
         socket.emit("join", { success: false });
       }
@@ -23,7 +23,7 @@ module.exports = function (Manager) {
       if (res.success) {
         socket.leave(room_id);
         socket.send("leave", { success: true });
-        socket.to(lobby_id).emit("player-left", res.lobby.players);
+        socket.to(lobby_id).emit("player-list-update", res.lobby.players);
       } else {
         socket.emit("leave");
       }
@@ -35,7 +35,7 @@ module.exports = function (Manager) {
 
       if (rooms.length == 2) {
         const res = await Manager.leaveRoom(socket.id, rooms[1]);
-        socket.to(rooms[1]).emit("player-left", res.lobby.players);
+        socket.to(rooms[1]).emit("player-list-update", res.lobby.players);
       }
     });
 

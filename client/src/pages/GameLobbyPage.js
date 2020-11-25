@@ -32,7 +32,6 @@ class GameLobbyPage extends React.Component {
         215,
         230,
       ],
-      players: [{ username: "abc" }],
       roomLinkValue: "hover to see lobby link",
     };
     this.handleNumRoundsChange = this.handleNumRoundsChange.bind(this);
@@ -129,6 +128,8 @@ class GameLobbyPage extends React.Component {
                 </Form.File>
                 <Form.Control
                   as="textarea"
+                  disabled={!this.props.isHost}
+                  readOnly={!this.props.isHost}
                   placeholder="Leave blank to use default words. Separate words with commas. Min 3 words"
                   value={this.state.customWords}
                   onChange={this.handleCustomWordChange}
@@ -151,7 +152,7 @@ class GameLobbyPage extends React.Component {
                   }}
                 />
                 <InputGroup.Append>
-                  <Button variant="info" onClick={this.handleCopyClicked}>
+                  <Button dvariant="info" onClick={this.handleCopyClicked}>
                     Copy
                   </Button>
                 </InputGroup.Append>
@@ -162,7 +163,10 @@ class GameLobbyPage extends React.Component {
             <h3 style={{ textAlign: "center", paddingBottom: "1em" }}>
               Players
             </h3>
-            {this.state.players.map((player, index) => {
+            {this.props.players.map((player, index) => {
+              if (player.disconnected) {
+                return "";
+              }
               return (
                 <div key={index} className="player-container">
                   <img
@@ -170,7 +174,7 @@ class GameLobbyPage extends React.Component {
                     src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
                     alt="pfp"
                   ></img>
-                  <div>{player.username}</div>
+                  <div>{player.name}</div>
                 </div>
               );
             })}
