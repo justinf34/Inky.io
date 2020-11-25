@@ -1,3 +1,5 @@
+const { settings } = require("../config/db");
+
 module.exports = function (Manager) {
   return function (socket) {
     console.log("socket: a client connected...");
@@ -41,6 +43,11 @@ module.exports = function (Manager) {
 
     socket.on("disconnect", () => {
       console.log("socket: a client disconected...");
+    });
+
+    socket.on("setting-change", (lobby_id, setting) => {
+      Manager.changeLobbySetting(lobby_id, setting); // Handle it with the manager
+      socket.to(lobby_id).emit("setting-change", setting); // Send it to other clients
     });
 
     socket.on("draw", (msg) => {

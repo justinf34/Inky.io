@@ -25,7 +25,10 @@ class Game extends Component {
     const lobby_id = this.props.match.params.lobbyID;
     const user = this.props.authCreds.auth.user;
 
+    // Listen to socket response to join request
     this.state.socket.on("join", this.onJoin);
+
+    // Listen to player list updates
     this.state.socket.on("player-list-update", (lobby) => {
       this.setState({
         host: lobby.host.id === user.id,
@@ -34,6 +37,7 @@ class Game extends Component {
       });
     });
 
+    // Join socket room
     this.state.socket.emit("join", {
       lobby_id: lobby_id,
       player: {
@@ -67,7 +71,12 @@ class Game extends Component {
     // add spinner for connecting loading
     if (this.state.state === "IN_LOBBY")
       return (
-        <GameLobbyPage isHost={this.state.host} players={this.state.players} />
+        <GameLobbyPage
+          socket={this.state.socket}
+          isHost={this.state.host}
+          players={this.state.players}
+          settings={this.state.settings}
+        />
       );
     if (this.state.state === "DISCONNECTED") return <Redirect to={"/"} />;
   }

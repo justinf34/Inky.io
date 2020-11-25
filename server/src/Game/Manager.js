@@ -16,16 +16,17 @@ module.exports = function () {
   }
 
   function joinRoom(socket_id, lobby_id, player_info) {
-    // Manager list
     const lobby = Lobbies.get(lobby_id);
     if (lobby) {
       lobby.joinPlayer(player_info, socket_id);
 
+      //TODO: add the player in the lobby record in db
       return {
         success: true,
         lobby: lobby.getLobbyStatus(),
       };
     }
+
     return {
       success: false,
     };
@@ -41,6 +42,7 @@ module.exports = function () {
     }
 
     const host_res = await lobbies.update({ hostId: lobby.host.id });
+    //TODO: update the player in the lobby record in db
 
     return {
       success: true,
@@ -48,9 +50,15 @@ module.exports = function () {
     };
   }
 
+  function changeLobbySetting(lobby_id, setting) {
+    const lobby = Lobbies.get(lobby_id);
+    lobby.changeSetting(setting);
+  }
+
   return {
     createNewRoom,
     joinRoom,
     leaveRoom,
+    changeLobbySetting,
   };
 };

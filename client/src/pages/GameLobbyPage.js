@@ -1,18 +1,17 @@
 import React from "react";
 import "../styles/GameLobbyPage.css";
-import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
+import { Form, InputGroup, Col, Button } from "react-bootstrap";
+
+import { withRouter } from "react-router-dom";
 
 //takes in prop isHost: bool
 class GameLobbyPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      numRounds: 3,
-      drawingTime: 100,
-      customWords: [],
+      numRounds: this.props.settings.rounds,
+      drawingTime: this.props.settings.draw_time,
+      customWords: [], //TODO: Need handle this in the backend
       roomLink: "placeholder",
       numRoundsOptions: [2, 3, 4, 5, 6, 7, 8, 9, 10],
       drawingTimeOptions: [
@@ -41,16 +40,39 @@ class GameLobbyPage extends React.Component {
   }
 
   componentDidMount() {
-    // TODO: get game from db or create instance of game in db with user as host if not game not found?
+    // Listen to changes in game settings
+    this.props.socket.on("setting-change", (setting) => {
+      this.setState({
+        numRounds: setting.rounds,
+        drawingTime: setting.draw_time,
+      });
+    });
+  }
+
+  componentWillUnmount() {
+    // unsubscribe to setting change subscription
+    this.props.socket.off("setting-change");
   }
 
   handleNumRoundsChange(e) {
+    const { match } = this.props;
+    this.props.socket.emit("setting-change", match.params.lobbyID, {
+      rounds: e.target.value,
+      draw_time: this.state.drawingTime,
+    });
+
     this.setState({
       numRounds: e.target.value,
     });
   }
 
   handleDrawingTimeChange(e) {
+    const { match } = this.props;
+    this.props.socket.emit("setting-change", match.params.lobbyID, {
+      rounds: this.state.numRounds,
+      draw_time: e.target.value,
+    });
+
     this.setState({
       drawingTime: e.target.value,
     });
@@ -185,4 +207,4 @@ class GameLobbyPage extends React.Component {
   }
 }
 
-export default GameLobbyPage;
+export default withRouter(GameLobbyPage);
