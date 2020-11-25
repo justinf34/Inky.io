@@ -6,7 +6,7 @@ import colors from "./colors";
 import ColorBox from "./ColorBox";
 import { Button } from "react-bootstrap";
 
-import socket from "../../Utils/socket";
+// import socket from "../../Utils/socket";
 
 export default class Canvas extends Component {
   constructor(props) {
