@@ -18,6 +18,7 @@ const session = require("express-session");
 const keys = require("./config/keys");
 const cors = require("cors");
 
+const LobbyManager = require("./src/Game/Manager")();
 const socket_handler = require("./src/socket");
 
 app.use(
@@ -67,9 +68,9 @@ app.get("/", authCheck, (req, res) => {
 });
 
 app.use("/auth", authRouter);
-app.use("/lobby", lobbyRouter);
+app.use("/lobby", lobbyRouter(LobbyManager));
 
-io.on("connection", socket_handler);
+io.on("connection", socket_handler(LobbyManager));
 
 let port = process.env.PORT || 8888;
 http.listen(port, (err) => {

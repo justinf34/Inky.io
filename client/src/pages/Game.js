@@ -3,38 +3,68 @@ import GameLobbyPage from "./GameLobbyPage";
 
 import { Redirect, withRouter } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
-import socket from "../Utils/socket";
+import io from "socket.io-client";
 
 class Game extends Component {
   constructor(props) {
     super(props);
 
-    // this.socket = socket();
-
     this.state = {
       host: false,
+      socket: io("http://localhost:8888"),
     };
+
+    this.onJoin = this.onJoin.bind(this);
   }
 
   componentDidMount() {
-    // get query params for the lobby id
-    // find the lobby in the db,
-    // subscribe to socket room
+    this.state.socket.once("connect", (data) => {
+      console.log("Connected to the server socket...");
+    });
+
+    const lobby_id = this.props.match.params.lobbyID;
+    const user = this.props.authCreds.auth.user;
+
+    this.state.socket.on("join", this.onJoin);
+
+    this.state.socket.emit("join", {
+      lobby_id: lobby_id,
+      player: {
+        id: user.id,
+        name: user.name,
+      },
+    });
   }
 
   componentWillUnmount() {
-    // this.socket.disconnect();
+    this.state.socket.disconnect();
+  }
+
+  onJoin(res) {
+    console.log(res);
+    const user = this.props.authCreds.auth.user;
+    if (res.success) {
+      this.setState({
+        host: res.lobby.host.id === user.id,
+        host_info: res.lobby.host,
+        settings: res.lobby.settings,
+        players: res.lobby.players,
+        state: res.lobby.state,
+      });
+    } else {
+      this.props.history.push("/");
+    }
   }
 
   pageManager() {
     // add spinner for connecting loading
-    if (this.state.game_state === "IN_LOBBY") return <GameLobbyPage />;
-    if (this.state.game_state === "DISCONNECTED") return <Redirect to={"/"} />;
+    if (this.state.state === "IN_LOBBY")
+      return <GameLobbyPage host={this.state.host} />;
+    if (this.state.state === "DISCONNECTED") return <Redirect to={"/"} />;
   }
 
   render() {
     const { match, location, history } = this.props;
-    console.log(match);
     return <React.Fragment>{this.pageManager()}</React.Fragment>;
   }
 }

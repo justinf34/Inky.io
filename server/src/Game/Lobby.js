@@ -2,38 +2,46 @@ class Lobby {
   constructor(id, host) {
     this.id = id;
     this.host = host; // Should be an object {id, name}
-    this.players = new Map(); // Keep track of the players(key = id, value = {socket_id, name, score})
+    this.state = "IN_LOBBY";
 
-    this.max_round = null; // Number of rounds in the game
+    this.players = new Map(); // Keep track of the players(key = id, value = {socket_id, name, score})
+    this.connected_players = new Map(); // key = socket id, value = player id
+
+    this.rounds = 0; // Number of rounds in the game
     this.curr_round = null; // Current round in the game
+
+    this.drawing_time = 100;
     this.timer = null; // Timer for the game
+
+    this.word_list = []; // TODO: Set a default when user does not input a lot
     this.word = null; // Current word
+
     this.drawer = null; //Current drawer of the game
   }
 
   joinPlayer(player_info, socket_id) {
-    // Add player to the player list
     this.players.set(player_info.id, {
       id: player_info.id,
-      socket_id: socket_id,
       name: player_info.name,
+      disconnected: false,
       score: 0,
     });
 
-    //TODO:
-    //  - Need to send a socket event that a new player joined
-    //  - Tell player of successful join
+    this.connected_players.set(socket_id, player_info.id);
   }
 
-  leavePlayer(player_info) {
-    // Remove the player from player list
-    this.players.delete(player_info.id);
+  leavePlayer(socket_id) {
+    const user_id = this.connected_players.get(socket_id);
+    this.players.get(user_id).disconnected = true;
+    this.connected_players.delete(socket_id);
 
-    if (player_info.id == this.host.id) {
-      this.hostChange(); // Handle the case when the user is the host
-    } else {
-      // TODO: send socket event that player left the lobby
+    if (this.connected_players.size === 0) return false; // Check if it is the last player
+
+    // Handle the case when the user is the host
+    if (user_id.id == this.host.id) {
+      this.hostChange();
     }
+    return user_id;
   }
 
   hostChange() {
@@ -42,6 +50,20 @@ class Lobby {
       id: next_host.id,
       name: next_host.name,
     };
-    //TODO: new there is a new host
+  }
+
+  getLobbyStatus() {
+    return {
+      state: this.state,
+      host: { id: this.host.id, name: this.host.name },
+      settings: {
+        rounds: this.rounds,
+        draw_time: this.drawing_time,
+        word_list: this.word_list,
+      },
+      players: Array.from(this.players.values()),
+    };
   }
 }
+
+module.exports = Lobby;
