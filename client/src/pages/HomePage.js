@@ -8,6 +8,7 @@ import {
   Toast,
   Button,
 } from "react-bootstrap";
+import NavBar from "../components/NavBar";
 
 import AuthContext from "../context/AuthContext";
 
@@ -34,6 +35,7 @@ class HomePage extends React.Component {
   }
 
   handleCreateGameClicked() {
+    console.log("hello");
     const user = this.props.authCreds.auth.user;
     fetch(
       `http://localhost:8888/lobby/create?hostId=${user.id}&hostName=${user.name}`,
@@ -114,30 +116,10 @@ class HomePage extends React.Component {
             alt="pfp"
           ></img>
 
-          <div className="button-group">
-            <Button
-              variant="outline-danger"
-              onClick={this.props.authCreds.logout}
-            >
-              Logout
-            </Button>
-            <Button
-              variant="outline-dark"
-              onClick={this.handleMatchHistoryClicked}
-            >
-              Match History
-            </Button>{" "}
-            <Button
-              variant="outline-dark"
-              onClick={this.handleViewProfileClicked}
-            >
-              View Profile
-            </Button>{" "}
-            <Button variant="info" onClick={this.handleCreateGameClicked}>
-              Create Game
-            </Button>{" "}
-          </div>
-
+          <NavBar
+            showCreateGame={true}
+            createGameClick={this.handleCreateGameClicked}
+          ></NavBar>
           <InputGroup style={{ maxWidth: "70%", margin: "10px auto" }}>
             <FormControl
               placeholder="Enter lobby code to join a game"

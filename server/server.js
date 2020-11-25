@@ -13,6 +13,8 @@ const passport = require("passport");
 const passportSetup = require("./config/passport");
 const authRouter = require("./routes/auth-route");
 const lobbyRouter = require("./routes/lobby-route");
+const profileRouter = require("./routes/profile-route");
+const reportRouter = require("./routes/report-route");
 const session = require("express-session");
 
 const keys = require("./config/keys");
@@ -69,6 +71,8 @@ app.get("/", authCheck, (req, res) => {
 
 app.use("/auth", authRouter);
 app.use("/lobby", lobbyRouter(LobbyManager));
+app.use("/profile", profileRouter);
+app.use("/report", reportRouter);
 
 io.on("connection", socket_handler(LobbyManager));
 
