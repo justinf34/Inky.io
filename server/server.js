@@ -13,6 +13,8 @@ const passport = require("passport");
 const passportSetup = require("./config/passport");
 const authRouter = require("./routes/auth-route");
 const lobbyRouter = require("./routes/lobby-route");
+const profileRouter = require("./routes/profile-route");
+const reportRouter = require("./routes/report-route")
 const session = require("express-session");
 
 const keys = require("./config/keys");
@@ -46,8 +48,9 @@ app.use(
 );
 
 app.use("/auth", authRouter);
-
 app.use("/lobby", lobbyRouter);
+app.use("/profile", profileRouter);
+app.use("/report", reportRouter);
 
 const authCheck = (req, res, next) => {
   if (!req.user) {
