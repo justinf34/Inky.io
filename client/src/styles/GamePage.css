@@ -1,0 +1,21 @@
+.game-page {
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.game-content {
+  text-align: start;
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+  width: 90%;
+  max-width: 1200px;
+  height: 90%;
+  max-height: 90%;
+  margin: auto;
+  padding: 30px 50px;
+  border: 1px solid;
+  border-radius: 10px;
+}

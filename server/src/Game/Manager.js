@@ -55,10 +55,27 @@ module.exports = function () {
     lobby.changeSetting(setting);
   }
 
+  async function changeLobbyState(lobby_id, state) {
+    // Update the DB
+    try {
+      const lobbies = db.collection("Lobbies").doc(lobby_id);
+      const state_res = await lobbies.update({ state: state });
+
+      lobby = Lobbies.get(lobby_id);
+      //TODO: should probably use a function in Lobby class
+      lobby.state = state;
+
+      return { success: true };
+    } catch (error) {
+      return { success: false, message: error };
+    }
+  }
+
   return {
     createNewRoom,
     joinRoom,
     leaveRoom,
     changeLobbySetting,
+    changeLobbyState,
   };
 };

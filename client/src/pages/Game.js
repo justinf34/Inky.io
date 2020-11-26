@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import GameLobbyPage from "./GameLobbyPage";
+import GamePage from "./GamePage";
 
 import { Redirect, withRouter } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
@@ -45,6 +46,13 @@ class Game extends Component {
         name: user.name,
       },
     });
+
+    this.state.socket.on("state-change", (new_state) => {
+      console.log(`NEW STATE!!!!! ${new_state}`);
+      this.setState({
+        state: new_state,
+      });
+    });
   }
 
   componentWillUnmount() {
@@ -78,11 +86,14 @@ class Game extends Component {
           settings={this.state.settings}
         />
       );
+
+    if (this.state.state === "IN_GAME")
+      return <GamePage socket={this.state.socket} />;
+
     if (this.state.state === "DISCONNECTED") return <Redirect to={"/"} />;
   }
 
   render() {
-    const { match, location, history } = this.props;
     return <React.Fragment>{this.pageManager()}</React.Fragment>;
   }
 }

@@ -74,7 +74,7 @@ app.use("/lobby", lobbyRouter(LobbyManager));
 app.use("/profile", profileRouter);
 app.use("/report", reportRouter);
 
-io.on("connection", socket_handler(LobbyManager));
+io.on("connection", socket_handler(LobbyManager, io));
 
 let port = process.env.PORT || 8888;
 http.listen(port, (err) => {

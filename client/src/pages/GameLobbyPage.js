@@ -12,7 +12,7 @@ class GameLobbyPage extends React.Component {
       numRounds: this.props.settings.rounds,
       drawingTime: this.props.settings.draw_time,
       customWords: [], //TODO: Need handle this in the backend
-      roomLink: "placeholder",
+      roomLink: this.props.match.params.lobbyID,
       numRoundsOptions: [2, 3, 4, 5, 6, 7, 8, 9, 10],
       drawingTimeOptions: [
         30,
@@ -37,6 +37,7 @@ class GameLobbyPage extends React.Component {
     this.handleDrawingTimeChange = this.handleDrawingTimeChange.bind(this);
     this.handleCustomWordChange = this.handleCustomWordChange.bind(this);
     this.handleCopyClicked = this.handleCopyClicked.bind(this);
+    this.startGame = this.startGame.bind(this);
   }
 
   componentDidMount() {
@@ -89,10 +90,23 @@ class GameLobbyPage extends React.Component {
     navigator.clipboard.writeText(this.state.roomLink);
   }
 
+  startGame() {
+    const { match } = this.props;
+    this.props.socket.emit("start-game", match.params.lobbyID);
+  }
+
   renderSelectOptions(options) {
     return options.map((value, index) => {
       return <option key={index}>{value}</option>;
     });
+  }
+
+  countPlayers() {
+    let count = 0;
+    this.props.players.forEach((player) => {
+      if (!player.disconnected) count++;
+    });
+    return count;
   }
 
   render() {
@@ -180,6 +194,14 @@ class GameLobbyPage extends React.Component {
                 </InputGroup.Append>
               </InputGroup>
             </Form>
+            <Button
+              className="start-game-btn"
+              // disabled={this.countPlayers() < 2}
+              disabled={!this.props.isHost}
+              onClick={this.startGame}
+            >
+              Start
+            </Button>
           </div>
           <div className="players">
             <h3 style={{ textAlign: "center", paddingBottom: "1em" }}>

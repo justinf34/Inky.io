@@ -1,6 +1,6 @@
 const { settings } = require("../config/db");
 
-module.exports = function (Manager) {
+module.exports = function (Manager, io) {
   return function (socket) {
     console.log("socket: a client connected...");
 
@@ -50,9 +50,17 @@ module.exports = function (Manager) {
       socket.to(lobby_id).emit("setting-change", setting); // Send it to other clients
     });
 
-    socket.on("draw", (msg) => {
-      console.log("draw: ", msg);
-      socket.broadcast.emit("draw", msg);
+    socket.on("start-game", (lobby_id) => {
+      console.log(lobby_id);
+      Manager.changeLobbyState(lobby_id, "IN_GAME").then(() => {
+        io.to(lobby_id).emit("state-change", "IN_GAME");
+      });
+    });
+
+    socket.on("draw", (lobby_id, msg) => {
+      // console.log("draw: ", msg);
+      // TODO: save the strokes
+      socket.to(lobby_id).emit("draw", msg);
     });
   };
 };
