@@ -1,4 +1,6 @@
-module.exports = function (Manager) {
+const { settings } = require("../config/db");
+
+module.exports = function (Manager, io) {
   return function (socket) {
     console.log("socket: a client connected...");
 
@@ -9,7 +11,7 @@ module.exports = function (Manager) {
       if (res.success) {
         socket.join(lobby_id);
         socket.emit("join", res);
-        socket.to(lobby_id).emit("player-list-update", res.lobby.players);
+        socket.to(lobby_id).emit("player-list-update", res.lobby);
       } else {
         socket.emit("join", { success: false });
       }
@@ -23,7 +25,7 @@ module.exports = function (Manager) {
       if (res.success) {
         socket.leave(room_id);
         socket.send("leave", { success: true });
-        socket.to(lobby_id).emit("player-list-update", res.lobby.players);
+        socket.to(lobby_id).emit("player-list-update", res.lobby);
       } else {
         socket.emit("leave");
       }
@@ -35,7 +37,7 @@ module.exports = function (Manager) {
 
       if (rooms.length == 2) {
         const res = await Manager.leaveRoom(socket.id, rooms[1]);
-        socket.to(rooms[1]).emit("player-list-update", res.lobby.players);
+        socket.to(rooms[1]).emit("player-list-update", res.lobby);
       }
     });
 
@@ -43,9 +45,22 @@ module.exports = function (Manager) {
       console.log("socket: a client disconected...");
     });
 
-    socket.on("draw", (msg) => {
-      console.log("draw: ", msg);
-      socket.broadcast.emit("draw", msg);
+    socket.on("setting-change", (lobby_id, setting) => {
+      Manager.changeLobbySetting(lobby_id, setting); // Handle it with the manager
+      socket.to(lobby_id).emit("setting-change", setting); // Send it to other clients
+    });
+
+    socket.on("start-game", (lobby_id) => {
+      console.log(lobby_id);
+      Manager.changeLobbyState(lobby_id, "IN_GAME").then(() => {
+        io.to(lobby_id).emit("state-change", "IN_GAME");
+      });
+    });
+
+    socket.on("draw", (lobby_id, msg) => {
+      // console.log("draw: ", msg);
+      // TODO: save the strokes
+      socket.to(lobby_id).emit("draw", msg);
     });
 
     socket.on("chat", (player, lobby_id, msg) {

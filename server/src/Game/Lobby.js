@@ -7,7 +7,7 @@ class Lobby {
     this.players = new Map(); // Keep track of the players(key = id, value = {socket_id, name, score})
     this.connected_players = new Map(); // key = socket id, value = player id
 
-    this.rounds = 0; // Number of rounds in the game
+    this.rounds = 3; // Number of rounds in the game
     this.curr_round = null; // Current round in the game
 
     this.drawing_time = 100;
@@ -35,10 +35,14 @@ class Lobby {
     this.players.get(user_id).disconnected = true;
     this.connected_players.delete(socket_id);
 
-    if (this.connected_players.size === 0) return false; // Check if it is the last player
+    if (this.connected_players.size === 0) {
+      // Check if it is the last player
+      this.state = "DISCONNECTED";
+      return false;
+    }
 
     // Handle the case when the user is the host
-    if (user_id.id == this.host.id) {
+    if (user_id == this.host.id) {
       console.log("Changing host....");
       this.hostChange();
     }
@@ -66,6 +70,11 @@ class Lobby {
       },
       players: Array.from(this.players.values()),
     };
+  }
+
+  changeSetting(setting) {
+    this.rounds = setting.rounds;
+    this.drawing_time = setting.draw_time;
   }
 }
 
