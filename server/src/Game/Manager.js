@@ -16,16 +16,17 @@ module.exports = function () {
   }
 
   function joinRoom(socket_id, lobby_id, player_info) {
-    // Manager list
     const lobby = Lobbies.get(lobby_id);
     if (lobby) {
       lobby.joinPlayer(player_info, socket_id);
 
+      //TODO: add the player in the lobby record in db
       return {
         success: true,
         lobby: lobby.getLobbyStatus(),
       };
     }
+
     return {
       success: false,
     };
@@ -41,6 +42,7 @@ module.exports = function () {
     }
 
     const host_res = await lobbies.update({ hostId: lobby.host.id });
+    //TODO: update the player in the lobby record in db
 
     return {
       success: true,
@@ -48,9 +50,32 @@ module.exports = function () {
     };
   }
 
+  function changeLobbySetting(lobby_id, setting) {
+    const lobby = Lobbies.get(lobby_id);
+    lobby.changeSetting(setting);
+  }
+
+  async function changeLobbyState(lobby_id, state) {
+    // Update the DB
+    try {
+      const lobbies = db.collection("Lobbies").doc(lobby_id);
+      const state_res = await lobbies.update({ state: state });
+
+      lobby = Lobbies.get(lobby_id);
+      //TODO: should probably use a function in Lobby class
+      lobby.state = state;
+
+      return { success: true };
+    } catch (error) {
+      return { success: false, message: error };
+    }
+  }
+
   return {
     createNewRoom,
     joinRoom,
     leaveRoom,
+    changeLobbySetting,
+    changeLobbyState,
   };
 };

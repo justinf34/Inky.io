@@ -11,7 +11,7 @@ export default function ColorBox(props) {
       onClick={onClick}
       style={{ backgroundColor: props.colorVal }}
     >
-      <div className="content">
+      <div className="col-content">
         <span>{""}</span>
       </div>
     </div>

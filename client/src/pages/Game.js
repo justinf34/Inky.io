@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import GameLobbyPage from "./GameLobbyPage";
+import GamePage from "./GamePage";
 
 import { Redirect, withRouter } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
@@ -25,19 +26,32 @@ class Game extends Component {
     const lobby_id = this.props.match.params.lobbyID;
     const user = this.props.authCreds.auth.user;
 
+    // Listen to socket response to join request
     this.state.socket.on("join", this.onJoin);
-    this.state.socket.on("player-list-update", (players_list) => {
+
+    // Listen to player list updates
+    this.state.socket.on("player-list-update", (lobby) => {
       this.setState({
-        players: players_list,
+        host: lobby.host.id === user.id,
+        host_info: lobby.host,
+        players: lobby.players,
       });
     });
 
+    // Join socket room
     this.state.socket.emit("join", {
       lobby_id: lobby_id,
       player: {
         id: user.id,
         name: user.name,
       },
+    });
+
+    this.state.socket.on("state-change", (new_state) => {
+      console.log(`NEW STATE!!!!! ${new_state}`);
+      this.setState({
+        state: new_state,
+      });
     });
   }
 
@@ -65,13 +79,21 @@ class Game extends Component {
     // add spinner for connecting loading
     if (this.state.state === "IN_LOBBY")
       return (
-        <GameLobbyPage isHost={this.state.host} players={this.state.players} />
+        <GameLobbyPage
+          socket={this.state.socket}
+          isHost={this.state.host}
+          players={this.state.players}
+          settings={this.state.settings}
+        />
       );
+
+    if (this.state.state === "IN_GAME")
+      return <GamePage socket={this.state.socket} />;
+
     if (this.state.state === "DISCONNECTED") return <Redirect to={"/"} />;
   }
 
   render() {
-    const { match, location, history } = this.props;
     return <React.Fragment>{this.pageManager()}</React.Fragment>;
   }
 }
