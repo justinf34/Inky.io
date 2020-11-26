@@ -21,8 +21,17 @@ class HomePage extends React.Component {
     };
     this.handleGameCodeChange = this.handleGameCodeChange.bind(this);
     this.handleJoinGameClicked = this.handleJoinGameClicked.bind(this);
-
     this.handleCreateGameClicked = this.handleCreateGameClicked.bind(this);
+  }
+
+  componentDidMount() {}
+
+  handleMatchHistoryClicked() {
+    // TODO: redirect to match history page
+  }
+
+  handleViewProfileClicked() {
+    // TODO: redirect to profile page
   }
 
   handleCreateGameClicked() {
@@ -47,6 +56,10 @@ class HomePage extends React.Component {
       .then((responseJson) => {
         console.log(responseJson);
         // redirect to lobby
+        const location = {
+          pathname: `/game/${responseJson.code}`,
+        };
+        this.props.history.push(location);
       })
       .catch((error) => {
         console.log(error);
@@ -55,10 +68,35 @@ class HomePage extends React.Component {
 
   handleJoinGameClicked() {
     if (this.state.gameCode === "") return;
-    // TODO: if game exists, redirect them to game else do below
-    this.setState({
-      showRoomNotFound: true,
-    });
+    fetch(`http://localhost:8888/lobby/join2`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: this.state.gameCode }),
+    })
+      .then((res) => {
+        if (res.status === 200) return res.json();
+        throw new Error("failed fetching room info");
+      })
+      .then((res_json) => {
+        if (res_json.success) {
+          const location = {
+            pathname: `/game/${res_json.code}`,
+          };
+          this.props.history.push(location);
+        } else {
+          //TODO: show error message
+          this.setState({
+            showRoomNotFound: true,
+            gameCode: "",
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   handleGameCodeChange(e) {

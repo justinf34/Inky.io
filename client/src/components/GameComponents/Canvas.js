@@ -6,14 +6,13 @@ import colors from "./colors";
 import ColorBox from "./ColorBox";
 import { Button } from "react-bootstrap";
 
-import socket from "../../Utils/socket";
+import { withRouter } from "react-router-dom";
 
-export default class Canvas extends Component {
+class Canvas extends Component {
   constructor(props) {
     super(props);
 
     this.myRef = React.createRef();
-    this.socket = socket();
 
     this.state = {
       color: "#000000",
@@ -45,7 +44,9 @@ export default class Canvas extends Component {
         color: this.state.color,
         weight: this.state.weight,
       };
-      this.socket.draw(msg);
+
+      const { match } = this.props;
+      this.props.socket.emit("draw", match.params.lobbyID, msg);
 
       sketch.strokeWeight(this.state.weight);
       sketch.stroke(this.state.color);
@@ -111,14 +112,15 @@ export default class Canvas extends Component {
   }
 
   clearCanvas() {
+    const { match } = this.props;
     const msg = { type: 1 };
-    this.socket.draw(msg);
+    this.props.socket.emit("draw", match.params.lobbyID, msg);
     this.sketch.background("#ffffff");
   }
 
   componentDidMount() {
     this.myP5 = new p5(this.Sketch, this.myRef.current);
-    this.socket.registerDraw(this.sketch.onNewDrawing);
+    this.props.socket.on("draw", this.sketch.onNewDrawing);
   }
 
   render() {
@@ -137,3 +139,5 @@ export default class Canvas extends Component {
     );
   }
 }
+
+export default withRouter(Canvas);

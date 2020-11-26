@@ -2,10 +2,10 @@ import React from "react";
 import Canvas from "./Canvas";
 import "./Canvas.css";
 
-export default function CanvasContainer() {
+export default function CanvasContainer(props) {
   return (
     <div className="canvas-container">
-      <Canvas />
+      <Canvas socket={props.socket} />
     </div>
   );
 }
