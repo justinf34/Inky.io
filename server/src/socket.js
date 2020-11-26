@@ -47,5 +47,10 @@ module.exports = function (Manager) {
       console.log("draw: ", msg);
       socket.broadcast.emit("draw", msg);
     });
+
+    socket.on("chat", (player, lobby_id, msg) {
+      console.log(`${player.id} posted ${msg} to lobby ${lobby_id}`);
+      
+    }
   };
 };
