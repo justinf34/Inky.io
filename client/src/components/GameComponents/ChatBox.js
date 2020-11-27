@@ -12,27 +12,9 @@ export default class ChatBox extends Component {
     this.state = {
       currentMessage: '',
       messageLog : [
-        {
-          user: {
-            name:'alice',
-            avatar: ''
-          },
-          content: 'hi'
-        },
-        {
-          user: {
-            name:'alice',
-            avatar: ''
-          },
-          content: 'how\'s it going?'
-        },
-        {
-          user: {
-            name:'bob',
-            avatar: ''
-          },
-          content: 'hi pretty good'
-        }
+        { name: 'bob', content: 'hi' },
+        { name: 'charlie', content: 'foo' },
+        { name: 'alice', content: 'bar' },
       ]
     }
     this.handleChange = this.handleChange.bind(this);
@@ -45,7 +27,16 @@ export default class ChatBox extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    this.props.socket.emit("chat", this.props.lobbyID, event.target.value);
+    this.props.socket.emit("chat", this.props.lobbyID, this.state.currentMessage);
+    this.setState({currentMessage: ''})
+  }
+
+  componentDidMount() {
+    this.props.socket.on("chat", (name, msg) => {
+      this.setState({
+        messageLog: [...this.state.messageLog, {'name': name, 'content': msg}]
+      })
+    });
   }
 
   render() {
@@ -59,7 +50,7 @@ export default class ChatBox extends Component {
         </Card.Body>
         <Card.Footer>
           <Form onSubmit={this.handleSubmit}>
-            <Form.Control type="input" onChange={this.handleChange}></Form.Control>
+            <Form.Control type="input" onChange={this.handleChange} value={this.state.currentMessage}></Form.Control>
           </Form>
         </Card.Footer>
       </Card>

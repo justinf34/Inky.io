@@ -14,9 +14,9 @@ export default class ChatMessage extends Component {
     return (
       <React.Fragment>
         {/* <Image src={this.props.user.avatar}/> */}
-        <p class="message">
-          <span class="message-name">{this.props.message.user.name}:  </span>
-          <span class="message-content">{this.props.message.content}</span>
+        <p className="message">
+          <span className="message-name">{this.props.message.name}:  </span>
+          <span className="message-content">{this.props.message.content}</span>
         </p>
       </React.Fragment>
     )
