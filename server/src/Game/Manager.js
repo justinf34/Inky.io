@@ -73,12 +73,15 @@ module.exports = function () {
 
   async function addChat(lobby_id, socket_id, message) {
     try {
+      lobby = Lobbies.get(lobby_id);
+      let user_id = lobby.connected_players.get(socket_id);
+      let name = lobby.players.get(user_id).name;
       db.collection("Chats").add({
-        'name': socket_id,
+        'name': name,
         'lobbyID': lobby_id,
         'message': message
       });
-      return { success: true};
+      return { success: true, name: name};
     } catch (error) {
       return {success: false, message: error}
     }
@@ -90,5 +93,6 @@ module.exports = function () {
     leaveRoom,
     changeLobbySetting,
     changeLobbyState,
+    addChat
   };
 };
