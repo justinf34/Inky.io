@@ -76,6 +76,14 @@ class Lobby {
     this.rounds = setting.rounds;
     this.drawing_time = setting.draw_time;
   }
+
+  gameResult(){
+    const gameResult = new Map([...this.players.entries()].sort((a, b)=>{ b[1].score = a[1].score }))
+    //TODO handle the result
+    gameResult.forEach(player => {
+      
+    });
+  }
 }
 
 module.exports = Lobby;
