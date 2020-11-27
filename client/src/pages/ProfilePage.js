@@ -4,7 +4,7 @@ import Modal from "react-bootstrap/Modal";
 import NavBar from "../components/NavBar";
 import "../styles/ProfilePage.css";
 import AuthContext from "../context/AuthContext";
-
+import Dialog from "react-bootstrap-dialog";
 class ProfilePage extends React.Component {
   constructor(props) {
     super(props);
@@ -76,10 +76,12 @@ class ProfilePage extends React.Component {
       .then((responseJson) => {
         console.log(responseJson);
         this.props.authCreds.getUserInfo();
+        this.dialog.showAlert("Your update was successful!");
         // redirect to lobby
       })
       .catch((error) => {
         console.log(error);
+        this.dialog.showAlert("Something went wrong please try again.");
       });
   }
   setModalShow(see) {
@@ -99,17 +101,7 @@ class ProfilePage extends React.Component {
           ></NavBar>
           <div className="profilecontainer">
             <div className="profile">
-              <div className="name">
-                <p className="nameTitle">Display Name: </p>
-                <input
-                  className="nameInput"
-                  type="text"
-                  value={this.state.userUsername}
-                  onChange={this.usernameChange}
-                ></input>
-              </div>
               <div className="picture">
-                <p>Display Icon: </p>
                 <img
                   className="profile-picture"
                   src={this.state.userImageDisplay}
@@ -123,6 +115,16 @@ class ProfilePage extends React.Component {
                   Change Profile Picture
                 </Button>
               </div>
+              <div className="name">
+                <p className="nameTitle">Display Name: </p>
+                <input
+                  className="nameInput"
+                  type="text"
+                  value={this.state.userUsername}
+                  onChange={this.usernameChange}
+                ></input>
+              </div>
+
               <Button
                 variant="success"
                 className="savebutton"
@@ -130,17 +132,21 @@ class ProfilePage extends React.Component {
               >
                 Save Changes
               </Button>
+              <Dialog
+                ref={(component) => {
+                  this.dialog = component;
+                }}
+              />
             </div>
           </div>
-          <p>Check:{this.state.userUsername}</p>
 
           <Modal
             show={this.state.modalShow}
             onHide={() => this.setModalShow(false)}
           >
             <Modal.Header>Icons</Modal.Header>
-            <Modal.Body scrollable>
-              <div id="profilePictureContainer">
+            <Modal.Body>
+              <div id="profilePictureContainer" className="modalBody">
                 {this.handleProfilePicture()}
               </div>
             </Modal.Body>
