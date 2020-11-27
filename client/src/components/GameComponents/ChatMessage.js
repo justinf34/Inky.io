@@ -6,14 +6,18 @@ import {
 
 export default class ChatMessage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
+    console.log(props);
   }
 
   render() {
     return (
       <React.Fragment>
-        <Image src={props.user.avatar}/>
-        <p>{props.msg}</p>
+        {/* <Image src={this.props.user.avatar}/> */}
+        <p class="message">
+          <span class="message-name">{this.props.message.user.name}:  </span>
+          <span class="message-content">{this.props.message.content}</span>
+        </p>
       </React.Fragment>
     )
   }
