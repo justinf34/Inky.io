@@ -71,6 +71,19 @@ module.exports = function () {
     }
   }
 
+  async function addChat(lobby_id, socket_id, message) {
+    try {
+      db.collection("Chats").add({
+        'name': socket_id,
+        'lobbyID': lobby_id,
+        'message': message
+      });
+      return { success: true};
+    } catch (error) {
+      return {success: false, message: error}
+    }
+  }
+
   return {
     createNewRoom,
     joinRoom,
