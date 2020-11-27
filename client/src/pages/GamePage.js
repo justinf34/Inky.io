@@ -11,7 +11,7 @@ export default class GamePage extends Component {
       <div className="game-page">
         <div className="game-content">
           <CanvasContainer socket={this.props.socket} />
-          <ChatBox/>
+          <ChatBox socket={this.props.socket}/>
         </div>
       </div>
     );

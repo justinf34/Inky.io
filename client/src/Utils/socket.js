@@ -43,6 +43,7 @@ function handlers() {
     draw,
     registerDraw,
     disconnect,
-    sendMessage
+    sendMessage,
+    getMessage
   };
 }
