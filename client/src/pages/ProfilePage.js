@@ -1,19 +1,27 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 import NavBar from "../components/NavBar";
 import "../styles/ProfilePage.css";
 import AuthContext from "../context/AuthContext";
+
 class ProfilePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       userUsername: this.props.authCreds.auth.user.name,
-      userImageDisplay:
-        "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png",
+      userImageDisplay: this.props.authCreds.auth.user.profileKey
+        ? this.imageWebLink(this.props.authCreds.auth.user.profileKey)
+        : "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png",
+      modalShow: false,
+      userImageDisplayIndex: 0,
     };
     this.usernameChange = this.usernameChange.bind(this);
-    this.imageSelect = this.imageSelect.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleProfilePicture = this.handleProfilePicture.bind(this);
+    this.setModalShow = this.setModalShow.bind(this);
+    this.handleProfilePick = this.handleProfilePick.bind(this);
+    this.imageWebLink = this.imageWebLink.bind(this);
   }
   usernameChange(event) {
     this.setState({
@@ -21,20 +29,39 @@ class ProfilePage extends React.Component {
     });
   }
 
-  imageSelect(event) {
-    console.log(event.target.files[0]);
+  handleProfilePicture() {
+    const pokemons_number = 10;
+    const pokemonImgList = [];
+
+    for (let i = 1; i <= pokemons_number; i++) {
+      pokemonImgList.push(
+        <img
+          key={i}
+          id={i}
+          className="pokemonImg"
+          src={this.imageWebLink(i)}
+          onClick={this.handleProfilePick}
+        ></img>
+      );
+    }
+    return pokemonImgList;
+  }
+  handleProfilePick(event) {
     this.setState({
-      userImageDisplay: URL.createObjectURL(event.target.files[0]),
-      userImageFile: event.target.files[0],
+      userImageDisplayIndex: event.target.id,
+      userImageDisplay: this.imageWebLink(event.target.id),
+      modalShow: false,
     });
   }
-
+  imageWebLink(id) {
+    return `https://pokeres.bastionbot.org/images/pokemon/${id}.png`;
+  }
   handleSubmit() {
     fetch(
-      `http://localhost:8888/profile/change/name?userID=${this.props.authCreds.auth.user.id}&newName=${this.state.userUsername}`,
+      `http://localhost:8888/profile/change/name?userID=${this.props.authCreds.auth.user.id}&newName=${this.state.userUsername}&userPicture=${this.state.userImageDisplayIndex}`,
       {
         method: "POST",
-        // credentials: "include",
+        credentials: "include",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
@@ -48,11 +75,17 @@ class ProfilePage extends React.Component {
       })
       .then((responseJson) => {
         console.log(responseJson);
+        this.props.authCreds.getUserInfo();
         // redirect to lobby
       })
       .catch((error) => {
         console.log(error);
       });
+  }
+  setModalShow(see) {
+    this.setState({
+      modalShow: see,
+    });
   }
 
   render() {
@@ -82,16 +115,13 @@ class ProfilePage extends React.Component {
                   src={this.state.userImageDisplay}
                   alt="pfp"
                 ></img>
-                <label className="fileinput">
-                  <input
-                    type="file"
-                    id="myFile"
-                    name="filename"
-                    accept="image/*"
-                    onChange={this.imageSelect}
-                  />
-                  Select File
-                </label>
+                <Button
+                  variant="primary"
+                  className="pickIcon"
+                  onClick={() => this.setModalShow(true)}
+                >
+                  Change Profile Picture
+                </Button>
               </div>
               <Button
                 variant="success"
@@ -103,6 +133,22 @@ class ProfilePage extends React.Component {
             </div>
           </div>
           <p>Check:{this.state.userUsername}</p>
+
+          <Modal
+            show={this.state.modalShow}
+            onHide={() => this.setModalShow(false)}
+          >
+            <Modal.Header>Icons</Modal.Header>
+            <Modal.Body scrollable>
+              <div id="profilePictureContainer">
+                {this.handleProfilePicture()}
+              </div>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button onClick={() => this.setModalShow(false)}>Close</Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </div>
     );
