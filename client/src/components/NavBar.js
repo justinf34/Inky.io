@@ -39,7 +39,17 @@ class NavBar extends React.Component {
         ) : (
           ""
         )}
+        {this.props.authCreds.auth.user.role ? (
+          <Link to="/report">
+            <Button variant="outline-dark" onClick={this.props.report}>
+             View Report
+            </Button>
+          </Link>
+        ) : (
+          ""
+        )}
       </div>
+      
     );
   }
 }

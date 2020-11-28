@@ -1,0 +1,23 @@
+.Title {
+  text-align: left;
+}
+.card {
+  text-align: left;
+}
+.PlayerName {
+  margin: 10px;
+}
+.Date {
+  margin: 10px;
+}
+.Reason {
+  margin: 10px;
+}
+.myContainer {
+  float: left;
+  width: 55%;
+}
+.home {
+  float: right;
+  width: 10%;
+}

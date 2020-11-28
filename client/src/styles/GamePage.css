@@ -1,11 +1,11 @@
-.game-lobby-page {
+.game-page {
   height: 95vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-.game-lobby-content {
+.game-content {
   text-align: start;
   background-color: white;
   display: flex;
@@ -18,27 +18,4 @@
   padding: 30px 50px;
   border: 1px solid;
   border-radius: 10px;
-}
-
-.settings {
-  width: 50%;
-  padding: 40px;
-  border-right: 1px solid;
-}
-
-.players {
-  width: 50%;
-  padding: 40px;
-}
-
-.player-container {
-  width: 90px;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-}
-
-.player-pfp {
-  width: 80px;
-  margin: auto;
 }
