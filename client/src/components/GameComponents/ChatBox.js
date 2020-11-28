@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
 
 import { 
   Card,
@@ -6,16 +7,12 @@ import {
  } from "react-bootstrap";
 
 import ChatMessage from './ChatMessage'
-export default class ChatBox extends Component {
+class ChatBox extends Component {
   constructor(props) {
     super(props);
     this.state = {
       currentMessage: '',
-      messageLog : [
-        { name: 'bob', content: 'hi' },
-        { name: 'charlie', content: 'foo' },
-        { name: 'alice', content: 'bar' },
-      ]
+      messageLog : []
     }
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -27,12 +24,14 @@ export default class ChatBox extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    this.props.socket.emit("chat", this.props.lobbyID, this.state.currentMessage);
+    const { match } = this.props;
+    this.props.socket.emit("chat", match.params.lobbyID, this.state.currentMessage);
     this.setState({currentMessage: ''})
   }
 
   componentDidMount() {
     this.props.socket.on("chat", (name, msg) => {
+      console.log('got chat back')
       this.setState({
         messageLog: [...this.state.messageLog, {'name': name, 'content': msg}]
       })
@@ -57,3 +56,5 @@ export default class ChatBox extends Component {
     )
   }
 }
+
+export default withRouter(ChatBox)
