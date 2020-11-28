@@ -7,6 +7,17 @@ const AuthProvider = ({ children }) => {
   });
 
   useEffect(() => {
+    getUserInfo();
+  }, []);
+
+  const logout = () => {
+    window.open("http://localhost:8888/auth/logout", "_self");
+    setAuth({
+      authenticated: false,
+    });
+  };
+
+  const getUserInfo = () => {
     fetch("http://localhost:8888/auth/login/success", {
       method: "GET",
       credentials: "include",
@@ -32,18 +43,12 @@ const AuthProvider = ({ children }) => {
           error: "Failed to authenticated user",
         });
       });
-  }, []);
-
-  const logout = () => {
-    window.open("http://localhost:8888/auth/logout", "_self");
-    setAuth({
-      authenticated: false,
-    });
   };
 
   const authContextValue = {
     auth,
     logout,
+    getUserInfo,
   };
 
   return (

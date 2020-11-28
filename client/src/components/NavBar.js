@@ -12,7 +12,7 @@ class NavBar extends React.Component {
       <div className="button-group">
         {this.props.showHome ? (
           <Link to="/">
-            <Button variant="info">Home</Button>
+            <Button variant="outline-dark">Home</Button>
           </Link>
         ) : (
           ""
