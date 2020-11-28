@@ -81,9 +81,11 @@
   color: black;
 }
 
-.savebutton,
 .pickIcon {
   width: 100%;
+}
+.savebutton {
+  width: 80%;
 }
 .pokemonImg {
   width: 100px;
