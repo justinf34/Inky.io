@@ -31,7 +31,7 @@ class ChatBox extends Component {
 
   componentDidMount() {
     this.props.socket.on("chat", (name, msg) => {
-      console.log('got chat back')
+      console.log(`received "${name}: ${msg}"`)
       this.setState({
         messageLog: [...this.state.messageLog, {'name': name, 'content': msg}]
       })
@@ -39,13 +39,12 @@ class ChatBox extends Component {
   }
 
   render() {
-
     return (
       <Card>
         <Card.Body>
-            {this.state.messageLog.map(msg => (
-              <ChatMessage message={msg}/>
-            ))}
+          {this.state.messageLog.map(msg => (
+            <ChatMessage message={msg}/>
+          ))}
         </Card.Body>
         <Card.Footer>
           <Form onSubmit={this.handleSubmit}>
