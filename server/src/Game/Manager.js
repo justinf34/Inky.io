@@ -1,5 +1,6 @@
 const Lobby = require("./Lobby");
 const db = require("../../config/db");
+const constants = require("../../src/Constants")
 
 /**
  * Interface to interact with the rooms
@@ -20,7 +21,7 @@ module.exports = function () {
     if (lobby) {
       lobby.joinPlayer(player_info, socket_id);
 
-      //TODO: add the player in the lobby record in db
+      lobby.dbJoinPlayer(player_info);
       return {
         success: true,
         lobby: lobby.getLobbyStatus(),
@@ -38,11 +39,12 @@ module.exports = function () {
 
     const lobbies = db.collection("Lobbies").doc(lobby_id);
     if (!res) {
-      const state_res = await lobbies.update({ state: "DISCONNECTED" });
+      const state_res = await lobbies.update({ state: constants.GAME_DISCONNECTED });
     }
 
     const host_res = await lobbies.update({ hostId: lobby.host.id });
-    //TODO: update the player in the lobby record in db
+
+    lobby.dbLeavePlayer(player_info);
 
     return {
       success: true,
