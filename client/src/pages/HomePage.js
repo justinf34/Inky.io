@@ -106,13 +106,18 @@ class HomePage extends React.Component {
   }
 
   render() {
+    const user = this.props.authCreds.auth.user;
     return (
       <div className="page">
         <div className="content">
-          <h3>{this.props.authCreds.auth.user.name || "kirby placeholder"}</h3>
+          <h3>{user.name || "kirby placeholder"}</h3>
           <img
             className="profile-picture"
-            src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
+            src={
+              user.profileKey
+                ? `https://pokeres.bastionbot.org/images/pokemon/${user.profileKey}.png`
+                : "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
+            }
             alt="pfp"
           ></img>
 

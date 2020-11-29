@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { app } = require("firebase-admin");
 const db = require("../config/db");
 
 router.get("/", (req, res) => {
@@ -9,13 +10,14 @@ router.get("/", (req, res) => {
 router.post("/change/name", async (req, res) => {
   const user_id = req.query.userID;
   const new_name = req.query.newName;
-
+  const pictureId = req.query.userPicture;
   const user = db.collection("Users");
 
-  const resetUser = await user
+  const resetUser = user
     .doc(user_id)
     .update({
       name: new_name,
+      profileKey: pictureId,
     })
     .then(() => {
       res.json({

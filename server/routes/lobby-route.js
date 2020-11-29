@@ -3,6 +3,7 @@ const { query } = require("express");
 const nanoid = require("nanoid");
 const db = require("../config/db");
 const { route } = require("./auth-route");
+const constants = require("../src/Constants");
 
 module.exports = function (Manager) {
   router.post("/create", (req, res) => {
@@ -10,7 +11,7 @@ module.exports = function (Manager) {
     const lobby = {
       code: lobbyCode,
       hostId: req.query.hostId,
-      state: "IN_LOBBY",
+      state: constants.IN_LOBBY,
     };
 
     db.collection("Lobbies")
@@ -26,7 +27,7 @@ module.exports = function (Manager) {
           message: "successfully created lobby",
           code: lobbyCode,
           hostId: req.query.hostId,
-          state: "IN_LOBBY",
+          state: constants.IN_LOBBY,
         });
       })
       .catch((error) => {
@@ -50,7 +51,7 @@ module.exports = function (Manager) {
           });
         } else {
           const data = lobby.data();
-          if (data.state === "IN_LOBBY") {
+          if (data.state !== constants.GAME_DISCONNECTED) {
             res.json({
               success: true,
               message: "found lobby",
@@ -64,10 +65,10 @@ module.exports = function (Manager) {
           }
         }
       })
-      .catch((e) => {
+      .catch((err) => {
         res.json({
           success: false,
-          message: e,
+          message: err.message,
         });
       });
   });
@@ -101,102 +102,122 @@ module.exports = function (Manager) {
 
   router.post("/join", (req, res) => {
     db.collection("Lobbies")
-      .where("code", "==", req.query.lobbyCode)
+      .doc(req.query.lobbycode)
       .get()
-      .then((querySnapshot) => {
-        if (querySnapshot.exists) {
-          querySnapshot.forEach((doc) => {
-            if (doc.exists) {
-              if (doc.data().state === "IN_LOBBY") {
-                // if theyre in the lobby already their user name will just update
-                db.collection("Lobbies")
-                  .doc(doc.id)
-                  .collection("Players")
-                  .doc(req.query.userId.toString())
-                  .set({
-                    id: req.query.userId,
-                    name: req.query.userName,
-                    disconnected: false,
+      .then((doc) => {
+        if (doc.exists) {
+          if (doc.data().state === constants.IN_LOBBY) {
+            doc.ref
+              .collection("Players")
+              .doc(req.query.userid)
+              .get()
+              .then((playerdoc) => {
+                if (
+                  !playerdoc.exists ||
+                  playerdoc.data().state !== constants.KICKED
+                ) {
+                  playerdoc.ref.set({
+                    id: req.query.userid,
+                    name: req.query.name,
+                    state: constants.CONNECTED,
+                  });
+                } else {
+                  throw Error("player could not join");
+                }
+              })
+              .then(() => {
+                res.json({
+                  success: true,
+                  message: "successfully joined lobby",
+                  code: doc.data().code,
+                  hostId: doc.data().hostId,
+                  state: doc.data().state,
+                });
+              });
+          } else {
+            throw Error("lobby unavailable");
+          }
+        } else {
+          throw Error("lobby not found");
+        }
+      })
+      .catch((err) => {
+        res.json({
+          success: false,
+          message: err.message,
+        });
+      });
+  });
+
+  router.post("/kick", (req, res) => {
+    db.collection("Lobbies")
+      .doc(req.query.lobbycode)
+      .collection("Players")
+      .doc(req.query.userid)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          doc.ref
+            .update({
+              state: constants.KICKED,
+            })
+            .then(() => {
+              res.json({
+                success: true,
+                message: "successfully kicked user from lobby",
+              });
+            });
+        } else {
+          throw Error("player is not in lobby");
+        }
+      })
+      .catch((err) => {
+        res.json({
+          success: false,
+          message: err.message,
+        });
+      });
+  });
+
+  // this doesnt handle case if user is host
+  router.post("/disconnect", (req, res) => {
+    db.collection("Lobbies")
+      .doc(req.query.lobbycode)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          doc.ref
+            .collection("Players")
+            .doc(req.query.userid)
+            .get()
+            .then((playerdoc) => {
+              if (playerdoc.exists) {
+                playerdoc.ref
+                  .update({
+                    state: constants.DISCONNECTED,
                   })
                   .then(() => {
                     res.json({
                       success: true,
-                      message: "successfully joined lobby",
+                      message: "successfully disconected from lobby",
                       code: doc.data().code,
                       hostId: doc.data().hostId,
                       state: doc.data().state,
                     });
                   });
               } else {
-                res.json({
-                  success: false,
-                  message: "cannot join lobby at this time",
-                  code: doc.data().code,
-                  hostId: doc.data().hostId,
-                  state: doc.data().state,
-                });
+                throw Error("player not found");
               }
-            }
-          });
+            });
         } else {
-          res.json({
-            success: false,
-            message: "couldn't find lobby",
-          });
+          throw Error("lobby not found");
         }
-      });
-  });
-
-  router.post("/disconnect", (req, res) => {
-    db.collection("Lobbies")
-      .where("code", "==", req.query.lobbyCode)
-      .get()
-      .then((querySnapshot) => {
-        if (querySnapshot.exists) {
-          querySnapshot.forEach((doc) => {
-            if (doc.exists) {
-              // if user is host disconnect the whole lobby
-              if (req.query.userId === doc.data().hostId) {
-                db.collection("Lobbies")
-                  .doc(doc.id)
-                  .update({
-                    state: "DISCONNECTED",
-                  })
-                  .then(() => {
-                    res.json({
-                      success: true,
-                      message: "successfully disconnected lobby",
-                      code: doc.data().code,
-                      hostId: doc.data().hostId,
-                      state: doc.data().state,
-                    });
-                  });
-              }
-              // disconnect the user
-              db.collection("Lobbies")
-                .doc(doc.id)
-                .collection("Players")
-                .doc(req.query.userId.toString())
-                .update({
-                  disconnected: true,
-                })
-                .then(() => {
-                  res.json({
-                    success: true,
-                    message: "successfully disconnected from lobby",
-                    code: doc.data().code,
-                    hostId: doc.data().hostId,
-                    state: doc.data().state,
-                  });
-                });
-            }
-          });
-        } else {
-          res.json({
-            success: false,
-            message: "couldn't find lobby",
-          });
-        }
+      })
+      .catch((err) => {
+        res.json({
+          success: false,
+          message: err.message,
+        });
       });
   });
 
@@ -211,7 +232,7 @@ module.exports = function (Manager) {
               db.collection("Lobbies")
                 .doc(doc.id)
                 .update({
-                  state: "GAME_ENDED",
+                  state: constants.GAME_ENDED,
                 })
                 .then(() => {
                   res.json({
@@ -225,11 +246,14 @@ module.exports = function (Manager) {
             }
           });
         } else {
-          res.json({
-            success: false,
-            message: "couldn't find lobby",
-          });
+          throw Error("lobby not found");
         }
+      })
+      .catch((err) => {
+        res.json({
+          success: false,
+          message: err.message,
+        });
       });
   });
 
@@ -244,7 +268,7 @@ module.exports = function (Manager) {
               db.collection("Lobbies")
                 .doc(doc.id)
                 .update({
-                  state: "IN_GAME",
+                  state: constants.IN_GAME,
                 })
                 .then(() => {
                   res.json({
@@ -258,11 +282,34 @@ module.exports = function (Manager) {
             }
           });
         } else {
-          res.json({
-            success: false,
-            message: "couldn't find lobby",
-          });
+          throw Error("lobby not found");
         }
+      })
+      .catch((err) => {
+        res.json({
+          success: false,
+          message: err.message,
+        });
+      });
+  });
+
+  router.get("/playerState", (req, res) => {
+    db.collection("Lobbies")
+      .doc(req.query.lobbycode)
+      .collection("Players")
+      .doc(req.query.userid)
+      .get()
+      .then((doc) => {
+        res.json({
+          success: true,
+          state: doc.data().state,
+        });
+      })
+      .catch((err) => {
+        res.json({
+          success: false,
+          message: err.message,
+        });
       });
   });
 

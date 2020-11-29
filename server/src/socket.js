@@ -62,5 +62,16 @@ module.exports = function (Manager, io) {
       // TODO: save the strokes
       socket.to(lobby_id).emit("draw", msg);
     });
+
+    socket.on("chat", async (lobby_id, msg) => {
+      Manager.addChat(lobby_id, socket.id, msg).then((result) => {
+        if (result.success) {
+          io.to(lobby_id).emit("chat", result.name, msg)
+          console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`)
+         } else {
+           console.log(result.message)
+         }
+      });
+    });
   };
 };

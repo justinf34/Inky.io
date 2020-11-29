@@ -1,5 +1,6 @@
 const Lobby = require("./Lobby");
 const db = require("../../config/db");
+const constants = require("../../src/Constants");
 
 /**
  * Interface to interact with the rooms
@@ -20,7 +21,7 @@ module.exports = function () {
     if (lobby) {
       lobby.joinPlayer(player_info, socket_id);
 
-      //TODO: add the player in the lobby record in db
+      lobby.dbJoinPlayer(player_info);
       return {
         success: true,
         lobby: lobby.getLobbyStatus(),
@@ -34,12 +35,15 @@ module.exports = function () {
 
   async function leaveRoom(socket_id, lobby_id) {
     const lobby = Lobbies.get(lobby_id);
+    lobby.dbLeavePlayer(socket_id);
+
     const res = lobby.leavePlayer(socket_id);
 
     const lobbies = db.collection("Lobbies").doc(lobby_id);
     if (!res) {
-      const state_res = await lobbies.update({ state: "DISCONNECTED" });
-      //TODO: Add player list to the lobby
+      const state_res = await lobbies.update({
+        state: constants.GAME_DISCONNECTED,
+      });
     }
 
     const host_res = await lobbies.update({ hostId: lobby.host.id });
@@ -71,11 +75,28 @@ module.exports = function () {
     }
   }
 
+  async function addChat(lobby_id, socket_id, message) {
+    try {
+      lobby = Lobbies.get(lobby_id);
+      let user_id = lobby.connected_players.get(socket_id);
+      let name = lobby.players.get(user_id).name;
+      db.collection("Chats").add({
+        name: name,
+        lobbyID: lobby_id,
+        message: message,
+      });
+      return { success: true, name: name };
+    } catch (error) {
+      return { success: false, message: error };
+    }
+  }
+
   return {
     createNewRoom,
     joinRoom,
     leaveRoom,
     changeLobbySetting,
     changeLobbyState,
+    addChat,
   };
 };
