@@ -91,20 +91,14 @@ class Lobby {
    * sets player state in db to disconnected 
    * @param {id: string, username: string} player_info 
    */
-  dbLeavePlayer(player_info) {
-    let lobby = db.collection('Lobbies').doc(this.id).get();
-
-    if (this.host.id !== lobby.hostId) {
-      let res = this.dbHostChange()
-      if (!res) return res;
-    }
-
+  dbLeavePlayer(socket_id) {
+    let player = this.connected_players.get(socket_id);
     try{
       db.collection('Lobbies')
         .doc(this.id)
         .collection('Players')
-        .doc(player_info.id)
-        .set({
+        .doc(player)
+        .update({
           state: constants.DISCONNECTED,
         })
       .then(() => {
@@ -120,16 +114,19 @@ class Lobby {
    * used by dbLeavePlayer
    */
   dbHostChange() {
-    try{
-      db.collection('Lobbies')
-        .doc(this.id)
-        .set({
-          hostId: this.hostId,
-        }).then(() => {
-          return true;
-        })
-    } catch (err) {
-      return err;
+    let lobby = db.collection('Lobbies').doc(this.id).get();
+    if (this.host.id !== lobby.hostId) {
+      try{
+        db.collection('Lobbies')
+          .doc(this.id)
+          .set({
+            hostId: this.hostId,
+          }).then(() => {
+            return hostId;
+          })
+      } catch (err) {
+        return err;
+      }
     }
   }
 
