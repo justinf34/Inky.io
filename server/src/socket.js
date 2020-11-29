@@ -66,8 +66,8 @@ module.exports = function (Manager, io) {
     socket.on("chat", async (lobby_id, msg) => {
       Manager.addChat(lobby_id, socket.id, msg).then((result) => {
         if (!result.success) {
-          console.log(result.message)
-        } else if (result.isCorrect) {
+          console.log(result.message);
+        } else if (result.correctGuess) {
           socket.to(lobby_id).emit("chat",'Inky',`${result.name} guessed correctly`)
           socket.emit("chat", result.name, msg)
           socket.emit("chat",'Inky',`You guessed correctly`)

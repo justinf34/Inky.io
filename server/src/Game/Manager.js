@@ -72,8 +72,8 @@ module.exports = function () {
   }
 
   // this function is meant to be replaced by an actual function in the game engine
-  function isCorrect(message) {
-    return message === 'proton';
+  function isCorrectGuess(message) {
+    return (message === 'proton');
   }
 
   async function addChat(lobby_id, socket_id, message) {
@@ -81,17 +81,34 @@ module.exports = function () {
       lobby = Lobbies.get(lobby_id);
       let user_id = lobby.connected_players.get(socket_id);
       let name = lobby.players.get(user_id).name;
+      let correctGuess = isCorrectGuess(message)
       db.collection("Chats").add({
         'name': name,
         'lobbyID': lobby_id,
         'message': message,
-        'isCorrect' : isCorrect(message)
+        'correctGuess' : correctGuess,
+        'timestamp' : Date.now()
       });
-      return {success: true, 'name': name, 'isCorrect': isCorrect};
+      return {success: true, 'name': name, 'correctGuess': correctGuess};
     } catch (error) {
       return {success: false, message: error}
     }
   }
+
+  async function getChatLog(lobby_id) {
+    let chatLog = []
+    db.collection('Chats')
+      .where('lobbyID', '==', lobby_id)
+      .where('isCorrect','==', false)
+      .orderBy('timestamp')
+      .get().then((snapshot) => {
+        snapshot.forEach(doc => {
+          chatLog.push({'name': doc.name(), 'message': doc.message()});
+        })
+      })
+    return chatLog  
+  }
+
 
   return {
     createNewRoom,
@@ -99,6 +116,7 @@ module.exports = function () {
     leaveRoom,
     changeLobbySetting,
     changeLobbyState,
-    addChat
+    addChat,
+    getChatLog
   };
 };
