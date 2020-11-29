@@ -71,6 +71,11 @@ module.exports = function () {
     }
   }
 
+  // this function is meant to be replaced by an actual function in the game engine
+  function isCorrect(message) {
+    return message === 'proton';
+  }
+
   async function addChat(lobby_id, socket_id, message) {
     try {
       lobby = Lobbies.get(lobby_id);
@@ -79,9 +84,10 @@ module.exports = function () {
       db.collection("Chats").add({
         'name': name,
         'lobbyID': lobby_id,
-        'message': message
+        'message': message,
+        'isCorrect' : isCorrect(message)
       });
-      return { success: true, name: name};
+      return {success: true, 'name': name, 'isCorrect': isCorrect};
     } catch (error) {
       return {success: false, message: error}
     }
