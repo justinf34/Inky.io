@@ -29,11 +29,21 @@ function handlers() {
     socket.close();
   }
 
+  function sendMessage(lobby_id, msg) {
+    socket.emit("chat", lobby_id, msg);
+  }
+
+  function getMessage(msg) {
+    socket.on("chat", msg)
+  }
+
   return {
     join,
     registerOnJoin,
     draw,
     registerDraw,
     disconnect,
+    sendMessage,
+    getMessage
   };
 }
