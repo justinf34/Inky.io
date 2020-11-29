@@ -76,6 +76,47 @@ class Lobby {
     this.rounds = setting.rounds;
     this.drawing_time = setting.draw_time;
   }
+
+  // returns random int between min and max
+  rndInt(min, max) {
+    [min,max] = [Math.ceil(min), Math.floor(max)]
+    return min + Math.floor(Math.random() * (max - min + 1));
+  }
+
+  // returns array of 3 words from the list of words
+  getWordOptions() {
+    // removes last word from possible words to be chosen from
+    // will be added back
+    for(let i = 0; i < this.word_list; i++) {
+      if(arr[i] === this.word) {
+        this.word_list.splice(i, 1);
+        break;
+      }
+    }
+
+    let wordOptions = [];
+    // gets 3 random words from list and add them to word options
+    for(let i = 0; i < 3; i++) {
+      let index = this.rndInt(0, this.word_list.length);
+      wordOptions.push(this.word_list[index]);
+      this.word_list.splice(index, 1);
+    }
+
+    // add back wordOptions and word to word list
+    this.word_list.concat(wordOptions);
+    this.word_list.push(this.word);
+
+    return wordOptions;
+  }
+
+  // takes in array of words to add to wordlist
+  addToWords(newWords) {
+    // remove douplicates
+    let uniqueWords = [...new Set(newWords)];
+    this.word_list.concat(uniqueWords);
+  }
+
+
 }
 
 module.exports = Lobby;
