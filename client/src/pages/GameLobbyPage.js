@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/GameLobbyPage.css";
 import { Form, InputGroup, Col, Button } from "react-bootstrap";
+import constants from "../Utils/Constants";
 
 import { withRouter } from "react-router-dom";
 
@@ -208,7 +209,10 @@ class GameLobbyPage extends React.Component {
               Players
             </h3>
             {this.props.players.map((player, index) => {
-              if (player.disconnected) {
+              if (
+                player.state === constants.DISCONNECTED ||
+                player.state === constants.KICKED
+              ) {
                 return "";
               }
               return (
