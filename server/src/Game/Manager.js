@@ -35,6 +35,8 @@ module.exports = function () {
 
   async function leaveRoom(socket_id, lobby_id) {
     const lobby = Lobbies.get(lobby_id);
+    lobby.dbLeavePlayer(socket_id);
+    
     const res = lobby.leavePlayer(socket_id);
 
     const lobbies = db.collection("Lobbies").doc(lobby_id);
@@ -46,7 +48,7 @@ module.exports = function () {
 
     const host_res = await lobbies.update({ hostId: lobby.host.id });
 
-    lobby.dbLeavePlayer(player_info);
+    
 
     return {
       success: true,
