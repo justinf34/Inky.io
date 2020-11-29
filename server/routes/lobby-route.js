@@ -50,7 +50,7 @@ module.exports = function (Manager) {
           });
         } else {
           const data = lobby.data();
-          if (data.state === constants.IN_LOBBY) {
+          if (data.state !== constants.GAME_DISCONNECTED) {
             res.json({
               success: true,
               message: "found lobby",
@@ -206,15 +206,15 @@ module.exports = function (Manager) {
                 .update({
                   state: constants.GAME_ENDED,
                 })
-              .then(() => {
-                res.json({
-                  success: true,
-                  message: "successfully ended game",
-                  code: doc.data().code,
-                  hostId: doc.data().hostId,
-                  state: doc.data().state,
+                .then(() => {
+                  res.json({
+                    success: true,
+                    message: "successfully ended game",
+                    code: doc.data().code,
+                    hostId: doc.data().hostId,
+                    state: doc.data().state,
+                  });
                 });
-              });
             }
           });
         } else {
@@ -242,15 +242,15 @@ module.exports = function (Manager) {
                 .update({
                   state: constants.IN_GAME,
                 })
-              .then(() => {
-                res.json({
-                  success: true,
-                  message: "successfully started game",
-                  code: doc.data().code,
-                  hostId: doc.data().hostId,
-                  state: doc.data().state,
+                .then(() => {
+                  res.json({
+                    success: true,
+                    message: "successfully started game",
+                    code: doc.data().code,
+                    hostId: doc.data().hostId,
+                    state: doc.data().state,
+                  });
                 });
-              });
             }
           });
         } else {

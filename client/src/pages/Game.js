@@ -5,6 +5,7 @@ import GamePage from "./GamePage";
 import { Redirect, withRouter } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import io from "socket.io-client";
+import constants from "../Utils/Constants";
 
 class Game extends Component {
   constructor(props) {
@@ -31,6 +32,7 @@ class Game extends Component {
 
     // Listen to player list updates
     this.state.socket.on("player-list-update", (lobby) => {
+      console.log("PLAYER UPDATE" + lobby.players.length);
       this.setState({
         host: lobby.host.id === user.id,
         host_info: lobby.host,
@@ -48,7 +50,6 @@ class Game extends Component {
     });
 
     this.state.socket.on("state-change", (new_state) => {
-      console.log(`NEW STATE!!!!! ${new_state}`);
       this.setState({
         state: new_state,
       });
@@ -76,8 +77,8 @@ class Game extends Component {
   }
 
   pageManager() {
-    // add spinner for connecting loading
-    if (this.state.state === "IN_LOBBY")
+    // TODO: add spinner for connecting loading
+    if (this.state.state === constants.IN_LOBBY)
       return (
         <GameLobbyPage
           socket={this.state.socket}
@@ -87,10 +88,11 @@ class Game extends Component {
         />
       );
 
-    if (this.state.state === "IN_GAME")
+    if (this.state.state === constants.IN_GAME)
       return <GamePage socket={this.state.socket} />;
 
-    if (this.state.state === "DISCONNECTED") return <Redirect to={"/"} />;
+    if (this.state.state === constants.GAME_DISCONNECTED)
+      return <Redirect to={"/"} />;
   }
 
   render() {

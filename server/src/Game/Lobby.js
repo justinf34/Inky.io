@@ -23,43 +23,47 @@ class Lobby {
   }
 
   joinPlayer(player_info, socket_id) {
-    this.players.set(player_info.id, {
-      id: player_info.id,
-      name: player_info.name,
-      disconnected: false,
-      score: 0,
-    });
+    if (!this.players.has(player_info.id)) {
+      // Create new player record in players list
+      this.players.set(player_info.id, {
+        id: player_info.id,
+        name: player_info.name,
+        state: constants.CONNECTED,
+        score: 0,
+      });
+    }
 
     this.connected_players.set(socket_id, player_info.id);
   }
 
   /**
    * connects player in db, unless player state is kicked
-   * @param {id: string, username: string} player_info 
+   * @param {id: string, username: string} player_info
    */
   dbJoinPlayer(player_info) {
     if (this.state === constants.IN_LOBBY) {
       try {
-        db.collection('Lobbies')
+        db.collection("Lobbies")
           .doc(this.id)
-          .collection('Players')
+          .collection("Players")
           .doc(player_info.id)
-          .get().then((doc) => {
-            // NOTE: comment out if condition if we want to allow kicked players to reconnect 
+          .get()
+          .then((doc) => {
+            // NOTE: comment out if condition if we want to allow kicked players to reconnect
             if (!doc.exists || doc.data().state !== constants.KICKED) {
               doc.ref.set({
                 id: player_info.id,
                 name: player_info.name,
                 state: constants.CONNECTED,
-              })
+              });
             } else {
-              throw Error ("could not connect player")
+              throw Error("could not connect player");
             }
           })
-          
-        .then(() => {
-          return constants.CONNECTED;
-        })
+
+          .then(() => {
+            return constants.CONNECTED;
+          });
       } catch (err) {
         return err;
       }
@@ -73,8 +77,8 @@ class Lobby {
     this.players.get(user_id).state = constants.DISCONNECTED;
     this.connected_players.delete(socket_id);
 
+    // Check if it is the last player
     if (this.connected_players.size === 0) {
-      // Check if it is the last player
       this.state = constants.GAME_DISCONNECTED;
       return false;
     }
@@ -88,28 +92,28 @@ class Lobby {
   }
 
   /**
-   * sets player state in db to disconnected 
-   * @param {id: string, username: string} player_info 
+   * sets player state in db to disconnected
+   * @param {id: string, username: string} player_info
    */
   dbLeavePlayer(player_info) {
-    let lobby = db.collection('Lobbies').doc(this.id).get();
+    let lobby = db.collection("Lobbies").doc(this.id).get();
 
     if (this.host.id !== lobby.hostId) {
-      let res = this.dbHostChange()
+      let res = this.dbHostChange();
       if (!res) return res;
     }
 
-    try{
-      db.collection('Lobbies')
+    try {
+      db.collection("Lobbies")
         .doc(this.id)
-        .collection('Players')
+        .collection("Players")
         .doc(player_info.id)
         .set({
           state: constants.DISCONNECTED,
         })
-      .then(() => {
-        return constants.DISCONNECTED;
-      })
+        .then(() => {
+          return constants.DISCONNECTED;
+        });
     } catch (err) {
       return err;
     }
@@ -120,14 +124,15 @@ class Lobby {
    * used by dbLeavePlayer
    */
   dbHostChange() {
-    try{
-      db.collection('Lobbies')
+    try {
+      db.collection("Lobbies")
         .doc(this.id)
         .set({
           hostId: this.hostId,
-        }).then(() => {
-          return true;
         })
+        .then(() => {
+          return true;
+        });
     } catch (err) {
       return err;
     }
@@ -161,17 +166,14 @@ class Lobby {
     this.drawing_time = setting.draw_time;
   }
 
-
   /**
    * changes db game state to match this.state
    */
   dbChangeGameState() {
-    try{
-      db.collection('Lobbies')
-        .doc(this.id)
-        .set({
-          state: this.state,
-        })
+    try {
+      db.collection("Lobbies").doc(this.id).set({
+        state: this.state,
+      });
     } catch (err) {
       return err;
     }
@@ -179,20 +181,20 @@ class Lobby {
 
   /**
    * sets player state in db to kicked
-   * @param {id: string, username: string} player_info 
+   * @param {id: string, username: string} player_info
    */
   dbKickPlayer(player_info) {
-    try{
-      db.collection('Lobbies')
+    try {
+      db.collection("Lobbies")
         .doc(this.id)
-        .collection('Players')
+        .collection("Players")
         .doc(player_info.id)
         .set({
           state: constants.KICKED,
         })
-      .then(() => {
-        return constants.KICKED;
-      })
+        .then(() => {
+          return constants.KICKED;
+        });
     } catch (err) {
       return err;
     }

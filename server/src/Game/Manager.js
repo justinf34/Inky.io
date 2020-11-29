@@ -1,6 +1,6 @@
 const Lobby = require("./Lobby");
 const db = require("../../config/db");
-const constants = require("../../src/Constants")
+const constants = require("../../src/Constants");
 
 /**
  * Interface to interact with the rooms
@@ -39,7 +39,9 @@ module.exports = function () {
 
     const lobbies = db.collection("Lobbies").doc(lobby_id);
     if (!res) {
-      const state_res = await lobbies.update({ state: constants.GAME_DISCONNECTED });
+      const state_res = await lobbies.update({
+        state: constants.GAME_DISCONNECTED,
+      });
     }
 
     const host_res = await lobbies.update({ hostId: lobby.host.id });
@@ -79,13 +81,13 @@ module.exports = function () {
       let user_id = lobby.connected_players.get(socket_id);
       let name = lobby.players.get(user_id).name;
       db.collection("Chats").add({
-        'name': name,
-        'lobbyID': lobby_id,
-        'message': message
+        name: name,
+        lobbyID: lobby_id,
+        message: message,
       });
-      return { success: true, name: name};
+      return { success: true, name: name };
     } catch (error) {
-      return {success: false, message: error}
+      return { success: false, message: error };
     }
   }
 
@@ -95,6 +97,6 @@ module.exports = function () {
     leaveRoom,
     changeLobbySetting,
     changeLobbyState,
-    addChat
+    addChat,
   };
 };
