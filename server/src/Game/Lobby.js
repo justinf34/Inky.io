@@ -20,6 +20,7 @@ class Lobby {
   }
 
   joinPlayer(player_info, socket_id) {
+    //TODO: Check if player was in the game before and update disconnected
     this.players.set(player_info.id, {
       id: player_info.id,
       name: player_info.name,

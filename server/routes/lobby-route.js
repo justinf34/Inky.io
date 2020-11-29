@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { query } = require("express");
 const nanoid = require("nanoid");
 const db = require("../config/db");
 const { route } = require("./auth-route");
@@ -69,6 +70,33 @@ module.exports = function (Manager) {
           message: e,
         });
       });
+  });
+
+  /**
+   * This should only be used for development purposes
+   */
+  router.post("/deleteLobbies", async (req, res) => {
+    if (req.body.key === "password") {
+      const query = db
+        .collection("Lobbies")
+        .where("state", "==", "DISCONNECTED");
+
+      try {
+        const disconnected = await query.get();
+        await disconnected.forEach((doc) => {
+          doc.ref.delete();
+        });
+        res.json({
+          success: true,
+          message: "Deleted disconnected lobbies",
+        });
+      } catch (error) {
+        res.json({
+          success: false,
+          message: error,
+        });
+      }
+    }
   });
 
   router.post("/join", (req, res) => {

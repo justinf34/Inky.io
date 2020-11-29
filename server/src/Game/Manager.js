@@ -39,10 +39,10 @@ module.exports = function () {
     const lobbies = db.collection("Lobbies").doc(lobby_id);
     if (!res) {
       const state_res = await lobbies.update({ state: "DISCONNECTED" });
+      //TODO: Add player list to the lobby
     }
 
     const host_res = await lobbies.update({ hostId: lobby.host.id });
-    //TODO: update the player in the lobby record in db
 
     return {
       success: true,
