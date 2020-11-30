@@ -1,4 +1,5 @@
 const { settings } = require("../config/db");
+const constants = require("./Constants");
 
 module.exports = function (Manager, io) {
   return function (socket) {
@@ -52,8 +53,8 @@ module.exports = function (Manager, io) {
 
     socket.on("start-game", (lobby_id) => {
       console.log(lobby_id);
-      Manager.changeLobbyState(lobby_id, "IN_GAME").then(() => {
-        io.to(lobby_id).emit("state-change", "IN_GAME");
+      Manager.changeLobbyState(lobby_id, constants.IN_GAME).then(() => {
+        io.to(lobby_id).emit("state-change", constants.IN_GAME);
       });
     });
 
@@ -66,11 +67,11 @@ module.exports = function (Manager, io) {
     socket.on("chat", async (lobby_id, msg) => {
       Manager.addChat(lobby_id, socket.id, msg).then((result) => {
         if (result.success) {
-          io.to(lobby_id).emit("chat", result.name, msg)
-          console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`)
-         } else {
-           console.log(result.message)
-         }
+          io.to(lobby_id).emit("chat", result.name, msg);
+          console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`);
+        } else {
+          console.log(result.message);
+        }
       });
     });
   };
