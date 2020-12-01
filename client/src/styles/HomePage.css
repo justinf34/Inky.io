@@ -5,15 +5,14 @@
   justify-content: center;
 }
 
-.content {
+.homepage-content {
   text-align: center;
   background-color: white;
   display: flex;
   flex-direction: column;
   width: 90%;
   max-width: 1200px;
-  height: 90%;
-  max-height: 90%;
+  height: auto;
   margin:auto;
   padding: 30px 50px;
   border: 1px solid;

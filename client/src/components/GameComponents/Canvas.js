@@ -5,6 +5,7 @@ import weights from "./weights";
 import colors from "./colors";
 import ColorBox from "./ColorBox";
 import { Button } from "react-bootstrap";
+import { FaEraser, FaRegTrashAlt } from "react-icons/fa";
 
 import { withRouter } from "react-router-dom";
 
@@ -34,8 +35,8 @@ class Canvas extends Component {
   Sketch = (sketch) => {
     sketch.setup = () => {
       sketch.createCanvas(
-        this.myRef.current.offsetWidth,
-        this.myRef.current.offsetHeight
+        this.myRef.current.offsetWidth-6,
+        this.myRef.current.offsetHeight-6
       );
       sketch.background("#ffffff");
     };
@@ -86,6 +87,14 @@ class Canvas extends Component {
       }
     };
 
+    sketch.windowResized = () => {
+      if (this.myRef && this.myRef.current)
+        sketch.resizeCanvas(
+          this.myRef.current.offsetWidth-6,
+          this.myRef.current.offsetHeight-6
+        );
+    }
+
     this.sketch = sketch;
   };
 
@@ -108,8 +117,12 @@ class Canvas extends Component {
     const options = [];
     weights.forEach((weight, i) => {
       options.push(
-        <Button key={i} value={weight.value} onClick={this.strokeOptionClick}>
-          {weight.name}
+        <Button variant="dark" 
+                style={{height: weight.value*5+"px", width: "70px"}} 
+                key={i} 
+                value={weight.value} 
+                onClick={this.strokeOptionClick}
+        >
         </Button>
       );
     });
@@ -147,9 +160,16 @@ class Canvas extends Component {
           <div className="color-options-container">
             {this.renderColorOptions()}
           </div>
-          <Button onClick={this.eraser}>eraser</Button>
-          <Button onClick={this.clearCanvas}>clear</Button>
-          <React.Fragment>{this.renderStrokeOptions()}</React.Fragment>
+          <div className="tools">
+            <Button variant="outline-primary" onClick={this.eraser}>
+              <FaEraser/>
+            </Button>
+            <Button variant="outline-primary" onClick={this.clearCanvas}>
+              <FaRegTrashAlt/>
+            </Button>
+            <div className="empty-placeholder"></div>
+            <React.Fragment>{this.renderStrokeOptions()}</React.Fragment>
+          </div>
         </div>
       </React.Fragment>
     );

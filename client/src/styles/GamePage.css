@@ -1,11 +1,22 @@
 .game-page {
   height: 95vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
+  margin: auto;
 }
 
-.game-content {
+.canvas-container {
+  height: 90%;
+  width: 70%;
+}
+
+.chat-container {
+  height: 90%;
+  width: 20%;
+}
+
+/* .game-content {
   text-align: start;
   background-color: white;
   display: flex;
@@ -18,4 +29,4 @@
   padding: 30px 50px;
   border: 1px solid;
   border-radius: 10px;
-}
+} */

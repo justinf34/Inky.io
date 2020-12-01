@@ -3,7 +3,7 @@ import "../styles/GameLobbyPage.css";
 import { Form, InputGroup, Col, Button } from "react-bootstrap";
 import constants from "../Utils/Constants";
 
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
 //takes in prop isHost: bool
 class GameLobbyPage extends React.Component {
@@ -123,7 +123,7 @@ class GameLobbyPage extends React.Component {
             <h3 style={{ textAlign: "center", paddingBottom: "1em" }}>
               Settings
             </h3>
-            <Form>
+            <Form className="settings-form">
               <Form.Group as={Form.Row}>
                 <Form.Label column sm={5}>
                   Number of Rounds
@@ -199,14 +199,22 @@ class GameLobbyPage extends React.Component {
                 </InputGroup.Append>
               </InputGroup>
             </Form>
-            <Button
-              className="start-game-btn"
-              // disabled={this.countPlayers() < 2}
-              disabled={!this.props.isHost}
-              onClick={this.startGame}
-            >
-              Start
-            </Button>
+            <div className="button-group">
+              <Link to="/" className="leave-lobby-btn">
+                <Button variant="outline-secondary">
+                  Leave Lobby
+                </Button>
+              </Link>
+              <Button
+                className="start-game-btn"
+                variant="success"
+                // disabled={this.countPlayers() < 2}
+                disabled={!this.props.isHost}
+                onClick={this.startGame}
+              >
+                Start Game
+              </Button>
+            </div>
           </div>
           <div className="players">
             <h3 style={{ textAlign: "center", paddingBottom: "1em" }}>

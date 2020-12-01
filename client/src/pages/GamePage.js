@@ -6,6 +6,8 @@ import ChatBox from "../components/GameComponents/ChatBox";
 import { withRouter } from "react-router-dom";
 import { withAuth } from "../context/auth-context";
 
+import "../styles/GamePage.css"
+
 class GamePage extends Component {
   constructor(props) {
     super(props);
@@ -37,14 +39,16 @@ class GamePage extends Component {
     const user = this.props.authCreds.auth.user;
     return (
       <div className="game-page">
-        <div className="game-content">
+        {/* <div className="game-content"> */}
           <CanvasContainer
             socket={this.props.socket}
             drawing={this.state.drawer ? this.state.drawer === user.id : false}
             strokes={this.state.strokes}
           />
-          <ChatBox socket={this.props.socket} />
-        </div>
+          <div className="chat-container">
+            <ChatBox socket={this.props.socket}/>
+          </div>
+        {/* </div> */}
       </div>
     );
   }

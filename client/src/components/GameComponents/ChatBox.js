@@ -40,7 +40,7 @@ class ChatBox extends Component {
 
   render() {
     return (
-      <Card>
+      <Card style={{height: "100%"}}>
         <Card.Body>
           {this.state.messageLog.map(msg => (
             <ChatMessage message={msg}/>

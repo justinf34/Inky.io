@@ -22,8 +22,10 @@
 
 .settings {
   width: 50%;
-  padding: 40px;
+  padding-right: 30px;
   border-right: 1px solid;
+  display: flex;
+  flex-direction: column;
 }
 
 .players {
@@ -41,4 +43,24 @@
 .player-pfp {
   width: 80px;
   margin: auto;
+}
+
+.settings-form {
+  padding: 10px;
+  margin-bottom: auto;
+  min-height: 70%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.start-game-btn {
+  margin-top: 10px;
+  margin-left: 10px;
+  width: max-content;
+}
+
+.leave-lobby-btn {
+  margin-top: 10px;
+  margin-left: auto;
+  width: max-content;
 }

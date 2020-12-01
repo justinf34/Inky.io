@@ -109,7 +109,7 @@ class HomePage extends React.Component {
     const user = this.props.authCreds.auth.user;
     return (
       <div className="page">
-        <div className="content">
+        <div className="homepage-content">
           <h3>{user.name || "kirby placeholder"}</h3>
           <img
             className="profile-picture"
