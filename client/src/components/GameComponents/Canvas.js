@@ -13,6 +13,7 @@ class Canvas extends Component {
     super(props);
 
     this.myRef = React.createRef();
+    this.strokes = props.strokes;
 
     this.state = {
       color: "#000000",
@@ -25,6 +26,11 @@ class Canvas extends Component {
     this.clearCanvas = this.clearCanvas.bind(this);
   }
 
+  componentDidMount() {
+    this.myP5 = new p5(this.Sketch, this.myRef.current);
+    this.props.socket.on("draw", this.sketch.onNewDrawing);
+  }
+
   Sketch = (sketch) => {
     sketch.setup = () => {
       sketch.createCanvas(
@@ -34,28 +40,43 @@ class Canvas extends Component {
       sketch.background("#ffffff");
     };
 
-    sketch.mouseDragged = () => {
-      const msg = {
-        type: 0,
-        x1: sketch.pmouseX,
-        y1: sketch.pmouseY,
-        x2: sketch.mouseX,
-        y2: sketch.mouseY,
-        color: this.state.color,
-        weight: this.state.weight,
-      };
-
-      const { match } = this.props;
-      this.props.socket.emit("draw", match.params.lobbyID, msg);
-
-      sketch.strokeWeight(this.state.weight);
-      sketch.stroke(this.state.color);
-      sketch.line(sketch.pmouseX, sketch.pmouseY, sketch.mouseX, sketch.mouseY);
+    sketch.draw = () => {
+      this.strokes.forEach((stroke) => {
+        console.log(stroke);
+        sketch.strokeWeight(stroke.weight);
+        sketch.stroke(stroke.color);
+        sketch.line(stroke.x1, stroke.y1, stroke.x2, stroke.y2);
+      });
     };
 
-    sketch.draw = () => {};
+    sketch.mouseDragged = () => {
+      if (this.props.drawing) {
+        const msg = {
+          type: 0,
+          x1: sketch.pmouseX,
+          y1: sketch.pmouseY,
+          x2: sketch.mouseX,
+          y2: sketch.mouseY,
+          color: this.state.color,
+          weight: this.state.weight,
+        };
 
-    sketch.onNewDrawing = (data) => {
+        const { match } = this.props;
+        this.props.socket.emit("draw", match.params.lobbyID, msg);
+
+        sketch.strokeWeight(this.state.weight);
+        sketch.stroke(this.state.color);
+        sketch.line(
+          sketch.pmouseX,
+          sketch.pmouseY,
+          sketch.mouseX,
+          sketch.mouseY
+        );
+      }
+    };
+
+    sketch.onNewDrawing = (data, strokes) => {
+      this.strokes = strokes;
       if (data.type == 1) {
         sketch.background("#ffffff");
       } else {
@@ -116,11 +137,6 @@ class Canvas extends Component {
     const msg = { type: 1 };
     this.props.socket.emit("draw", match.params.lobbyID, msg);
     this.sketch.background("#ffffff");
-  }
-
-  componentDidMount() {
-    this.myP5 = new p5(this.Sketch, this.myRef.current);
-    this.props.socket.on("draw", this.sketch.onNewDrawing);
   }
 
   render() {

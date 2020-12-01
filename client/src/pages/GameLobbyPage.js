@@ -93,7 +93,11 @@ class GameLobbyPage extends React.Component {
 
   startGame() {
     const { match } = this.props;
-    this.props.socket.emit("start-game", match.params.lobbyID);
+    this.props.socket.emit(
+      "lobby-state-change",
+      match.params.lobbyID,
+      constants.IN_GAME
+    );
   }
 
   renderSelectOptions(options) {

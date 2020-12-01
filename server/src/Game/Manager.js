@@ -67,7 +67,7 @@ module.exports = function () {
 
       lobby = Lobbies.get(lobby_id);
       //TODO: should probably use a function in Lobby class
-      lobby.state = state;
+      lobby.changeLobbyState(state);
 
       return { success: true };
     } catch (error) {
@@ -91,6 +91,21 @@ module.exports = function () {
     }
   }
 
+  function addStroke(lobby_id, stroke) {
+    const lobby = Lobbies.get(lobby_id);
+    return lobby.saveStroke(stroke);
+  }
+
+  function initNotifier(lobby_id, notifier_func) {
+    const lobby = Lobbies.get(lobby_id);
+    lobby.init_sock(notifier_func);
+  }
+
+  function getGameStatus(lobby_id, user_id) {
+    const lobby = Lobbies.get(lobby_id);
+    return lobby.getRoundStatus(user_id);
+  }
+
   return {
     createNewRoom,
     joinRoom,
@@ -98,5 +113,8 @@ module.exports = function () {
     changeLobbySetting,
     changeLobbyState,
     addChat,
+    addStroke,
+    initNotifier,
+    getGameStatus,
   };
 };

@@ -5,7 +5,11 @@ import "./Canvas.css";
 export default function CanvasContainer(props) {
   return (
     <div className="canvas-container">
-      <Canvas socket={props.socket} />
+      <Canvas
+        socket={props.socket}
+        strokes={props.strokes}
+        drawing={props.drawing}
+      />
     </div>
   );
 }

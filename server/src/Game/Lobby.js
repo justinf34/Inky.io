@@ -7,19 +7,98 @@ class Lobby {
     this.host = host; // Should be an object {id, name}
     this.state = constants.IN_LOBBY;
 
+    this.notifier = null;
+
     this.players = new Map(); // Keep track of the players(key = id, value = {socket_id, name, score})
     this.connected_players = new Map(); // key = socket id, value = player id
 
     this.rounds = 3; // Number of rounds in the game
-    this.curr_round = null; // Current round in the game
+    this.curr_round = 1; // Current round in the game
+    this.round_state = 0;
+    this.players_guessed = []; //Number of players that correctly guessed the word
 
     this.drawing_time = 100;
     this.timer = null; // Timer for the game
 
     this.word_list = []; // TODO: Set a default when user does not input a lot
-    this.word = null; // Current word
+    this.word = "temp"; // Current word
 
-    this.drawer = null; //Current drawer of the game
+    this.drawer = null; // user_id of drawer
+    this.drawer_order = [];
+    this.strokes = []; // Strokes that was sent to the player
+  }
+
+  init_sock(notifier_func) {
+    this.notifier = notifier_func;
+  }
+
+  getRoundStatus(user_id) {
+    return {
+      rounds: this.rounds,
+      curr_round: this.curr_round,
+      state: this.round_state,
+      drawer: this.drawer, // user_id of the drawer
+      word_list: this.drawer === user_id ? this.word_list : [],
+      word: this.drawer === user_id ? this.word : "_".repeat(this.word.length),
+      strokes: this.strokes,
+      // TODO: Add current time here
+    };
+  }
+
+  changeLobbyState(state) {
+    this.state = state;
+    if (state === constants.IN_GAME) {
+      //Init game settings
+      this.curr_round = 1;
+      this.players_guessed = [];
+
+      // Setting draw order
+      this.drawer_order = Array.from(this.connected_players.values());
+
+      this.newTurn();
+    }
+  }
+
+  newTurn() {
+    this.drawer = this.drawer_order.shift();
+    this.word_list = ["apple", "banana", "cat"]; // Generate word choices
+    this.strokes = []; // Clear the canvas
+    this.round_state = 0; // State to choosing
+
+    // Restart timer but do not start it
+  }
+
+  startTurn(word) {
+    this.word = word; // set the word
+
+    // start timer
+
+    this.notifier(); // Let all the players know that turn started
+  }
+
+  /**
+   * Should be called when timer ends, when
+   * all the guesser guessed the word, or when
+   * the drawer disconnects
+   */
+  endTurn() {
+    let endGame = false;
+
+    //check if all the players already had a turn to draw
+    if (this.drawer_order.length === 0) {
+      //check for last round
+      if (this.curr_round == this.rounds) {
+        this.round_state = 3;
+        endGame = true;
+      } else {
+        this.curr_round += 1;
+        this.drawer_order = Array.from(this.connected_players.values());
+      }
+    }
+
+    if (!endGame) this.newTurn();
+
+    this.notifier(); // Let all the players know that turn ended
   }
 
   joinPlayer(player_info, socket_id) {
@@ -34,6 +113,10 @@ class Lobby {
     }
 
     this.connected_players.set(socket_id, player_info.id);
+
+    // Adding player to draw order when in game
+    if (this.state === constants.IN_GAME)
+      this.drawer_order.push(player_info.id);
   }
 
   /**
@@ -76,6 +159,16 @@ class Lobby {
     const user_id = this.connected_players.get(socket_id);
     this.players.get(user_id).state = constants.DISCONNECTED;
     this.connected_players.delete(socket_id);
+
+    if (this.state === constants.IN_GAME) {
+      this.drawer_order = this.drawer_order.filter(
+        (drawer) => drawer !== user_id
+      );
+      if (this.drawer === user_id) {
+        //TODO: Test on case were last person leaves or last drawer leaves
+        this.endTurn();
+      }
+    }
 
     // Check if it is the last player
     if (this.connected_players.size === 0) {
@@ -195,6 +288,16 @@ class Lobby {
     } catch (err) {
       return err;
     }
+  }
+
+  saveStroke(stroke) {
+    if (stroke.type === 1) {
+      this.strokes = [];
+    } else {
+      this.strokes.push(stroke);
+    }
+
+    return this.strokes;
   }
 }
 

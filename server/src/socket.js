@@ -51,17 +51,30 @@ module.exports = function (Manager, io) {
       socket.to(lobby_id).emit("setting-change", setting); // Send it to other clients
     });
 
-    socket.on("start-game", (lobby_id) => {
-      console.log(lobby_id);
-      Manager.changeLobbyState(lobby_id, constants.IN_GAME).then(() => {
-        io.to(lobby_id).emit("state-change", constants.IN_GAME);
+    socket.on("lobby-state-change", (lobby_id, state) => {
+      console.log(state + " " + constants.IN_GAME);
+      // Set up the game notifer for the lobby to send messages
+      if (state === constants.IN_GAME) {
+        function gameNotifier() {
+          io.to(lobby_id).emit("new-round-status");
+        }
+        Manager.initNotifier(lobby_id, gameNotifier);
+      }
+
+      Manager.changeLobbyState(lobby_id, state).then(() => {
+        io.to(lobby_id).emit("state-change", state);
       });
+    });
+
+    socket.on("game-status", (lobby_id, user_id) => {
+      const status = Manager.getGameStatus(lobby_id, user_id);
+      socket.emit("game-status", status);
     });
 
     socket.on("draw", (lobby_id, msg) => {
       // console.log("draw: ", msg);
-      // TODO: save the strokes
-      socket.to(lobby_id).emit("draw", msg);
+      const strokes = Manager.addStroke(lobby_id, msg);
+      socket.to(lobby_id).emit("draw", msg, strokes);
     });
 
     socket.on("chat", async (lobby_id, msg) => {
