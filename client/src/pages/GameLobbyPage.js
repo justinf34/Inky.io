@@ -81,8 +81,11 @@ class GameLobbyPage extends React.Component {
   }
 
   handleCustomWordChange(e) {
+    const customWords = e.target.value.split(",");
+    const { match } = this.props;
+    this.props.socket.emit("add-words", match.params.lobbyID, customWords);
     this.setState({
-      customWords: e.target.value.split(","),
+      customWords
     });
   }
 
@@ -167,9 +170,8 @@ class GameLobbyPage extends React.Component {
                   as="textarea"
                   disabled={!this.props.isHost}
                   readOnly={!this.props.isHost}
-                  placeholder="Leave blank to use default words. Separate words with commas. Min 3 words"
+                  placeholder="Leave blank to only use default words. Separate words with commas."
                   value={this.state.customWords}
-                  onChange={this.handleCustomWordChange}
                 />
               </Form.Group>
               <InputGroup
@@ -199,7 +201,10 @@ class GameLobbyPage extends React.Component {
               className="start-game-btn"
               // disabled={this.countPlayers() < 2}
               disabled={!this.props.isHost}
-              onClick={this.startGame}
+              onClick={() => {
+                this.handleCustomWordChange
+                this.startGame
+              }}
             >
               Start
             </Button>
