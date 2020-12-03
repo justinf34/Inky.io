@@ -110,6 +110,8 @@ class Lobby {
         state: constants.CONNECTED,
         score: 0,
       });
+    } else {
+      this.players.get(player_info.id).state = constants.CONNECTED;
     }
 
     this.connected_players.set(socket_id, player_info.id);
