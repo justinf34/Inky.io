@@ -26,6 +26,8 @@ class Lobby {
     this.drawer = null; // user_id of drawer
     this.drawer_order = [];
     this.strokes = []; // Strokes that was sent to the player
+
+    this.interval = null; //Timer interval
   }
 
   init_sock(notifier_func) {
@@ -41,6 +43,7 @@ class Lobby {
       word_list: this.drawer === user_id ? this.word_list : [],
       word: this.drawer === user_id ? this.word : "_".repeat(this.word.length),
       strokes: this.strokes,
+      timer: this.timer,
       // TODO: Add current time here
     };
   }
@@ -52,6 +55,7 @@ class Lobby {
       this.curr_round = 1;
       this.players_guessed = [];
 
+      this.timer = this.drawing_time;
       // Setting draw order
       this.drawer_order = Array.from(this.connected_players.values());
 
@@ -66,14 +70,31 @@ class Lobby {
     this.round_state = 0; // State to choosing
 
     // Restart timer but do not start it
+    this.timer = this.drawing_time;
+    this.startTurn(this.word_list[0]);
   }
 
   startTurn(word) {
     this.word = word; // set the word
 
     // start timer
+    this.startTimer();
 
     this.notifier(); // Let all the players know that turn started
+    console.log("after notifer");
+  }
+
+  startTimer(){
+
+    this.interval = setInterval(() => {
+      if(this.timer > 0 ){
+        this.timer -=1;
+        console.log("timer now:" ,this.timer);
+      }else{
+        clearInterval(this.interval)
+        this.endTurn();
+      }
+    }, 1000);
   }
 
   /**

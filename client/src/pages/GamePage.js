@@ -13,18 +13,51 @@ class GamePage extends Component {
     this.state = {
       strokes: [],
     };
+    this.getTime = this.getTime.bind(this);
+    this.interval = null;
+    this.syncInterval = null;
   }
 
   componentDidMount() {
     this.props.socket.on("game-status", (status) => {
+      console.log("gamepage",status);
       this.setState({ ...status });
     });
 
     this.getRoundStatus();
 
     this.props.socket.on("new-round-status", () => {
+
+      console.log("new round statssssssssss");
+      this.interval = setInterval(() => {
+        this.setState({
+          timer: this.state.timer-1,
+        })
+      }, 1000);
+
+      this.syncInterval = setInterval(() => {
+        this.getTime();
+      }, 5000);
       this.getRoundStatus();
     });
+
+    this.props.socket.on("timesync", (data) => {
+      console.log("Server time now",data);
+        this.setState({
+          timer: data,
+        });
+    });
+
+
+    this.props.socket.on("stopTimer", () => {
+      clearInterval(this.interval);
+      clearInterval(this.syncInterval);
+    });
+
+  }
+
+  getTime() {
+    this.props.socket.emit("timesync", this.props.match.params.lobbyID);
   }
 
   getRoundStatus() {
@@ -39,6 +72,7 @@ class GamePage extends Component {
       <div className="game-page">
         <div className="game-content">
           <CanvasContainer
+            timer={this.state.timer}
             socket={this.props.socket}
             drawing={this.state.drawer ? this.state.drawer === user.id : false}
             strokes={this.state.strokes}

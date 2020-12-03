@@ -106,6 +106,10 @@ module.exports = function () {
     return lobby.getRoundStatus(user_id);
   }
 
+  function getSyncTime(lobby_id, user_id){
+    const lobby = Lobbies.get(lobby_id);
+    return lobby.getRoundStatus(user_id).timer;
+  }
   return {
     createNewRoom,
     joinRoom,
@@ -116,5 +120,6 @@ module.exports = function () {
     addStroke,
     initNotifier,
     getGameStatus,
+    getSyncTime,
   };
 };
