@@ -42,7 +42,7 @@ class Canvas extends Component {
 
     sketch.draw = () => {
       this.strokes.forEach((stroke) => {
-        console.log(stroke);
+        //console.log(stroke);
         sketch.strokeWeight(stroke.weight);
         sketch.stroke(stroke.color);
         sketch.line(stroke.x1, stroke.y1, stroke.x2, stroke.y2);
@@ -133,10 +133,12 @@ class Canvas extends Component {
   }
 
   clearCanvas() {
+    if (this.props.drawing){
     const { match } = this.props;
     const msg = { type: 1 };
     this.props.socket.emit("draw", match.params.lobbyID, msg);
     this.sketch.background("#ffffff");
+    }
   }
 
   render() {
