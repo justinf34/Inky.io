@@ -1,6 +1,6 @@
 import React from "react";
 import "./PlayerSidebar.css";
-import PlayerContainer from './PlayerContainer'
+import PlayerContainer from "./PlayerContainer";
 
 export default class PlayerSidebar extends React.Component {
   constructor(props) {
@@ -8,10 +8,8 @@ export default class PlayerSidebar extends React.Component {
     this.state = {};
   }
 
- 
-
   render() {
-    return(
+    return (
       <div className="player-sidebar">
         {this.props.players
           .sort(function (a, b) {
@@ -19,11 +17,14 @@ export default class PlayerSidebar extends React.Component {
           })
           .map((player, index) => {
             return (
-              <PlayerContainer key={index} player={player} index={index}></PlayerContainer>
+              <PlayerContainer
+                key={index}
+                player={player}
+                index={index}
+              ></PlayerContainer>
             );
           })}
       </div>
     );
   }
 }
-

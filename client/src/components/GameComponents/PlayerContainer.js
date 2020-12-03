@@ -1,21 +1,19 @@
-import React from 'react';
+import React from "react";
 import "./PlayerSidebar.css";
-import { Card, Button, OverlayTrigger, Popover  } from 'react-bootstrap'
+import { Card, Button, OverlayTrigger, Popover } from "react-bootstrap";
 import { FaCheck, FaTimes } from "react-icons/fa";
-import constants from '../../Utils/Constants'
+import constants from "../../Utils/Constants";
 
 export default class PlayerContainer extends React.Component {
   constructor(props) {
     super(props);
-    this.state= {
-
-    }
+    this.state = {};
     this.cardRef = React.createRef();
     this.reportPlayer = this.reportPlayer.bind(this);
   }
 
   getVariant(playerState) {
-    switch(playerState) {
+    switch (playerState) {
       case constants.CONNECTED:
         return "primary";
       case constants.KICKED:
@@ -34,25 +32,28 @@ export default class PlayerContainer extends React.Component {
   }
 
   getReportOverlay() {
-    return(
-      this.props.player.state === constants.CONNECTED ? 
-        <Popover>
-          <div className="report-popover">
-            <span>Report? </span>
-            <Button variant="outline-danger" onClick={ () => this.cardRef.current.click() }>
-              <FaTimes/>
-            </Button>
-            <Button variant="outline-success" onClick={ () => this.reportPlayer() }>
-              <FaCheck/>
-            </Button>
-          </div>
-        </Popover > :
-        <div></div>
-    )
+    return this.props.player.state === constants.CONNECTED ? (
+      <Popover>
+        <div className="report-popover">
+          <span>Report? </span>
+          <Button
+            variant="outline-danger"
+            onClick={() => this.cardRef.current.click()}
+          >
+            <FaTimes />
+          </Button>
+          <Button variant="outline-success" onClick={() => this.reportPlayer()}>
+            <FaCheck />
+          </Button>
+        </div>
+      </Popover>
+    ) : (
+      <div></div>
+    );
   }
 
   render() {
-    return(
+    return (
       <OverlayTrigger
         trigger={["click"]}
         rootClose
@@ -60,15 +61,21 @@ export default class PlayerContainer extends React.Component {
         delay={{ hide: 200 }}
         overlay={this.getReportOverlay(this.props.player)}
       >
-        <Card ref={this.cardRef} id="player-card" border="dark" bg={this.getVariant(this.props.player.state)} >
+        <Card
+          ref={this.cardRef}
+          id="player-card"
+          border="dark"
+          bg={this.getVariant(this.props.player.state)}
+        >
           <Card.Header>{this.props.player.name}</Card.Header>
           <Card.Body>
             <Card.Text>
-              <b># {this.props.index + 1}&emsp;</b>{this.props.player.score}
+              <b># {this.props.index + 1}&emsp;</b>
+              {this.props.player.score}
             </Card.Text>
           </Card.Body>
         </Card>
       </OverlayTrigger>
-    )
+    );
   }
 }

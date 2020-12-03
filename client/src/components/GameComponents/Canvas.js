@@ -35,8 +35,8 @@ class Canvas extends Component {
   Sketch = (sketch) => {
     sketch.setup = () => {
       sketch.createCanvas(
-        this.myRef.current.offsetWidth-6,
-        this.myRef.current.offsetHeight-6
+        this.myRef.current.offsetWidth - 6,
+        this.myRef.current.offsetHeight - 6
       );
       sketch.background("#ffffff");
     };
@@ -90,10 +90,10 @@ class Canvas extends Component {
     sketch.windowResized = () => {
       if (this.myRef && this.myRef.current)
         sketch.resizeCanvas(
-          this.myRef.current.offsetWidth-6,
-          this.myRef.current.offsetHeight-6
+          this.myRef.current.offsetWidth - 6,
+          this.myRef.current.offsetHeight - 6
         );
-    }
+    };
 
     this.sketch = sketch;
   };
@@ -117,13 +117,17 @@ class Canvas extends Component {
     const options = [];
     weights.forEach((weight, i) => {
       options.push(
-        <Button variant="dark" 
-                style={{height: weight.value*5+"px", width: "70px"}} 
-                key={i} 
-                value={weight.value} 
-                onClick={this.strokeOptionClick}
-        >
-        </Button>
+        <Button
+          className="strokeButton"
+          style={{
+            padding: weight.value + "px",
+            width: "70px",
+            borderRadius: "50px",
+          }}
+          key={i}
+          value={weight.value}
+          onClick={this.strokeOptionClick}
+        ></Button>
       );
     });
 
@@ -162,10 +166,10 @@ class Canvas extends Component {
           </div>
           <div className="tools">
             <Button variant="outline-primary" onClick={this.eraser}>
-              <FaEraser/>
+              <FaEraser />
             </Button>
             <Button variant="outline-primary" onClick={this.clearCanvas}>
-              <FaRegTrashAlt/>
+              <FaRegTrashAlt />
             </Button>
             <div className="empty-placeholder"></div>
             <React.Fragment>{this.renderStrokeOptions()}</React.Fragment>
