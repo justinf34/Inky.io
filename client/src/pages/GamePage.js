@@ -12,6 +12,7 @@ class GamePage extends Component {
 
     this.state = {
       strokes: [],
+      drawing_Time:0,
     };
     this.getTime = this.getTime.bind(this);
     this.interval = null;
@@ -20,7 +21,6 @@ class GamePage extends Component {
 
   componentDidMount() {
     this.props.socket.on("game-status", (status) => {
-      console.log("gamepage",status);
       this.setState({ ...status });
     });
 
@@ -28,31 +28,38 @@ class GamePage extends Component {
 
     this.props.socket.on("new-round-status", () => {
 
-      console.log("new round statssssssssss");
-      this.interval = setInterval(() => {
-        this.setState({
-          timer: this.state.timer-1,
-        })
-      }, 1000);
+      if(this.interval === null){
+        console.log("new round statssssssssss");
+        this.interval = setInterval(() => {
+          if(this.state.timer > 0 ){
+            this.setState({
+              timer: this.state.timer-1,
+            });
+          }else{
+            clearInterval(this.interval)
+            clearInterval(this.syncInterval)
+            this.interval = null;
+            this.syncInterval = null;
+          }
+        }, 1000);
+  
+        this.syncInterval = setInterval(() => {
+          this.getTime();
+        }, 5000);
 
-      this.syncInterval = setInterval(() => {
-        this.getTime();
-      }, 5000);
-      this.getRoundStatus();
+        this.getRoundStatus();
+      }
     });
 
     this.props.socket.on("timesync", (data) => {
-      console.log("Server time now",data);
+      console.log("Server time now",data,"off set:", this.state.timer - data);
         this.setState({
           timer: data,
         });
     });
 
 
-    this.props.socket.on("stopTimer", () => {
-      clearInterval(this.interval);
-      clearInterval(this.syncInterval);
-    });
+
 
   }
 

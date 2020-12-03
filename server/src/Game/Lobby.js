@@ -71,6 +71,7 @@ class Lobby {
 
     // Restart timer but do not start it
     this.timer = this.drawing_time;
+    console.log("drawer:",this.drawer);
     this.startTurn(this.word_list[0]);
   }
 
@@ -78,10 +79,11 @@ class Lobby {
     this.word = word; // set the word
 
     // start timer
-    this.startTimer();
+    //this.startTimer();
 
-    this.notifier(); // Let all the players know that turn started
-    console.log("after notifer");
+    setTimeout(()=>{this.startTimer();this.notifier(); }, 1000);
+    //this.notifier(); // Let all the players know that turn started
+    
   }
 
   startTimer(){
@@ -314,6 +316,7 @@ class Lobby {
   saveStroke(stroke) {
     if (stroke.type === 1) {
       this.strokes = [];
+      console.log("should be 1");
     } else {
       this.strokes.push(stroke);
     }
