@@ -1,0 +1,48 @@
+.player-sidebar {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  /* width: 100%; */
+}
+
+.player-score-container {
+  border: 1px solid;
+  border-radius: 10px;
+  width: max-content;
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+}
+
+.player-sidebar .card-header {
+  background-color: rgba(255, 255, 255, .8);
+  padding: 5px;
+}
+
+.player-sidebar .card-body {
+  background-color: rgba(255, 255, 255, .8);
+  padding: 5px;
+}
+
+.arrow::after, .bs-popover-right .arrow::after {
+  border-right-color: lavender !important;
+}
+
+.report-popover {
+  background-color: lavender;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: max-content;
+  padding: 10px;
+}
+
+.report-popover Button {
+  background-color: white;
+  margin-left: 5px;
+}
+
+.report-popover span {
+  display: inline-flex;
+  align-items: center;
+}

@@ -36,14 +36,14 @@
   margin: 20px auto;
 }
 
-.card-header.collapsed {
+.homepage-content .card-header.collapsed {
   background:#FFEDD2;
 }
 
-.card-header:not(.collapsed) {
+.homepage-content .card-header:not(.collapsed) {
   background:#FFEDD2;
 }
 
-.card-body {
+.homepage-content .card-body {
   background:#FFEDD2;
 }

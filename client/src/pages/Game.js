@@ -89,7 +89,7 @@ class Game extends Component {
       );
 
     if (this.state.state === constants.IN_GAME)
-      return <GamePage socket={this.state.socket} />;
+      return <GamePage players={this.state.players} socket={this.state.socket} />;
 
     if (this.state.state === constants.GAME_DISCONNECTED)
       return <Redirect to={"/"} />;
