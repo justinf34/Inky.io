@@ -15,6 +15,7 @@ function gettingReportFromDB(req, res){
         dates.push(doc.data().date.toDate());
         lobbyIDs.push(doc.data().lobbyID);
     })
+
     res.json({
         document: documents,
         player: players,
@@ -73,21 +74,37 @@ router.post("/ban",(req, res) =>{
     })
 })
 // retrive chat log from db
-router.post("/chatLog",(req, res) =>{
-    db.collection('Chats').where('lobbyID', '==', req.query.lobbyCode).where('name', '==', req.query.name).collection("Messages").get().then(snapshot=>{
-        snapshot.forEach(doc => {
-            if(doc.exists){
-                console.log(doc.data());
-                res.json({
-                    message: doc.message(),
-                  })
-            }else{
-                console.log("Can't find chat log");
-            }
-
+router.get("/chatLog",(req, res) =>{
+  var reportPlayerID;
+  var reportLobbyID;
+  var reportPlayerName;
+  var messages = [];
+    db.collection("Reports").doc(req.query.documentID).get().then((snapshot)=>{
+      reportPlayerID = snapshot.data().playerID;
+      reportLobbyID = snapshot.data().lobbyID;
+      reportPlayerName = snapshot.data().name;
+      reportDate = snapshot.data().date.toDate();
+      db.collection("Chats").where('lobbyID', '==', reportLobbyID).where('userID', '==', reportPlayerID).get().then((querySnapshot)=>{
+        querySnapshot.forEach((log)=>{
+          messages.push(reportPlayerName + ', ' + reportDate.getHours() + ':' + reportDate.getMinutes() + ' : ' +  log.data().message );
+        })
+        res.json({
+          success: true,
+          message: messages,
+        })
+      })
+    })
+    .catch(error =>{
+        console.log("error");
+        res.json({
+            success: false,
+            message: error,
         })
     })
 })
+
+
+
 
 
 
