@@ -81,6 +81,7 @@ module.exports = function () {
       let user_id = lobby.connected_players.get(socket_id);
       let name = lobby.players.get(user_id).name;
       db.collection("Chats").add({
+        userID: user_id,
         name: name,
         lobbyID: lobby_id,
         message: message,

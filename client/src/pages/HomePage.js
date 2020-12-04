@@ -11,6 +11,7 @@ import {
 import NavBar from "../components/NavBar";
 
 import AuthContext from "../context/AuthContext";
+import { withDeviceDetect } from "../Utils/DeviceDetect";
 
 class HomePage extends React.Component {
   constructor(props) {
@@ -122,18 +123,23 @@ class HomePage extends React.Component {
           ></img>
 
           <NavBar
-            showCreateGame={true}
+            showCreateGame={!this.props.mobile}
             createGameClick={this.handleCreateGameClicked}
           ></NavBar>
           <InputGroup style={{ maxWidth: "70%", margin: "10px auto" }}>
             <FormControl
+              disabled={this.props.mobile}
               placeholder="Enter lobby code to join a game"
               value={this.state.gameCode}
               onChange={this.handleGameCodeChange}
               aria-label="Lobby Code"
             />
             <InputGroup.Append>
-              <Button variant="success" onClick={this.handleJoinGameClicked}>
+              <Button
+                disabled={this.props.mobile}
+                variant="success"
+                onClick={this.handleJoinGameClicked}
+              >
                 Join Game
               </Button>
             </InputGroup.Append>
@@ -180,4 +186,4 @@ class HomePage extends React.Component {
   }
 }
 
-export default AuthContext(HomePage);
+export default AuthContext(withDeviceDetect(HomePage));
