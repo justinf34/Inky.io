@@ -76,13 +76,19 @@ export default class PlayerContainer extends React.Component {
             label="Verbal Abuse"
             type="checkbox"
             value={this.state.verbalAbuse}
-            onChange={() => this.setState({ verbalAbuse: !this.state.verbalAbuse })}
+            onChange={() =>
+              this.setState({ verbalAbuse: !this.state.verbalAbuse })
+            }
           />
           <Form.Check
             label="Inappropriate Name"
             type="checkbox"
             value={this.state.inappropriateName}
-            onChange={() => this.setState({ inappropriateName: !this.state.inappropriateName })}
+            onChange={() =>
+              this.setState({
+                inappropriateName: !this.state.inappropriateName,
+              })
+            }
           />
         </Modal.Body>
         <Modal.Footer>
