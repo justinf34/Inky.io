@@ -51,6 +51,10 @@ module.exports = function (Manager, io) {
       socket.to(lobby_id).emit("setting-change", setting); // Send it to other clients
     });
 
+    socket.on("add-words", (lobby_id, customWords) => {
+      Manager.addCustomWords(lobby_id, customWords);
+    });
+
     socket.on("start-game", (lobby_id) => {
       console.log(lobby_id);
       Manager.changeLobbyState(lobby_id, constants.IN_GAME).then(() => {

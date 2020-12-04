@@ -28,26 +28,26 @@ class Lobby {
       "comedian","cupcake","baker","facebook","convertible","giant","garden","diving","hopscotch",
       "stingray","song","trip","backbone","bomb","treasure","garbage","park","pirate","ski","whistle",
       "state","baseball","coal","queen","photograph","computer","hockey","hot dog","salt and pepper","ipad",
-      "frog","lawnmower","mattress","pinwheel","cake","circus","battery","mailman","cowboy","password","bicycle",
-      "skate","electricity","thief","teapot","deep","spring","nature","shallow","outside","america","bow tie",
-      "wax","light bulb","music","popsicle","brain","birthday cake","knee","pineapple","tusk","sprinkler","money",
+      "frog","lawnmower","mattress","pinwheel","circus","battery","mailman","cowboy","password","bicycle",
+      "skate","electricity","thief","teapot","spring","nature","shallow","outside","america","bow tie",
+      "wax","light bulb","music","popsicle","brain","knee","pineapple","tusk","sprinkler","money",
       "pool","lighthouse","doormat","face","flute","rug","snowball","purse","owl","gate","suitcase","stomach",
-      "doghouse","pajamas","bathroom","scale","peach","newspaper","watering can","hook","school","french fries",
+      "doghouse","pajamas","bathroom","scale","peach","watering can","hook","school","french fries",
       "beehive","artist","flagpole","camera","hair dryer","mushroom","tv","quilt","chalk","angle","ant","apple",
       "arch","arm","army","baby","bag","ball","band","basin","basket","bath","bed","bee","bell","berry","bird",
-      "blade","board","boat","bone","book","boot","bottle","box","boy","brain","brake","branch","brick","bridge",
-      "brush","bucket","bulb","button","cake","camera","card","carriage","cart","cat","chain","cheese","chess","chin",
-      "church","circle","clock","cloud","coat","collar","comb","cord","cow","cup","curtain","cushion","dog","door",
-      "drain","drawer","dress","drop","ear","egg","engine","eye","face","farm","feather","finger","fish","flag",
-      "floor","fly","foot","fork","fowl","frame","garden","girl","glove","goat","gun","hair","hammer","hand","hat",
-      "head","heart","hook","horn","horse","hospital","house","island","jewel","kettle","key","knee","knife","knot",
+      "blade","board","boat","bone","book","boot","bottle","box","boy","brake","branch","brick","bridge",
+      "brush","bucket","button","cake","card","carriage","cart","cat","chain","cheese","chin",
+      "church","circle","clock","cloud","coat","collar","comb","cord","cow","cup","cushion","dog","door",
+      "drain","drawer","dress","drop","ear","egg","engine","eye","farm","feather","finger","fish","flag",
+      "floor","fly","foot","fork","fowl","frame","girl","glove","goat","gun","hair","hammer","hand","hat",
+      "head","heart","horn","horse","hospital","house","island","jewel","kettle","key","knife","knot",
       "leaf","leg","line","lip","lock","map","match","monkey","moon","mouth","muscle","nail","neck","needle","nerve",
       "net","nose","nut","office","orange","oven","parcel","pen","pencil","picture","pig","pin","pipe","plane","plate",
-      "plough","pocket","pot","potato","prison","pump","rail","rat","receipt","ring","rod","roof","root","sail","school",
-      "scissors","screw","seed","sheep","shelf","ship","shirt","shoe","skin","skirt","snake","sock","spade","sponge","spoon",
-      "spring","square","stamp","star","station","stem","stick","stocking","stomach","store","street","sun","table","tail",
+      "plough","pocket","pot","potato","prison","pump","rail","rat","receipt","ring","rod","roof","root","sail",
+      "scissors","screw","seed","sheep","shelf","ship","shirt","shoe","skin","skirt","snake","sock","spade","spoon",
+      "square","stamp","star","station","stem","stick","stocking","store","street","sun","table","tail",
       "thread","throat","thumb","ticket","toe","tongue","tooth","town","train","tray","tree","trousers","umbrella","wall",
-      "watch","wheel","whip","whistle","window","wing","wire","worm"];
+      "watch","wheel","whip","window","wing","wire","worm"];
     this.word = null; // Current word
 
     this.drawer = null; //Current drawer of the game
@@ -264,12 +264,21 @@ class Lobby {
 
   // takes in array of words to add to wordlist
   addToWords(newWords) {
-    for(word in newWords)
-      this.word.trim().toLowerCase();
-    this.word_list = [...new Set(this.word_list.concat(newWords))];
+    console.log(this.word_list.length);
+    this.word_list = [...new Set(this.word_list)];
+    console.log(this.word_list.length + " old list length. " + newWords.length + " in new words");
+    let wordsToAdd = [];
+    for(let word in newWords) {
+      newWords[word] = newWords[word].trim().toLowerCase();
+      // handles empty inputs
+      if(newWords[word].length) {
+         wordsToAdd.push(newWords[word]);
+         console.log(newWords[word]);
+      }
+    }
+    this.word_list = [...new Set(this.word_list.concat(wordsToAdd))];
+    console.log("new list length is " + this.word_list.length);
   }
-
-
 }
 
 module.exports = Lobby;
