@@ -11,7 +11,7 @@ class GameLobbyPage extends React.Component {
     this.state = {
       numRounds: this.props.settings.rounds,
       drawingTime: this.props.settings.draw_time,
-      customWords: [], //TODO: Need handle this in the backend
+      customWords: '', //TODO: Need handle this in the backend
       roomLink: this.props.match.params.lobbyID,
       numRoundsOptions: [2, 3, 4, 5, 6, 7, 8, 9, 10],
       drawingTimeOptions: [
@@ -80,11 +80,8 @@ class GameLobbyPage extends React.Component {
   }
 
   handleCustomWordChange(e) {
-    const customWords = e.target.value.split(",");
-    const { match } = this.props;
-    this.props.socket.emit("add-words", match.params.lobbyID, customWords);
     this.setState({
-      customWords
+      customWords: e.target.value,
     });
   }
 
@@ -95,6 +92,10 @@ class GameLobbyPage extends React.Component {
 
   startGame() {
     const { match } = this.props;
+    if(this.state.customWords.length) {
+      const customWords = this.state.customWords.split(",");
+      this.props.socket.emit("add-words", match.params.lobbyID, customWords);
+    }
     this.props.socket.emit("start-game", match.params.lobbyID);
   }
 
@@ -171,6 +172,7 @@ class GameLobbyPage extends React.Component {
                   readOnly={!this.props.isHost}
                   placeholder="Leave blank to only use default words. Separate words with commas."
                   value={this.state.customWords}
+                  onChange={this.handleCustomWordChange}
                 />
               </Form.Group>
               <InputGroup
@@ -200,10 +202,7 @@ class GameLobbyPage extends React.Component {
               className="start-game-btn"
               // disabled={this.countPlayers() < 2}
               disabled={!this.props.isHost}
-              onClick={() => {
-                this.handleCustomWordChange
-                this.startGame
-              }}
+              onClick={this.startGame}
             >
               Start
             </Button>
