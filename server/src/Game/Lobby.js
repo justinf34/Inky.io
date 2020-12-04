@@ -241,7 +241,7 @@ class Lobby {
     // removes last word from possible words to be chosen from
     // will be added back
     for(let i = 0; i < this.word_list; i++) {
-      if(arr[i] === this.word) {
+      if(this.word_list[i] === this.word) {
         this.word_list.splice(i, 1);
         break;
       }
@@ -250,7 +250,7 @@ class Lobby {
     let wordOptions = [];
     // gets 3 random words from list and add them to word options
     for(let i = 0; i < 3; i++) {
-      let index = this.rndInt(0, this.word_list.length);
+      let index = this.rndInt(0, this.word_list.length - 1);
       wordOptions.push(this.word_list[index]);
       this.word_list.splice(index, 1);
     }
@@ -264,20 +264,15 @@ class Lobby {
 
   // takes in array of words to add to wordlist
   addToWords(newWords) {
-    console.log(this.word_list.length);
-    this.word_list = [...new Set(this.word_list)];
-    console.log(this.word_list.length + " old list length. " + newWords.length + " in new words");
     let wordsToAdd = [];
     for(let word in newWords) {
       newWords[word] = newWords[word].trim().toLowerCase();
       // handles empty inputs
       if(newWords[word].length) {
          wordsToAdd.push(newWords[word]);
-         console.log(newWords[word]);
       }
     }
     this.word_list = [...new Set(this.word_list.concat(wordsToAdd))];
-    console.log("new list length is " + this.word_list.length);
   }
 }
 
