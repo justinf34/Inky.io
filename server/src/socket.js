@@ -71,6 +71,10 @@ module.exports = function (Manager, io) {
       socket.emit("game-status", status);
     });
 
+    socket.on("timesync", (lobby_id, user_id) => {
+      socket.emit("timesync", Manager.getSyncTime(lobby_id, user_id));
+    });
+
     socket.on("draw", (lobby_id, msg) => {
       // console.log("draw: ", msg);
       const strokes = Manager.addStroke(lobby_id, msg);

@@ -46,3 +46,8 @@
   align-items: center;
   justify-content: center;
 }
+
+.timer {
+  width: 5%;
+  height: auto;
+}
