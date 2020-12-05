@@ -35,8 +35,8 @@ class Canvas extends Component {
   Sketch = (sketch) => {
     sketch.setup = () => {
       sketch.createCanvas(
-        this.myRef.current.offsetWidth - 6,
-        this.myRef.current.offsetHeight - 6
+        this.myRef.current.offsetWidth,
+        this.myRef.current.offsetHeight
       );
       sketch.background("#ffffff");
     };
@@ -90,9 +90,10 @@ class Canvas extends Component {
     sketch.windowResized = () => {
       if (this.myRef && this.myRef.current)
         sketch.resizeCanvas(
-          this.myRef.current.offsetWidth - 6,
-          this.myRef.current.offsetHeight - 6
+          this.myRef.current.offsetWidth,
+          this.myRef.current.offsetHeight
         );
+      sketch.background("#ffffff");
     };
 
     this.sketch = sketch;
@@ -118,10 +119,11 @@ class Canvas extends Component {
     weights.forEach((weight, i) => {
       options.push(
         <Button
-          className="strokeButton"
+          variant="dark"
           style={{
             padding: weight.value + "px",
-            width: "70px",
+            maxWidth: "70px",
+            width: "100%",
             borderRadius: "50px",
           }}
           key={i}
@@ -160,21 +162,24 @@ class Canvas extends Component {
     return (
       <React.Fragment>
         <div id="canvas" ref={this.myRef}></div>
-        <div className="canvas-tool-container">
-          <div className="color-options-container">
-            {this.renderColorOptions()}
+        {this.props.drawing ? (
+          <div className="canvas-tool-container">
+            <div className="color-options-container">
+              {this.renderColorOptions()}
+            </div>
+            <div className="tools">
+              <React.Fragment>{this.renderStrokeOptions()}</React.Fragment>
+              <Button variant="outline-info" onClick={this.eraser}>
+                <FaEraser />
+              </Button>
+              <Button variant="outline-info" onClick={this.clearCanvas}>
+                <FaRegTrashAlt />
+              </Button>
+            </div>
           </div>
-          <div className="tools">
-            <Button variant="outline-primary" onClick={this.eraser}>
-              <FaEraser />
-            </Button>
-            <Button variant="outline-primary" onClick={this.clearCanvas}>
-              <FaRegTrashAlt />
-            </Button>
-            <div className="empty-placeholder"></div>
-            <React.Fragment>{this.renderStrokeOptions()}</React.Fragment>
-          </div>
-        </div>
+        ) : (
+          <></>
+        )}
       </React.Fragment>
     );
   }

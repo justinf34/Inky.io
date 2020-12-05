@@ -1,19 +1,21 @@
 #canvas {
-  height: 80%;
+  height: 100%;
   width: 100%;
+}
+
+canvas {
   border: 1px solid;
-  padding: 3px;
   border-radius: 10px; 
 }
 
 .canvas-tool-container {
-  height: 20%;
+  height: 30%;
+  margin-top: 10px;
   display: flex;
   background-color: white;
   width: 100%;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
-
   border: 1px solid;
   border-radius: 10px;
 }
@@ -29,6 +31,7 @@
 .color-option {
   border-radius: 100%;
   max-width: 60px;
+  width: 60%;
   position: relative;
   height: auto;
   cursor: pointer;
@@ -56,5 +59,13 @@
   grid-template-columns: repeat(3, 1fr);
   justify-content: space-evenly;
   align-items: center;
-  gap: 5px;
+  gap: 10%;
+  width: 20%;
+  max-width: 20%;
+  height: 70%
+}
+
+.tools Button{
+  padding: inherit;
+  height: auto;
 }

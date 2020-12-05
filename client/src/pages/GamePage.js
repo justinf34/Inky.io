@@ -4,10 +4,11 @@ import CanvasContainer from "../components/GameComponents/CanvasContainer";
 import ChatBox from "../components/GameComponents/ChatBox";
 import PlayerSidebar from "../components/GameComponents/PlayerSidebar";
 
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import { withAuth } from "../context/auth-context";
 
-import "../styles/GamePage.css"
+import "../styles/GamePage.css";
+import { Button } from "react-bootstrap";
 
 class GamePage extends Component {
   constructor(props) {
@@ -40,17 +41,27 @@ class GamePage extends Component {
     const user = this.props.authCreds.auth.user;
     return (
       <div className="game-page">
-        {/* <div className="game-content"> */}
-          <PlayerSidebar players={this.props.players}></PlayerSidebar>
+        <Link to="/" className="leave-lobby-btn">
+          <Button variant="outline-secondary">Leave Lobby</Button>
+        </Link>
+        <div className="game-contents">
+          {/* <div className="game-components"> */}
+          <div className="players-container">
+            <PlayerSidebar
+              className="players-container"
+              players={this.props.players}
+            ></PlayerSidebar>
+          </div>
           <CanvasContainer
             socket={this.props.socket}
+            drawer={this.state.drawer}
             drawing={this.state.drawer ? this.state.drawer === user.id : false}
             strokes={this.state.strokes}
           />
           <div className="chat-container">
-            <ChatBox socket={this.props.socket}/>
+            <ChatBox socket={this.props.socket} />
           </div>
-        {/* </div> */}
+        </div>
       </div>
     );
   }

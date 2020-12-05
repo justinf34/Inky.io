@@ -1,5 +1,6 @@
 import React from "react";
 import Canvas from "./Canvas";
+import WordsModal from "./WordsModal";
 import "./Canvas.css";
 
 export default function CanvasContainer(props) {
@@ -10,6 +11,7 @@ export default function CanvasContainer(props) {
         strokes={props.strokes}
         drawing={props.drawing}
       />
+      <WordsModal isArtist={props.drawing} artistName={props.drawer} words={["testing", "words", "modal"]}></WordsModal>
     </div>
   );
 }
