@@ -201,9 +201,7 @@ class GameLobbyPage extends React.Component {
             </Form>
             <div className="button-group">
               <Link to="/" className="leave-lobby-btn">
-                <Button variant="outline-secondary">
-                  Leave Lobby
-                </Button>
+                <Button variant="outline-secondary">Leave Lobby</Button>
               </Link>
               <Button
                 className="start-game-btn"
@@ -220,24 +218,26 @@ class GameLobbyPage extends React.Component {
             <h3 style={{ textAlign: "center", paddingBottom: "1em" }}>
               Players
             </h3>
-            {this.props.players.map((player, index) => {
-              if (
-                player.state === constants.DISCONNECTED ||
-                player.state === constants.KICKED
-              ) {
-                return "";
-              }
-              return (
-                <div key={index} className="player-container">
-                  <img
-                    className="player-pfp"
-                    src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
-                    alt="pfp"
-                  ></img>
-                  <div>{player.name}</div>
-                </div>
-              );
-            })}
+            <div className="player-grid">
+              {this.props.players.map((player, index) => {
+                if (
+                  player.state === constants.DISCONNECTED ||
+                  player.state === constants.KICKED
+                ) {
+                  return "";
+                }
+                return (
+                  <div key={index} className="player-container">
+                    <img
+                      className="player-pfp"
+                      src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
+                      alt="pfp"
+                    ></img>
+                    <div>{player.name}</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

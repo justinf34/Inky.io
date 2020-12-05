@@ -37,7 +37,9 @@
   width: 90px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   text-align: center;
+  overflow-wrap: break-word;
 }
 
 .player-pfp {
@@ -63,4 +65,9 @@
   margin-top: 10px;
   margin-left: auto;
   width: max-content;
+}
+
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat( auto-fill, minmax(30%, 1fr) );
 }
