@@ -20,9 +20,6 @@ class Lobby {
     this.drawing_time = 100;
     this.timer = null; // Timer for the game
 
-    this.word_list = []; // TODO: Set a default when user does not input a lot
-    this.word = "temp"; // Current word
-
     this.drawer = null; // user_id of drawer
     this.drawer_order = [];
     this.strokes = []; // Strokes that was sent to the player
@@ -72,6 +69,39 @@ class Lobby {
     this.word = word; // set the word
 
     // start timer
+    this.word_list = ["turtle","garfield","alligator","headphones","wedding dress","violin","newspaper",
+      "raincoat","chameleon","cardboard","oar","drip","shampoo","time machine","yardstick","think","lace",
+      "darts","avocado","bleach","curtain","extension cord","birthday","sandbox","bruise",
+      "fog","sponge","wig","pilot","mascot","fireman","zoo","sushi","fizz","ceiling","post office",
+      "season","internet","chess","puppet","chime","koala","dentist","ping pong","bonnet","sheets",
+      "sunburn","houseboat","sleep","kneel","crust","speakers","cheerleader","dust","salmon","cabin",
+      "handle","swamp","cruise","pharmacist","dream","raft","plank","cliff","sweater","safe","picnic",
+      "shrink","ray","leak","deep","tiptoe","hurdle","knight","cloak","bedbug","hot tub","firefighter",
+      "charger","nightmare","coach","sneeze","goblin","chef","applause","golden retriever","joke",
+      "comedian","cupcake","baker","facebook","convertible","giant","garden","diving","hopscotch",
+      "stingray","song","trip","backbone","bomb","treasure","garbage","park","pirate","ski","whistle",
+      "state","baseball","coal","queen","photograph","computer","hockey","hot dog","salt and pepper","ipad",
+      "frog","lawnmower","mattress","pinwheel","circus","battery","mailman","cowboy","password","bicycle",
+      "skate","electricity","thief","teapot","spring","nature","shallow","outside","america","bow tie",
+      "wax","light bulb","music","popsicle","brain","knee","pineapple","tusk","sprinkler","money",
+      "pool","lighthouse","doormat","face","flute","rug","snowball","purse","owl","gate","suitcase","stomach",
+      "doghouse","pajamas","bathroom","scale","peach","watering can","hook","school","french fries",
+      "beehive","artist","flagpole","camera","hair dryer","mushroom","tv","quilt","chalk","angle","ant","apple",
+      "arch","arm","army","baby","bag","ball","band","basin","basket","bath","bed","bee","bell","berry","bird",
+      "blade","board","boat","bone","book","boot","bottle","box","boy","brake","branch","brick","bridge",
+      "brush","bucket","button","cake","card","carriage","cart","cat","chain","cheese","chin",
+      "church","circle","clock","cloud","coat","collar","comb","cord","cow","cup","cushion","dog","door",
+      "drain","drawer","dress","drop","ear","egg","engine","eye","farm","feather","finger","fish","flag",
+      "floor","fly","foot","fork","fowl","frame","girl","glove","goat","gun","hair","hammer","hand","hat",
+      "head","heart","horn","horse","hospital","house","island","jewel","kettle","key","knife","knot",
+      "leaf","leg","line","lip","lock","map","match","monkey","moon","mouth","muscle","nail","neck","needle","nerve",
+      "net","nose","nut","office","orange","oven","parcel","pen","pencil","picture","pig","pin","pipe","plane","plate",
+      "plough","pocket","pot","potato","prison","pump","rail","rat","receipt","ring","rod","roof","root","sail",
+      "scissors","screw","seed","sheep","shelf","ship","shirt","shoe","skin","skirt","snake","sock","spade","spoon",
+      "square","stamp","star","station","stem","stick","stocking","store","street","sun","table","tail",
+      "thread","throat","thumb","ticket","toe","tongue","tooth","town","train","tray","tree","trousers","umbrella","wall",
+      "watch","wheel","whip","window","wing","wire","worm"];
+    this.word = null; // Current word
 
     this.notifier(); // Let all the players know that turn started
   }
@@ -300,6 +330,51 @@ class Lobby {
     }
 
     return this.strokes;
+  }
+  
+  // returns random int between min and max
+  rndInt(min, max) {
+    [min,max] = [Math.ceil(min), Math.floor(max)]
+    return min + Math.floor(Math.random() * (max - min + 1));
+  }
+
+  // returns array of 3 words from the list of words
+  getWordOptions() {
+    // removes last word from possible words to be chosen from
+    // will be added back
+    for(let i = 0; i < this.word_list; i++) {
+      if(this.word_list[i] === this.word) {
+        this.word_list.splice(i, 1);
+        break;
+      }
+    }
+
+    let wordOptions = [];
+    // gets 3 random words from list and add them to word options
+    for(let i = 0; i < 3; i++) {
+      let index = this.rndInt(0, this.word_list.length - 1);
+      wordOptions.push(this.word_list[index]);
+      this.word_list.splice(index, 1);
+    }
+
+    // add back wordOptions and word to word list
+    this.word_list.concat(wordOptions);
+    this.word_list.push(this.word);
+
+    return wordOptions;
+  }
+
+  // takes in array of words to add to wordlist
+  addToWords(newWords) {
+    let wordsToAdd = [];
+    for(let word in newWords) {
+      newWords[word] = newWords[word].trim().toLowerCase();
+      // handles empty inputs
+      if(newWords[word].length) {
+         wordsToAdd.push(newWords[word]);
+      }
+    }
+    this.word_list = [...new Set(this.word_list.concat(wordsToAdd))];
   }
 }
 

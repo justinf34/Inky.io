@@ -12,7 +12,7 @@ class GameLobbyPage extends React.Component {
     this.state = {
       numRounds: this.props.settings.rounds,
       drawingTime: this.props.settings.draw_time,
-      customWords: [], //TODO: Need handle this in the backend
+      customWords: '', //TODO: Need handle this in the backend
       roomLink: this.props.match.params.lobbyID,
       numRoundsOptions: [2, 3, 4, 5, 6, 7, 8, 9, 10],
       drawingTimeOptions: [
@@ -82,7 +82,7 @@ class GameLobbyPage extends React.Component {
 
   handleCustomWordChange(e) {
     this.setState({
-      customWords: e.target.value.split(","),
+      customWords: e.target.value,
     });
   }
 
@@ -93,11 +93,11 @@ class GameLobbyPage extends React.Component {
 
   startGame() {
     const { match } = this.props;
-    this.props.socket.emit(
-      "lobby-state-change",
-      match.params.lobbyID,
-      constants.IN_GAME
-    );
+    if(this.state.customWords.length) {
+      const customWords = this.state.customWords.split(",");
+      this.props.socket.emit("add-words", match.params.lobbyID, customWords);
+    }
+    this.props.socket.emit("start-game", match.params.lobbyID);
   }
 
   renderSelectOptions(options) {
@@ -171,7 +171,7 @@ class GameLobbyPage extends React.Component {
                   as="textarea"
                   disabled={!this.props.isHost}
                   readOnly={!this.props.isHost}
-                  placeholder="Leave blank to use default words. Separate words with commas. Min 3 words"
+                  placeholder="Leave blank to only use default words. Separate words with commas."
                   value={this.state.customWords}
                   onChange={this.handleCustomWordChange}
                 />

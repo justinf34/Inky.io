@@ -59,6 +59,11 @@ module.exports = function () {
     lobby.changeSetting(setting);
   }
 
+  async function addCustomWords(lobby_id, customWords) {
+    const lobby = Lobbies.get(lobby_id);
+    lobby.addToWords(customWords);
+  }
+
   async function changeLobbyState(lobby_id, state) {
     // Update the DB
     try {
@@ -112,6 +117,7 @@ module.exports = function () {
     joinRoom,
     leaveRoom,
     changeLobbySetting,
+    addCustomWords,
     changeLobbyState,
     addChat,
     addStroke,
