@@ -1,41 +1,65 @@
 import React from "react";
-import { Button, ButtonGroup, Modal } from "react-bootstrap";
-import './WordsModal.css';
+import { Button, Card } from "react-bootstrap";
+import "./WordsModal.css";
 
 // takes in prop isArtist, artistName, words
 export default class WordsModal extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      show: true,
-    };
+    this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick(e) {
-    console.log(this.props.artistName + "chose" + e.value);
+  handleClick(word) {
+    console.log(this.props.artistName + " chose " + word);
   }
 
   render() {
     return (
-      <Modal
-        show={this.state.show}
-        backdrop='static'
-        keyboard={false}
-        onHide={() => this.setState({ show: false })}
+      <div
+        className="words-modal"
+        style={{
+          display: this.props.show ? "block" : "none",
+        }}
       >
-        <Modal.Header className="words-modal">
-          <Modal.Title>
-            {this.props.isArtist
-              ? "Pick a Word"
-              : this.props.artistName + " is picking a word"}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Footer className="words-modal">
-            <Button variant="info">{this.props.words[0]}</Button>
-            <Button variant="info">{this.props.words[1]}</Button>
-            <Button variant="info">{this.props.words[2]}</Button>
-        </Modal.Footer>
-      </Modal>
+        <Card>
+          <Card.Header>
+            <Card.Title>
+              {this.props.isArtist
+                ? "Pick a Word"
+                : this.props.artistName + " is picking a word"}
+            </Card.Title>
+          </Card.Header>
+          <Card.Footer>
+            {this.props.isArtist ? (
+              <>
+                <Button
+                  className="word-btn"
+                  variant="outline-dark"
+                  onClick={() => this.handleClick(this.props.words[0])}
+                >
+                  {this.props.words[0]}
+                </Button>
+                <Button
+                  className="word-btn"
+                  variant="outline-dark"
+                  onClick={() => this.handleClick(this.props.words[1])}
+                >
+                  {this.props.words[1]}
+                </Button>
+                <Button
+                  className="word-btn"
+                  variant="outline-dark"
+                  onClick={() => this.handleClick(this.props.words[2])}
+                >
+                  {this.props.words[2]}
+                </Button>
+              </>
+            ) : (
+              <p>The round will start when a word is chosen!</p>
+            )}
+          </Card.Footer>
+        </Card>
+      </div>
     );
   }
 }

@@ -45,7 +45,12 @@ class GamePage extends Component {
           <Button variant="outline-secondary">Leave Lobby</Button>
         </Link>
         <div className="game-contents">
-          {/* <div className="game-components"> */}
+          <div className="hints">
+            {/* TODO */}
+          </div>
+          <div className="timer">
+            {/* TODO */}
+          </div>
           <div className="players-container">
             <PlayerSidebar
               className="players-container"

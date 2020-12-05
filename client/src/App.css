@@ -1,4 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Chilanka&display=swap');
+
 .App {
+  font-family: 'Chilanka', cursive;
   text-align: center;
 }
 
