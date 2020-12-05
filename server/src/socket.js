@@ -83,5 +83,18 @@ module.exports = function (Manager, io) {
         }
       });
     });
+
+    socket.on("report", async (lobby_id, user_id, name, reason) => {
+      const status = Manager.addReport(lobby_id, user_id, name, reason).then((result) => {
+        if (result.success) {
+          socket.emit("report", result.success);
+          console.log("sucessful created report");
+        } else {
+          socket.emit("report", result.success);
+          console.log("failed creating report");
+        }
+      });
+    });
+
   };
 };

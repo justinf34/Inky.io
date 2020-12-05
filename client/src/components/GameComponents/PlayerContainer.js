@@ -44,7 +44,16 @@ export default class PlayerContainer extends React.Component {
 
   reportPlayer() {
     console.log("reported " + this.props.player, this.state);
-    // TODO
+
+    if(this.state.cheating || this.state.verbalAbuse || this.state.inappropriateName){
+      this.props.socket.emit("report", this.props.lobby, this.props.player.id, this.props.player.name, 
+      {cheating: this.state.cheating,
+       verbalAbuse: this.state.verbalAbuse,
+       inappropriateName: this.state.inappropriateName,}
+      )
+    }
+
+
     this.setState({
       cheating: false,
       verbalAbuse: false,

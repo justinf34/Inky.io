@@ -1,6 +1,7 @@
 const Lobby = require("./Lobby");
 const db = require("../../config/db");
 const constants = require("../../src/Constants");
+const admin = require("firebase-admin");
 
 /**
  * Interface to interact with the rooms
@@ -97,6 +98,33 @@ module.exports = function () {
     }
   }
 
+  async function addReport(lobby_id, user_id, name, reason) {
+    var reasons = "";
+    if(reason.cheating){
+      reasons += "Cheating. "
+    }
+    if(reason.verbalAbuse){
+      reasons += "Verbal Abuse. "
+    }
+    if(reason.inappropriateName){
+      reasons += "Inappropriate Name. "
+    }
+
+    try {
+      //console.log(new Timestamp());
+      db.collection("Reports").add({
+        date: admin.firestore.Timestamp.now(),
+        lobbyID: lobby_id,
+        name: name,
+        playerID: user_id,
+        reason: reasons
+      });
+      return { success: true, name: name };
+    } catch (error) {
+      return { success: false, message: error };
+    }
+  }
+
   function addStroke(lobby_id, stroke) {
     const lobby = Lobbies.get(lobby_id);
     return lobby.saveStroke(stroke);
@@ -120,6 +148,7 @@ module.exports = function () {
     addCustomWords,
     changeLobbyState,
     addChat,
+    addReport,
     addStroke,
     initNotifier,
     getGameStatus,

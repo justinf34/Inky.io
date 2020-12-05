@@ -21,6 +21,8 @@ export default class PlayerSidebar extends React.Component {
                 key={index}
                 player={player}
                 index={index}
+                lobby={this.props.lobby}
+                socket={this.props.socket}
               ></PlayerContainer>
             );
           })}

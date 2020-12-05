@@ -55,6 +55,8 @@ class GamePage extends Component {
             <PlayerSidebar
               className="players-container"
               players={this.props.players}
+              lobby={this.props.match.params.lobbyID}
+              socket={this.props.socket}
             ></PlayerSidebar>
           </div>
           <CanvasContainer
