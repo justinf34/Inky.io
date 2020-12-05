@@ -138,7 +138,7 @@ export default class PlayerContainer extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="player">
         <a
           style={{ cursor: "pointer" }}
           ref={this.cardRef}

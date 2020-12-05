@@ -16,12 +16,12 @@
 
 .player-sidebar .card-header {
   background-color: rgba(255, 255, 255, .8);
-  padding: 5px;
+  padding: 4px;
 }
 
 .player-sidebar .card-body {
   background-color: rgba(255, 255, 255, .8);
-  padding: 5px;
+  padding: 7px;
 }
 
 .arrow::after, .bs-popover-right .arrow::after {
@@ -45,4 +45,8 @@
 .report-popover span {
   display: inline-flex;
   align-items: center;
+}
+
+.player {
+  margin-bottom: 5px;
 }
