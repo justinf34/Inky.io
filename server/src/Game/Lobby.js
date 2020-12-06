@@ -68,7 +68,6 @@ class Lobby {
   newTurn() {
     this.drawer = this.drawer_order.shift();
     this.word_list = ["apple", "banana", "cat"]; // Generate word choices
-    this.strokes = []; // Clear the canvas
     this.round_state = 0; // State to choosing
 
     // Restart timer but do not start it
@@ -81,15 +80,10 @@ class Lobby {
     this.round_state = 1;
     this.word = word; // Current word
 
-    // start timer
-    //this.startTimer();
-
     setTimeout(() => {
-      this.startTimer();
-      this.notifier();
+      this.startTimer(); // Start timer
+      this.notifier(); // Let everyone know
     }, 1000);
-
-    //this.notifier(); // Let all the players know that turn started
   }
 
   startTimer() {
@@ -97,7 +91,7 @@ class Lobby {
       if (this.timer > 0) {
         this.timer -= 1;
         this.io.to(this.id).emit("time-update", this.timer);
-        console.log("timer now:", this.timer);
+        // console.log("timer now:", this.timer);
       } else {
         clearInterval(this.interval);
         this.endTurn();
@@ -112,6 +106,10 @@ class Lobby {
    */
   endTurn() {
     clearInterval(this.interval);
+
+    // Clear canvas
+    this.strokes.length = 0; // Clear the canvas
+    this.io.to(this.id).emit("draw", { type: 1 }, this.strokes);
 
     let endGame = false;
 

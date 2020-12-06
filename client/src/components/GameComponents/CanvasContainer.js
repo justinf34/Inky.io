@@ -11,6 +11,7 @@ export default function CanvasContainer(props) {
         socket={props.socket}
         strokes={props.strokes}
         drawing={props.drawing}
+        round_state={props.round_state}
       />
       <div
         className="custom-modal"
