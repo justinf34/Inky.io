@@ -130,9 +130,9 @@ module.exports = function () {
     return lobby.saveStroke(stroke);
   }
 
-  function initNotifier(lobby_id, notifier_func) {
+  function initNotifier(lobby_id, notifier_func, io) {
     const lobby = Lobbies.get(lobby_id);
-    lobby.init_sock(notifier_func);
+    lobby.init_sock(notifier_func, io);
   }
 
   function getGameStatus(lobby_id, user_id) {

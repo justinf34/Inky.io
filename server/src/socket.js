@@ -58,7 +58,7 @@ module.exports = function (Manager, io) {
         function gameNotifier() {
           io.to(lobby_id).emit("new-round-status");
         }
-        Manager.initNotifier(lobby_id, gameNotifier);
+        Manager.initNotifier(lobby_id, gameNotifier, io);
       }
 
       Manager.changeLobbyState(lobby_id, state).then(() => {

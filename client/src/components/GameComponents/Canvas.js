@@ -39,6 +39,7 @@ class Canvas extends Component {
         this.myRef.current.offsetHeight
       );
       sketch.background("#ffffff");
+      sketch.frameRate(20);
     };
 
     sketch.draw = () => {
@@ -78,7 +79,7 @@ class Canvas extends Component {
 
     sketch.onNewDrawing = (data, strokes) => {
       this.strokes = strokes;
-      if (data.type == 1) {
+      if (data.type === 1) {
         sketch.background("#ffffff");
       } else {
         sketch.strokeWeight(data.weight);

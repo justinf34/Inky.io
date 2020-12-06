@@ -9,6 +9,7 @@ class Lobby {
     this.state = constants.IN_LOBBY;
 
     this.notifier = null;
+    this.io = null;
 
     this.players = new Map(); // Keep track of the players(key = id, value = {socket_id, name, score})
     this.connected_players = new Map(); // key = socket id, value = player id
@@ -18,7 +19,7 @@ class Lobby {
     this.round_state = 0;
     this.players_guessed = []; //Number of players that correctly guessed the word
 
-    this.drawing_time = 100;
+    this.drawing_time = 30;
     this.timer = null; // Timer for the game
 
     this.drawer = null; // user_id of drawer
@@ -31,8 +32,9 @@ class Lobby {
     this.word_list = ["apple", "banana", "cat"];
   }
 
-  init_sock(notifier_func) {
+  init_sock(notifier_func, io) {
     this.notifier = notifier_func;
+    this.io = io;
   }
 
   getRoundStatus(user_id) {
@@ -86,6 +88,7 @@ class Lobby {
       this.startTimer();
       this.notifier();
     }, 1000);
+
     //this.notifier(); // Let all the players know that turn started
   }
 
@@ -93,6 +96,7 @@ class Lobby {
     this.interval = setInterval(() => {
       if (this.timer > 0) {
         this.timer -= 1;
+        this.io.to(this.id).emit("time-update", this.timer);
         console.log("timer now:", this.timer);
       } else {
         clearInterval(this.interval);
@@ -107,12 +111,14 @@ class Lobby {
    * the drawer disconnects
    */
   endTurn() {
+    clearInterval(this.interval);
+
     let endGame = false;
 
     //check if all the players already had a turn to draw
     if (this.drawer_order.length === 0) {
       //check for last round
-      if (this.curr_round == this.rounds) {
+      if (this.curr_round === this.rounds) {
         this.round_state = 3;
         endGame = true;
       } else {
@@ -186,6 +192,8 @@ class Lobby {
     const user_id = this.connected_players.get(socket_id);
     this.players.get(user_id).state = constants.DISCONNECTED;
     this.connected_players.delete(socket_id);
+
+    //TODO: If in game, and only 1 player -> black to lobby
 
     if (this.state === constants.IN_GAME) {
       this.drawer_order = this.drawer_order.filter(
