@@ -14,7 +14,7 @@ class Lobby {
     this.players = new Map(); // Keep track of the players(key = id, value = {socket_id, name, score})
     this.connected_players = new Map(); // key = socket id, value = player id
 
-    this.rounds = 3; // Number of rounds in the game
+    this.rounds = 1; // Number of rounds in the game
     this.curr_round = 1; // Current round in the game
     this.round_state = 0;
     this.players_guessed = []; //Number of players that correctly guessed the word
@@ -105,7 +105,7 @@ class Lobby {
    * the drawer disconnects
    */
   endTurn() {
-    clearInterval(this.interval);
+    clearInterval(this.interval); // Clear interval
 
     // Clear canvas
     this.strokes.length = 0; // Clear the canvas
@@ -117,7 +117,6 @@ class Lobby {
     if (this.drawer_order.length === 0) {
       //check for last round
       if (this.curr_round === this.rounds) {
-        this.round_state = 3;
         endGame = true;
       } else {
         this.curr_round += 1;
@@ -125,9 +124,21 @@ class Lobby {
       }
     }
 
-    if (!endGame) this.newTurn();
-
-    this.notifier(); // Let all the players know that turn ended
+    if (!endGame) {
+      this.newTurn();
+      this.notifier(); // Let all the players know that turn ended
+    } else {
+      this.state = constants.IN_LOBBY;
+      this.round_state = 3;
+      db.collection("Lobbies")
+        .doc(this.id)
+        .update({
+          state: constants.IN_LOBBY,
+        })
+        .then((_) => {
+          this.io.to(this.id).emit("state-change", constants.IN_LOBBY);
+        });
+    }
   }
 
   joinPlayer(player_info, socket_id) {

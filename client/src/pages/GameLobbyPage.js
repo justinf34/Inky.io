@@ -14,7 +14,7 @@ class GameLobbyPage extends React.Component {
       drawingTime: this.props.settings.draw_time,
       customWords: "", //TODO: Need handle this in the backend
       roomLink: this.props.match.params.lobbyID,
-      numRoundsOptions: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+      numRoundsOptions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       drawingTimeOptions: [
         30,
         45,
