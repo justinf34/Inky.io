@@ -26,6 +26,9 @@ class Lobby {
     this.strokes = []; // Strokes that was sent to the player
 
     this.interval = null; //Timer interval
+
+    this.word = "placeholder";
+    this.word_list = ["apple", "banana", "cat"];
   }
 
   init_sock(notifier_func) {
@@ -36,13 +39,12 @@ class Lobby {
     return {
       rounds: this.rounds,
       curr_round: this.curr_round,
-      state: this.round_state,
+      round_state: this.round_state,
       drawer: this.drawer, // user_id of the drawer
       word_list: this.drawer === user_id ? this.word_list : [],
       word: this.drawer === user_id ? this.word : "_".repeat(this.word.length),
       strokes: this.strokes,
       timer: this.timer,
-      // TODO: Add current time here
     };
   }
 
@@ -69,12 +71,13 @@ class Lobby {
 
     // Restart timer but do not start it
     this.timer = this.drawing_time;
-    // console.log("drawer:", this.drawer);
-    // this.startTurn(this.word_list[0]);
   }
 
   startTurn(word) {
-    this.word = word; // set the word
+    console.log(`Starting ${this.id} with ${word}`);
+    // this.word_list = word_list;
+    this.round_state = 1;
+    this.word = word; // Current word
 
     // start timer
     //this.startTimer();
@@ -84,9 +87,6 @@ class Lobby {
       this.notifier();
     }, 1000);
     //this.notifier(); // Let all the players know that turn started
-
-    this.word_list = word_list;
-    this.word = "test"; // Current word
   }
 
   startTimer() {

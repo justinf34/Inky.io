@@ -19,11 +19,13 @@ export default function CanvasContainer(props) {
         }}
       >
         <WordsModal
-          show={true}
+          socket={props.socket}
+          show={props.round_state === 0}
           isArtist={props.drawing}
           artistName={props.drawer}
-          words={["testing", "words", "modal"]}
-        ></WordsModal>
+          round_state={props.round_state}
+          words={props.word_list}
+        />
       </div>
     </div>
   );

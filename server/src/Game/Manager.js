@@ -144,6 +144,11 @@ module.exports = function () {
     const lobby = Lobbies.get(lobby_id);
     return lobby.getRoundStatus(user_id).timer;
   }
+
+  function startTurn(lobby_id, word) {
+    const lobby = Lobbies.get(lobby_id);
+    lobby.startTurn(word);
+  }
   return {
     createNewRoom,
     joinRoom,
@@ -157,5 +162,6 @@ module.exports = function () {
     initNotifier,
     getGameStatus,
     getSyncTime,
+    startTurn,
   };
 };

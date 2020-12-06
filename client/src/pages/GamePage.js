@@ -96,6 +96,8 @@ class GamePage extends Component {
           <CanvasContainer
             socket={this.props.socket}
             drawer={this.state.drawer}
+            round_state={this.state.round_state}
+            word_list={this.state.word_list}
             drawing={this.state.drawer ? this.state.drawer === user.id : false}
             strokes={this.state.strokes}
           />

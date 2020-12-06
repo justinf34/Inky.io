@@ -52,7 +52,7 @@ module.exports = function (Manager, io) {
     });
 
     socket.on("lobby-state-change", (lobby_id, state) => {
-      console.log(state + " " + constants.IN_GAME);
+      console.log(`Lobby ${lobby_id} is in state ${state}`);
       // Set up the game notifer for the lobby to send messages
       if (state === constants.IN_GAME) {
         function gameNotifier() {
@@ -71,10 +71,14 @@ module.exports = function (Manager, io) {
     });
 
     socket.on("start-game", (lobby_id) => {
-      console.log(lobby_id);
       Manager.changeLobbyState(lobby_id, constants.IN_GAME).then(() => {
         io.to(lobby_id).emit("state-change", constants.IN_GAME);
       });
+    });
+
+    socket.on("turn-start", (lobby_id, word) => {
+      console.log(`Starting game in ${lobby_id} with ${word}`);
+      Manager.startTurn(lobby_id, word);
     });
 
     socket.on("game-status", (lobby_id, user_id) => {
