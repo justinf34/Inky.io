@@ -1,5 +1,6 @@
 const db = require("../../config/db");
 const constants = require("../Constants");
+const word_list = require("./word-list");
 
 class Lobby {
   constructor(id, host) {
@@ -19,9 +20,6 @@ class Lobby {
 
     this.drawing_time = 100;
     this.timer = null; // Timer for the game
-
-    this.word_list = []; // TODO: Set a default when user does not input a lot
-    this.word = "temp"; // Current word
 
     this.drawer = null; // user_id of drawer
     this.drawer_order = [];
@@ -71,8 +69,8 @@ class Lobby {
 
     // Restart timer but do not start it
     this.timer = this.drawing_time;
-    console.log("drawer:",this.drawer);
-    this.startTurn(this.word_list[0]);
+    // console.log("drawer:", this.drawer);
+    // this.startTurn(this.word_list[0]);
   }
 
   startTurn(word) {
@@ -81,19 +79,23 @@ class Lobby {
     // start timer
     //this.startTimer();
 
-    setTimeout(()=>{this.startTimer();this.notifier(); }, 1000);
+    setTimeout(() => {
+      this.startTimer();
+      this.notifier();
+    }, 1000);
     //this.notifier(); // Let all the players know that turn started
-    
+
+    this.word_list = word_list;
+    this.word = "test"; // Current word
   }
 
-  startTimer(){
-
+  startTimer() {
     this.interval = setInterval(() => {
-      if(this.timer > 0 ){
-        this.timer -=1;
-        console.log("timer now:" ,this.timer);
-      }else{
-        clearInterval(this.interval)
+      if (this.timer > 0) {
+        this.timer -= 1;
+        console.log("timer now:", this.timer);
+      } else {
+        clearInterval(this.interval);
         this.endTurn();
       }
     }, 1000);
@@ -133,6 +135,8 @@ class Lobby {
         state: constants.CONNECTED,
         score: 0,
       });
+    } else {
+      this.players.get(player_info.id).state = constants.CONNECTED;
     }
 
     this.connected_players.set(socket_id, player_info.id);
@@ -322,6 +326,51 @@ class Lobby {
     }
 
     return this.strokes;
+  }
+
+  // returns random int between min and max
+  rndInt(min, max) {
+    [min, max] = [Math.ceil(min), Math.floor(max)];
+    return min + Math.floor(Math.random() * (max - min + 1));
+  }
+
+  // returns array of 3 words from the list of words
+  getWordOptions() {
+    // removes last word from possible words to be chosen from
+    // will be added back
+    for (let i = 0; i < this.word_list; i++) {
+      if (this.word_list[i] === this.word) {
+        this.word_list.splice(i, 1);
+        break;
+      }
+    }
+
+    let wordOptions = [];
+    // gets 3 random words from list and add them to word options
+    for (let i = 0; i < 3; i++) {
+      let index = this.rndInt(0, this.word_list.length - 1);
+      wordOptions.push(this.word_list[index]);
+      this.word_list.splice(index, 1);
+    }
+
+    // add back wordOptions and word to word list
+    this.word_list.concat(wordOptions);
+    this.word_list.push(this.word);
+
+    return wordOptions;
+  }
+
+  // takes in array of words to add to wordlist
+  addToWords(newWords) {
+    let wordsToAdd = [];
+    for (let word in newWords) {
+      newWords[word] = newWords[word].trim().toLowerCase();
+      // handles empty inputs
+      if (newWords[word].length) {
+        wordsToAdd.push(newWords[word]);
+      }
+    }
+    this.word_list = [...new Set(this.word_list.concat(wordsToAdd))];
   }
 }
 

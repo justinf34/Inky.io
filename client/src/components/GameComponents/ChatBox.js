@@ -40,7 +40,7 @@ class ChatBox extends Component {
 
   render() {
     return (
-      <Card>
+      <Card style={{height: "100%"}}>
         <Card.Body>
           {this.state.messageLog.map(msg => (
             <ChatMessage message={msg}/>
@@ -48,7 +48,7 @@ class ChatBox extends Component {
         </Card.Body>
         <Card.Footer>
           <Form onSubmit={this.handleSubmit}>
-            <Form.Control type="input" onChange={this.handleChange} value={this.state.currentMessage}></Form.Control>
+            <Form.Control type="input" onChange={this.handleChange} value={this.state.currentMessage} placeholder="type your guess here"></Form.Control>
           </Form>
         </Card.Footer>
       </Card>

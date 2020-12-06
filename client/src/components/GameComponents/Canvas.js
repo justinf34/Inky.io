@@ -5,6 +5,7 @@ import weights from "./weights";
 import colors from "./colors";
 import ColorBox from "./ColorBox";
 import { Button } from "react-bootstrap";
+import { FaEraser, FaRegTrashAlt } from "react-icons/fa";
 
 import { withRouter } from "react-router-dom";
 
@@ -86,6 +87,15 @@ class Canvas extends Component {
       }
     };
 
+    sketch.windowResized = () => {
+      if (this.myRef && this.myRef.current)
+        sketch.resizeCanvas(
+          this.myRef.current.offsetWidth,
+          this.myRef.current.offsetHeight
+        );
+      sketch.background("#ffffff");
+    };
+
     this.sketch = sketch;
   };
 
@@ -108,9 +118,18 @@ class Canvas extends Component {
     const options = [];
     weights.forEach((weight, i) => {
       options.push(
-        <Button key={i} value={weight.value} onClick={this.strokeOptionClick}>
-          {weight.name}
-        </Button>
+        <Button
+          variant="dark"
+          style={{
+            padding: weight.value + "px",
+            maxWidth: "70px",
+            width: "100%",
+            borderRadius: "50px",
+          }}
+          key={i}
+          value={weight.value}
+          onClick={this.strokeOptionClick}
+        ></Button>
       );
     });
 
@@ -143,14 +162,24 @@ class Canvas extends Component {
     return (
       <React.Fragment>
         <div id="canvas" ref={this.myRef}></div>
-        <div className="canvas-tool-container">
-          <div className="color-options-container">
-            {this.renderColorOptions()}
+        {this.props.drawing ? (
+          <div className="canvas-tool-container">
+            <div className="color-options-container">
+              {this.renderColorOptions()}
+            </div>
+            <div className="tools">
+              <React.Fragment>{this.renderStrokeOptions()}</React.Fragment>
+              <Button variant="outline-info" onClick={this.eraser}>
+                <FaEraser />
+              </Button>
+              <Button variant="outline-info" onClick={this.clearCanvas}>
+                <FaRegTrashAlt />
+              </Button>
+            </div>
           </div>
-          <Button onClick={this.eraser}>eraser</Button>
-          <Button onClick={this.clearCanvas}>clear</Button>
-          <React.Fragment>{this.renderStrokeOptions()}</React.Fragment>
-        </div>
+        ) : (
+          <></>
+        )}
       </React.Fragment>
     );
   }

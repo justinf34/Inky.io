@@ -66,6 +66,17 @@ module.exports = function (Manager, io) {
       });
     });
 
+    socket.on("add-words", (lobby_id, customWords) => {
+      Manager.addCustomWords(lobby_id, customWords);
+    });
+
+    socket.on("start-game", (lobby_id) => {
+      console.log(lobby_id);
+      Manager.changeLobbyState(lobby_id, constants.IN_GAME).then(() => {
+        io.to(lobby_id).emit("state-change", constants.IN_GAME);
+      });
+    });
+
     socket.on("game-status", (lobby_id, user_id) => {
       const status = Manager.getGameStatus(lobby_id, user_id);
       socket.emit("game-status", status);
@@ -90,6 +101,20 @@ module.exports = function (Manager, io) {
           console.log(result.message);
         }
       });
+    });
+
+    socket.on("report", async (lobby_id, user_id, name, reason) => {
+      const status = Manager.addReport(lobby_id, user_id, name, reason).then(
+        (result) => {
+          if (result.success) {
+            socket.emit("report", result.success);
+            console.log("sucessful created report");
+          } else {
+            socket.emit("report", result.success);
+            console.log("failed creating report");
+          }
+        }
+      );
     });
   };
 };

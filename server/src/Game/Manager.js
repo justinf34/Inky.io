@@ -1,6 +1,7 @@
 const Lobby = require("./Lobby");
 const db = require("../../config/db");
 const constants = require("../../src/Constants");
+const admin = require("firebase-admin");
 
 /**
  * Interface to interact with the rooms
@@ -59,6 +60,11 @@ module.exports = function () {
     lobby.changeSetting(setting);
   }
 
+  async function addCustomWords(lobby_id, customWords) {
+    const lobby = Lobbies.get(lobby_id);
+    lobby.addToWords(customWords);
+  }
+
   async function changeLobbyState(lobby_id, state) {
     // Update the DB
     try {
@@ -81,9 +87,37 @@ module.exports = function () {
       let user_id = lobby.connected_players.get(socket_id);
       let name = lobby.players.get(user_id).name;
       db.collection("Chats").add({
+        userID: user_id,
         name: name,
         lobbyID: lobby_id,
         message: message,
+      });
+      return { success: true, name: name };
+    } catch (error) {
+      return { success: false, message: error };
+    }
+  }
+
+  async function addReport(lobby_id, user_id, name, reason) {
+    var reasons = "";
+    if (reason.cheating) {
+      reasons += "Cheating. ";
+    }
+    if (reason.verbalAbuse) {
+      reasons += "Verbal Abuse. ";
+    }
+    if (reason.inappropriateName) {
+      reasons += "Inappropriate Name. ";
+    }
+
+    try {
+      //console.log(new Timestamp());
+      db.collection("Reports").add({
+        date: admin.firestore.Timestamp.now(),
+        lobbyID: lobby_id,
+        name: name,
+        playerID: user_id,
+        reason: reasons,
       });
       return { success: true, name: name };
     } catch (error) {
@@ -106,7 +140,7 @@ module.exports = function () {
     return lobby.getRoundStatus(user_id);
   }
 
-  function getSyncTime(lobby_id, user_id){
+  function getSyncTime(lobby_id, user_id) {
     const lobby = Lobbies.get(lobby_id);
     return lobby.getRoundStatus(user_id).timer;
   }
@@ -115,8 +149,10 @@ module.exports = function () {
     joinRoom,
     leaveRoom,
     changeLobbySetting,
+    addCustomWords,
     changeLobbyState,
     addChat,
+    addReport,
     addStroke,
     initNotifier,
     getGameStatus,

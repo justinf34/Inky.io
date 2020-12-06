@@ -4,8 +4,22 @@ import GamePage from "./GamePage";
 
 import { Redirect, withRouter } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
+import DeviceDetect from "../Utils/DeviceDetect";
 import io from "socket.io-client";
 import constants from "../Utils/Constants";
+
+function mobileChecker(Component) {
+  const { isMobile } = DeviceDetect();
+
+  if (isMobile) {
+    return <Redirect to={"/"} />;
+  } else {
+    console.log("On phone");
+    return function GameRoute(props) {
+      return <Component {...props} />;
+    };
+  }
+}
 
 class Game extends Component {
   constructor(props) {
@@ -89,7 +103,7 @@ class Game extends Component {
       );
 
     if (this.state.state === constants.IN_GAME)
-      return <GamePage socket={this.state.socket} />;
+      return <GamePage players={this.state.players} socket={this.state.socket} />;
 
     if (this.state.state === constants.GAME_DISCONNECTED)
       return <Redirect to={"/"} />;
