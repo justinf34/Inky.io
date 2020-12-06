@@ -152,12 +152,10 @@ class Canvas extends Component {
   }
 
   clearCanvas() {
-    if (this.props.drawing) {
-      const { match } = this.props;
-      const msg = { type: 1 };
-      this.props.socket.emit("draw", match.params.lobbyID, msg);
-      this.sketch.background("#ffffff");
-    }
+    const { match } = this.props;
+    const msg = { type: 1 };
+    this.props.socket.emit("draw", match.params.lobbyID, msg);
+    this.sketch.background("#ffffff");
   }
 
   render() {
