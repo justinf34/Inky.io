@@ -14,7 +14,7 @@ class Canvas extends Component {
     super(props);
 
     this.myRef = React.createRef();
-    this.strokes = props.strokes;
+    this.start = true;
 
     this.state = {
       color: "#000000",
@@ -32,6 +32,10 @@ class Canvas extends Component {
     this.props.socket.on("draw", this.sketch.onNewDrawing);
   }
 
+  componentWillUnmount() {
+    // this.start = true;
+  }
+
   Sketch = (sketch) => {
     sketch.setup = () => {
       sketch.createCanvas(
@@ -39,19 +43,24 @@ class Canvas extends Component {
         this.myRef.current.offsetHeight
       );
       sketch.background("#ffffff");
+      sketch.frameRate(20);
     };
 
     sketch.draw = () => {
-      this.strokes.forEach((stroke) => {
-        console.log(stroke);
-        sketch.strokeWeight(stroke.weight);
-        sketch.stroke(stroke.color);
-        sketch.line(stroke.x1, stroke.y1, stroke.x2, stroke.y2);
-      });
+      if (this.start) {
+        console.log("Drawin old stuff");
+        console.log(this.strokes);
+        this.props.strokes.forEach((stroke) => {
+          sketch.strokeWeight(stroke.weight);
+          sketch.stroke(stroke.color);
+          sketch.line(stroke.x1, stroke.y1, stroke.x2, stroke.y2);
+        });
+        this.start = false;
+      }
     };
 
     sketch.mouseDragged = () => {
-      if (this.props.drawing) {
+      if (this.props.drawing && this.props.round_state !== 0) {
         const msg = {
           type: 0,
           x1: sketch.pmouseX,
@@ -77,8 +86,7 @@ class Canvas extends Component {
     };
 
     sketch.onNewDrawing = (data, strokes) => {
-      this.strokes = strokes;
-      if (data.type == 1) {
+      if (data.type === 1) {
         sketch.background("#ffffff");
       } else {
         sketch.strokeWeight(data.weight);
@@ -94,6 +102,7 @@ class Canvas extends Component {
           this.myRef.current.offsetHeight
         );
       sketch.background("#ffffff");
+      this.start = true;
     };
 
     this.sketch = sketch;

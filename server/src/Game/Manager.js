@@ -100,14 +100,14 @@ module.exports = function () {
 
   async function addReport(lobby_id, user_id, name, reason) {
     var reasons = "";
-    if(reason.cheating){
-      reasons += "Cheating. "
+    if (reason.cheating) {
+      reasons += "Cheating. ";
     }
-    if(reason.verbalAbuse){
-      reasons += "Verbal Abuse. "
+    if (reason.verbalAbuse) {
+      reasons += "Verbal Abuse. ";
     }
-    if(reason.inappropriateName){
-      reasons += "Inappropriate Name. "
+    if (reason.inappropriateName) {
+      reasons += "Inappropriate Name. ";
     }
 
     try {
@@ -117,7 +117,7 @@ module.exports = function () {
         lobbyID: lobby_id,
         name: name,
         playerID: user_id,
-        reason: reasons
+        reason: reasons,
       });
       return { success: true, name: name };
     } catch (error) {
@@ -130,9 +130,9 @@ module.exports = function () {
     return lobby.saveStroke(stroke);
   }
 
-  function initNotifier(lobby_id, notifier_func) {
+  function initNotifier(lobby_id, notifier_func, io) {
     const lobby = Lobbies.get(lobby_id);
-    lobby.init_sock(notifier_func);
+    lobby.init_sock(notifier_func, io);
   }
 
   function getGameStatus(lobby_id, user_id) {
@@ -140,6 +140,15 @@ module.exports = function () {
     return lobby.getRoundStatus(user_id);
   }
 
+  function getSyncTime(lobby_id, user_id) {
+    const lobby = Lobbies.get(lobby_id);
+    return lobby.getRoundStatus(user_id).timer;
+  }
+
+  function startTurn(lobby_id, word) {
+    const lobby = Lobbies.get(lobby_id);
+    lobby.startTurn(word);
+  }
   return {
     createNewRoom,
     joinRoom,
@@ -152,5 +161,7 @@ module.exports = function () {
     addStroke,
     initNotifier,
     getGameStatus,
+    getSyncTime,
+    startTurn,
   };
 };

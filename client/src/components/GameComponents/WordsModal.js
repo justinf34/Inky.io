@@ -1,16 +1,19 @@
 import React from "react";
 import { Button, Card } from "react-bootstrap";
+import { withRouter } from "react-router-dom";
 import "./WordsModal.css";
 
 // takes in prop isArtist, artistName, words
-export default class WordsModal extends React.Component {
+class WordsModal extends React.Component {
   constructor(props) {
     super(props);
     this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick(word) {
-    console.log(this.props.artistName + " chose " + word);
+    const { match } = this.props;
+    console.log(`${word} to ${match.params.lobbyID} `);
+    this.props.socket.emit("turn-start", match.params.lobbyID, word);
   }
 
   render() {
@@ -63,3 +66,5 @@ export default class WordsModal extends React.Component {
     );
   }
 }
+
+export default withRouter(WordsModal);

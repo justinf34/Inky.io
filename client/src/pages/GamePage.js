@@ -9,6 +9,7 @@ import { withAuth } from "../context/auth-context";
 
 import "../styles/GamePage.css";
 import { Button } from "react-bootstrap";
+import Timer from "../components/GameComponents/Timer";
 
 class GamePage extends Component {
   constructor(props) {
@@ -17,6 +18,10 @@ class GamePage extends Component {
     this.state = {
       strokes: [],
     };
+
+    // this.getTime = this.getTime.bind(this);
+    // this.interval = null;
+    // this.syncInterval = null;
   }
 
   componentDidMount() {
@@ -26,9 +31,40 @@ class GamePage extends Component {
 
     this.getRoundStatus();
 
-    this.props.socket.on("new-round-status", () => {
-      this.getRoundStatus();
-    });
+    this.props.socket.on("new-round-status", () => this.getRoundStatus());
+
+    // this.props.socket.on("new-round-status", () => {
+    //   if (this.interval === null) {
+    //     console.log("new round statssssssssss");
+    //     this.interval = setInterval(() => {
+    //       if (this.state.timer > 0) {
+    //         this.setState({
+    //           timer: this.state.timer - 1,
+    //         });
+    //       } else {
+    //         clearInterval(this.interval);
+    //         clearInterval(this.syncInterval);
+    //         this.interval = null;
+    //         this.syncInterval = null;
+    //       }
+    //     }, 1000);
+    //     this.syncInterval = setInterval(() => {
+    //       this.getTime();
+    //     }, 5000);
+    //     this.getRoundStatus();
+    //   }
+    // });
+
+    // this.props.socket.on("timesync", (data) => {
+    //   console.log("Server time now", data, "off set:", this.state.timer - data);
+    //   this.setState({
+    //     timer: data,
+    //   });
+    // });
+  }
+
+  getTime() {
+    this.props.socket.emit("timesync", this.props.match.params.lobbyID);
   }
 
   getRoundStatus() {
@@ -45,11 +81,9 @@ class GamePage extends Component {
           <Button variant="outline-secondary">Leave Lobby</Button>
         </Link>
         <div className="game-contents">
-          <div className="hints">
-            {/* TODO */}
-          </div>
+          <div className="hints">{/* TODO */}</div>
           <div className="timer">
-            {/* TODO */}
+            <Timer socket={this.props.socket} timer={this.state.timer} />
           </div>
           <div className="players-container">
             <PlayerSidebar
@@ -62,6 +96,8 @@ class GamePage extends Component {
           <CanvasContainer
             socket={this.props.socket}
             drawer={this.state.drawer}
+            round_state={this.state.round_state}
+            word_list={this.state.word_list}
             drawing={this.state.drawer ? this.state.drawer === user.id : false}
             strokes={this.state.strokes}
           />

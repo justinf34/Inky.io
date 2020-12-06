@@ -1,5 +1,6 @@
 const db = require("../../config/db");
 const constants = require("../Constants");
+const word_list = require("./word-list");
 
 class Lobby {
   constructor(id, host) {
@@ -8,37 +9,44 @@ class Lobby {
     this.state = constants.IN_LOBBY;
 
     this.notifier = null;
+    this.io = null;
 
     this.players = new Map(); // Keep track of the players(key = id, value = {socket_id, name, score})
     this.connected_players = new Map(); // key = socket id, value = player id
 
-    this.rounds = 3; // Number of rounds in the game
+    this.rounds = 1; // Number of rounds in the game
     this.curr_round = 1; // Current round in the game
     this.round_state = 0;
     this.players_guessed = []; //Number of players that correctly guessed the word
 
-    this.drawing_time = 100;
+    this.drawing_time = 30;
     this.timer = null; // Timer for the game
 
     this.drawer = null; // user_id of drawer
     this.drawer_order = [];
     this.strokes = []; // Strokes that was sent to the player
+
+    this.interval = null; //Timer interval
+
+    this.word = "placeholder";
+    this.word_list = ["apple", "banana", "cat"];
   }
 
-  init_sock(notifier_func) {
+  init_sock(notifier_func, io) {
     this.notifier = notifier_func;
+    this.io = io;
   }
 
   getRoundStatus(user_id) {
     return {
       rounds: this.rounds,
       curr_round: this.curr_round,
-      state: this.round_state,
+      round_state: this.round_state,
       drawer: this.drawer, // user_id of the drawer
       word_list: this.drawer === user_id ? this.word_list : [],
       word: this.drawer === user_id ? this.word : "_".repeat(this.word.length),
       strokes: this.strokes,
-      // TODO: Add current time here
+      timer: this.timer,
     };
   }
 
@@ -49,6 +57,7 @@ class Lobby {
       this.curr_round = 1;
       this.players_guessed = [];
 
+      this.timer = this.drawing_time;
       // Setting draw order
       this.drawer_order = Array.from(this.connected_players.values());
 
@@ -59,51 +68,35 @@ class Lobby {
   newTurn() {
     this.drawer = this.drawer_order.shift();
     this.word_list = ["apple", "banana", "cat"]; // Generate word choices
-    this.strokes = []; // Clear the canvas
     this.round_state = 0; // State to choosing
 
     // Restart timer but do not start it
+    this.timer = this.drawing_time;
   }
 
   startTurn(word) {
-    this.word = word; // set the word
+    console.log(`Starting ${this.id} with ${word}`);
+    // this.word_list = word_list;
+    this.round_state = 1;
+    this.word = word; // Current word
 
-    // start timer
-    this.word_list = ["turtle","garfield","alligator","headphones","wedding dress","violin","newspaper",
-      "raincoat","chameleon","cardboard","oar","drip","shampoo","time machine","yardstick","think","lace",
-      "darts","avocado","bleach","curtain","extension cord","birthday","sandbox","bruise",
-      "fog","sponge","wig","pilot","mascot","fireman","zoo","sushi","fizz","ceiling","post office",
-      "season","internet","chess","puppet","chime","koala","dentist","ping pong","bonnet","sheets",
-      "sunburn","houseboat","sleep","kneel","crust","speakers","cheerleader","dust","salmon","cabin",
-      "handle","swamp","cruise","pharmacist","dream","raft","plank","cliff","sweater","safe","picnic",
-      "shrink","ray","leak","deep","tiptoe","hurdle","knight","cloak","bedbug","hot tub","firefighter",
-      "charger","nightmare","coach","sneeze","goblin","chef","applause","golden retriever","joke",
-      "comedian","cupcake","baker","facebook","convertible","giant","garden","diving","hopscotch",
-      "stingray","song","trip","backbone","bomb","treasure","garbage","park","pirate","ski","whistle",
-      "state","baseball","coal","queen","photograph","computer","hockey","hot dog","salt and pepper","ipad",
-      "frog","lawnmower","mattress","pinwheel","circus","battery","mailman","cowboy","password","bicycle",
-      "skate","electricity","thief","teapot","spring","nature","shallow","outside","america","bow tie",
-      "wax","light bulb","music","popsicle","brain","knee","pineapple","tusk","sprinkler","money",
-      "pool","lighthouse","doormat","face","flute","rug","snowball","purse","owl","gate","suitcase","stomach",
-      "doghouse","pajamas","bathroom","scale","peach","watering can","hook","school","french fries",
-      "beehive","artist","flagpole","camera","hair dryer","mushroom","tv","quilt","chalk","angle","ant","apple",
-      "arch","arm","army","baby","bag","ball","band","basin","basket","bath","bed","bee","bell","berry","bird",
-      "blade","board","boat","bone","book","boot","bottle","box","boy","brake","branch","brick","bridge",
-      "brush","bucket","button","cake","card","carriage","cart","cat","chain","cheese","chin",
-      "church","circle","clock","cloud","coat","collar","comb","cord","cow","cup","cushion","dog","door",
-      "drain","drawer","dress","drop","ear","egg","engine","eye","farm","feather","finger","fish","flag",
-      "floor","fly","foot","fork","fowl","frame","girl","glove","goat","gun","hair","hammer","hand","hat",
-      "head","heart","horn","horse","hospital","house","island","jewel","kettle","key","knife","knot",
-      "leaf","leg","line","lip","lock","map","match","monkey","moon","mouth","muscle","nail","neck","needle","nerve",
-      "net","nose","nut","office","orange","oven","parcel","pen","pencil","picture","pig","pin","pipe","plane","plate",
-      "plough","pocket","pot","potato","prison","pump","rail","rat","receipt","ring","rod","roof","root","sail",
-      "scissors","screw","seed","sheep","shelf","ship","shirt","shoe","skin","skirt","snake","sock","spade","spoon",
-      "square","stamp","star","station","stem","stick","stocking","store","street","sun","table","tail",
-      "thread","throat","thumb","ticket","toe","tongue","tooth","town","train","tray","tree","trousers","umbrella","wall",
-      "watch","wheel","whip","window","wing","wire","worm"];
-    this.word = null; // Current word
+    setTimeout(() => {
+      this.startTimer(); // Start timer
+      this.notifier(); // Let everyone know
+    }, 1000);
+  }
 
-    this.notifier(); // Let all the players know that turn started
+  startTimer() {
+    this.interval = setInterval(() => {
+      if (this.timer > 0) {
+        this.timer -= 1;
+        this.io.to(this.id).emit("time-update", this.timer);
+        // console.log("timer now:", this.timer);
+      } else {
+        clearInterval(this.interval);
+        this.endTurn();
+      }
+    }, 1000);
   }
 
   /**
@@ -112,13 +105,18 @@ class Lobby {
    * the drawer disconnects
    */
   endTurn() {
+    clearInterval(this.interval); // Clear interval
+
+    // Clear canvas
+    this.strokes.length = 0; // Clear the canvas
+    this.io.to(this.id).emit("draw", { type: 1 }, this.strokes);
+
     let endGame = false;
 
     //check if all the players already had a turn to draw
     if (this.drawer_order.length === 0) {
       //check for last round
-      if (this.curr_round == this.rounds) {
-        this.round_state = 3;
+      if (this.curr_round === this.rounds) {
         endGame = true;
       } else {
         this.curr_round += 1;
@@ -126,9 +124,21 @@ class Lobby {
       }
     }
 
-    if (!endGame) this.newTurn();
-
-    this.notifier(); // Let all the players know that turn ended
+    if (!endGame) {
+      this.newTurn();
+      this.notifier(); // Let all the players know that turn ended
+    } else {
+      this.state = constants.IN_LOBBY;
+      this.round_state = 3;
+      db.collection("Lobbies")
+        .doc(this.id)
+        .update({
+          state: constants.IN_LOBBY,
+        })
+        .then((_) => {
+          this.io.to(this.id).emit("state-change", constants.IN_LOBBY);
+        });
+    }
   }
 
   joinPlayer(player_info, socket_id) {
@@ -191,6 +201,8 @@ class Lobby {
     const user_id = this.connected_players.get(socket_id);
     this.players.get(user_id).state = constants.DISCONNECTED;
     this.connected_players.delete(socket_id);
+
+    //TODO: If in game, and only 1 player -> black to lobby
 
     if (this.state === constants.IN_GAME) {
       this.drawer_order = this.drawer_order.filter(
@@ -325,16 +337,17 @@ class Lobby {
   saveStroke(stroke) {
     if (stroke.type === 1) {
       this.strokes = [];
+      console.log("should be 1");
     } else {
       this.strokes.push(stroke);
     }
 
     return this.strokes;
   }
-  
+
   // returns random int between min and max
   rndInt(min, max) {
-    [min,max] = [Math.ceil(min), Math.floor(max)]
+    [min, max] = [Math.ceil(min), Math.floor(max)];
     return min + Math.floor(Math.random() * (max - min + 1));
   }
 
@@ -342,8 +355,8 @@ class Lobby {
   getWordOptions() {
     // removes last word from possible words to be chosen from
     // will be added back
-    for(let i = 0; i < this.word_list; i++) {
-      if(this.word_list[i] === this.word) {
+    for (let i = 0; i < this.word_list; i++) {
+      if (this.word_list[i] === this.word) {
         this.word_list.splice(i, 1);
         break;
       }
@@ -351,7 +364,7 @@ class Lobby {
 
     let wordOptions = [];
     // gets 3 random words from list and add them to word options
-    for(let i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
       let index = this.rndInt(0, this.word_list.length - 1);
       wordOptions.push(this.word_list[index]);
       this.word_list.splice(index, 1);
@@ -367,11 +380,11 @@ class Lobby {
   // takes in array of words to add to wordlist
   addToWords(newWords) {
     let wordsToAdd = [];
-    for(let word in newWords) {
+    for (let word in newWords) {
       newWords[word] = newWords[word].trim().toLowerCase();
       // handles empty inputs
-      if(newWords[word].length) {
-         wordsToAdd.push(newWords[word]);
+      if (newWords[word].length) {
+        wordsToAdd.push(newWords[word]);
       }
     }
     this.word_list = [...new Set(this.word_list.concat(wordsToAdd))];

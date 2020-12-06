@@ -9,7 +9,7 @@
 
 canvas {
   border: 1px solid;
-  border-radius: .25rem; 
+  border-radius: 0.25rem;
 }
 
 .canvas-tool-container {
@@ -21,7 +21,7 @@ canvas {
   justify-content: space-evenly;
   align-items: center;
   border: 1px solid;
-  border-radius: .25rem;
+  border-radius: 0.25rem;
 }
 
 .color-options-container {
@@ -58,6 +58,11 @@ canvas {
   justify-content: center;
 }
 
+.timer {
+  width: 5%;
+  height: auto;
+}
+
 .tools {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -69,7 +74,7 @@ canvas {
   height: auto;
 }
 
-.tools Button{
+.tools Button {
   padding: inherit;
   height: auto;
 }
@@ -82,5 +87,5 @@ canvas {
   bottom: 0;
   left: 0;
   right: 0;
-  border-radius: .25rem;
+  border-radius: 0.25rem;
 }
