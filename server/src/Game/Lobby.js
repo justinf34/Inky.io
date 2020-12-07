@@ -42,7 +42,10 @@ class Lobby {
       rounds: this.rounds,
       curr_round: this.curr_round,
       round_state: this.round_state,
-      drawer: this.drawer, // user_id of the drawer
+      drawer: {
+        id: this.drawer,
+        name: this.players.get(this.drawer).name,
+      },
       word_list: this.drawer === user_id ? this.word_list : [],
       word: this.drawer === user_id ? this.word : "_".repeat(this.word.length),
       strokes: this.strokes,
