@@ -95,10 +95,12 @@ class GamePage extends Component {
           </div>
           <CanvasContainer
             socket={this.props.socket}
-            drawer={this.state.drawer}
+            drawer={this.state.drawer ? this.state.drawer.name : ""}
             round_state={this.state.round_state}
             word_list={this.state.word_list}
-            drawing={this.state.drawer ? this.state.drawer === user.id : false}
+            drawing={
+              this.state.drawer ? this.state.drawer.id === user.id : false
+            }
             strokes={this.state.strokes}
           />
           <div className="chat-container">
