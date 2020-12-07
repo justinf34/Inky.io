@@ -1,4 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Chilanka&display=swap');
+
 .App {
+  font-family: 'Chilanka', cursive;
   text-align: center;
 }
 
@@ -34,5 +37,17 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1000px) {
+  * {
+    font-size: 12px;
+  }
+}
+
+@media (max-height: 700px) {
+  * {
+    font-size: 12px;
   }
 }

@@ -3,7 +3,7 @@ import "../styles/GameLobbyPage.css";
 import { Form, InputGroup, Col, Button } from "react-bootstrap";
 import constants from "../Utils/Constants";
 
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
 //takes in prop isHost: bool
 class GameLobbyPage extends React.Component {
@@ -12,9 +12,9 @@ class GameLobbyPage extends React.Component {
     this.state = {
       numRounds: this.props.settings.rounds,
       drawingTime: this.props.settings.draw_time,
-      customWords: [], //TODO: Need handle this in the backend
+      customWords: "", //TODO: Need handle this in the backend
       roomLink: this.props.match.params.lobbyID,
-      numRoundsOptions: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+      numRoundsOptions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       drawingTimeOptions: [
         30,
         45,
@@ -82,7 +82,7 @@ class GameLobbyPage extends React.Component {
 
   handleCustomWordChange(e) {
     this.setState({
-      customWords: e.target.value.split(","),
+      customWords: e.target.value,
     });
   }
 
@@ -93,7 +93,15 @@ class GameLobbyPage extends React.Component {
 
   startGame() {
     const { match } = this.props;
-    this.props.socket.emit("start-game", match.params.lobbyID);
+    if (this.state.customWords.length) {
+      const customWords = this.state.customWords.split(",");
+      this.props.socket.emit("add-words", match.params.lobbyID, customWords);
+    }
+    this.props.socket.emit(
+      "lobby-state-change",
+      match.params.lobbyID,
+      constants.IN_GAME
+    );
   }
 
   renderSelectOptions(options) {
@@ -119,7 +127,7 @@ class GameLobbyPage extends React.Component {
             <h3 style={{ textAlign: "center", paddingBottom: "1em" }}>
               Settings
             </h3>
-            <Form>
+            <Form className="settings-form">
               <Form.Group as={Form.Row}>
                 <Form.Label column sm={5}>
                   Number of Rounds
@@ -167,7 +175,7 @@ class GameLobbyPage extends React.Component {
                   as="textarea"
                   disabled={!this.props.isHost}
                   readOnly={!this.props.isHost}
-                  placeholder="Leave blank to use default words. Separate words with commas. Min 3 words"
+                  placeholder="Leave blank to only use default words. Separate words with commas."
                   value={this.state.customWords}
                   onChange={this.handleCustomWordChange}
                 />
@@ -195,37 +203,45 @@ class GameLobbyPage extends React.Component {
                 </InputGroup.Append>
               </InputGroup>
             </Form>
-            <Button
-              className="start-game-btn"
-              // disabled={this.countPlayers() < 2}
-              disabled={!this.props.isHost}
-              onClick={this.startGame}
-            >
-              Start
-            </Button>
+            <div className="button-group">
+              <Link to="/" className="leave-lobby-btn">
+                <Button variant="outline-secondary">Leave Lobby</Button>
+              </Link>
+              <Button
+                className="start-game-btn"
+                variant="success"
+                // disabled={this.countPlayers() < 2}
+                disabled={!this.props.isHost}
+                onClick={this.startGame}
+              >
+                Start Game
+              </Button>
+            </div>
           </div>
           <div className="players">
             <h3 style={{ textAlign: "center", paddingBottom: "1em" }}>
               Players
             </h3>
-            {this.props.players.map((player, index) => {
-              if (
-                player.state === constants.DISCONNECTED ||
-                player.state === constants.KICKED
-              ) {
-                return "";
-              }
-              return (
-                <div key={index} className="player-container">
-                  <img
-                    className="player-pfp"
-                    src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
-                    alt="pfp"
-                  ></img>
-                  <div>{player.name}</div>
-                </div>
-              );
-            })}
+            <div className="player-grid">
+              {this.props.players.map((player, index) => {
+                if (
+                  player.state === constants.DISCONNECTED ||
+                  player.state === constants.KICKED
+                ) {
+                  return "";
+                }
+                return (
+                  <div key={index} className="player-container">
+                    <img
+                      className="player-pfp"
+                      src="https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
+                      alt="pfp"
+                    ></img>
+                    <div>{player.name}</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
