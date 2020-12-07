@@ -8,7 +8,7 @@ import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
 import Game from "./pages/Game";
 import AdminPage from "./pages/AdminPage";
-
+import GameEndingPage from "./pages/GameEndingPage";
 export default class App extends Component {
   render() {
     return (
@@ -20,6 +20,7 @@ export default class App extends Component {
             <ProtectedRoute exact path="/profile" component={ProfilePage} />
             <ProtectedRoute exact path="/game/:lobbyID" component={Game} />
             <ProtectedRoute exact path="/report" component={AdminPage} />
+            <Route exact path="/gameEnding" component={GameEndingPage} />
           </Switch>
         </Router>
       </div>

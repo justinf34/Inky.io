@@ -5,6 +5,7 @@ import NavBar from "../components/NavBar";
 import "../styles/ProfilePage.css";
 import AuthContext from "../context/AuthContext";
 import Dialog from "react-bootstrap-dialog";
+import { Link } from "react-router-dom";
 class ProfilePage extends React.Component {
   constructor(props) {
     super(props);
@@ -14,7 +15,7 @@ class ProfilePage extends React.Component {
         ? this.imageWebLink(this.props.authCreds.auth.user.profileKey)
         : "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png",
       modalShow: false,
-      userImageDisplayIndex: 0,
+      userImageDisplayIndex: this.props.authCreds.auth.user.profileKey,
     };
     this.usernameChange = this.usernameChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
