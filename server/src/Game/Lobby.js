@@ -1,3 +1,4 @@
+const { collection } = require("../../config/db");
 const db = require("../../config/db");
 const constants = require("../Constants");
 const word_list = require("./word-list");
@@ -107,7 +108,7 @@ class Lobby {
    * all the guesser guessed the word, or when
    * the drawer disconnects
    */
-  endTurn() {
+  async endTurn() {
     clearInterval(this.interval); // Clear interval
 
     // Clear canvas
@@ -133,14 +134,48 @@ class Lobby {
     } else {
       this.state = constants.IN_LOBBY;
       this.round_state = 3;
-      db.collection("Lobbies")
-        .doc(this.id)
-        .update({
+      try {
+        const res = db.collection("Lobbies").doc(this.id).update({
           state: constants.IN_LOBBY,
-        })
-        .then((_) => {
-          this.io.to(this.id).emit("state-change", constants.IN_LOBBY);
         });
+
+        this.io.to(this.id).emit("state-change", constants.IN_LOBBY);
+      } catch (error) {
+        //TODO: Handle properly
+        console.log("Cannot update lobby state in db ");
+      }
+
+      try {
+        // Create new new Game document
+        const docRef = await db
+          .collection("Lobbies")
+          .doc(this.id)
+          .collection("Games")
+          .add({
+            date: new Date(),
+            rounds: this.rounds,
+          });
+
+        const scores = db
+          .collection("Lobbies")
+          .doc(this.id)
+          .collection("Games")
+          .doc(docRef.id)
+          .collection("Scores");
+
+        const batch = db.batch();
+        const players = Array.from(this.players.values());
+        players.forEach((player) => {
+          const playerRef = scores.doc(player.id);
+          batch.set(playerRef, { name: player.name, score: player.score });
+        });
+
+        const res = await batch.commit();
+        console.log("Successfully upload scores to db");
+      } catch (error) {
+        //TODO: Handle properly
+        console.log("Something went wrong in uploading score... ");
+      }
     }
   }
 
