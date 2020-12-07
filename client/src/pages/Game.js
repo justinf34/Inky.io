@@ -27,7 +27,7 @@ class Game extends Component {
 
     this.state = {
       host: false,
-      socket: io("http://localhost:8888"),
+      socket: io.connect("http://localhost:8888"), // Set up reconnections
     };
 
     this.onJoin = this.onJoin.bind(this);
@@ -68,6 +68,18 @@ class Game extends Component {
         state: new_state,
       });
     });
+
+    this.state.socket.on("disconnect", (reason) => {
+      console.log("Disconnected  from server...");
+
+      if (
+        reason === "ping timeout" ||
+        reason === "transport close" ||
+        reason === "transport error"
+      ) {
+        console.log("Handle these properly");
+      }
+    });
   }
 
   componentWillUnmount() {
@@ -103,7 +115,9 @@ class Game extends Component {
       );
 
     if (this.state.state === constants.IN_GAME)
-      return <GamePage players={this.state.players} socket={this.state.socket} />;
+      return (
+        <GamePage players={this.state.players} socket={this.state.socket} />
+      );
 
     if (this.state.state === constants.GAME_DISCONNECTED)
       return <Redirect to={"/"} />;
