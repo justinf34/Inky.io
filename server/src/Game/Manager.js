@@ -1,5 +1,7 @@
 const Lobby = require("./Lobby");
 const db = require("../../config/db");
+const constants = require("../../src/Constants");
+const admin = require("firebase-admin");
 
 /**
  * Interface to interact with the rooms
@@ -20,7 +22,7 @@ module.exports = function () {
     if (lobby) {
       lobby.joinPlayer(player_info, socket_id);
 
-      //TODO: add the player in the lobby record in db
+      lobby.dbJoinPlayer(player_info);
       return {
         success: true,
         lobby: lobby.getLobbyStatus(),
@@ -34,15 +36,18 @@ module.exports = function () {
 
   async function leaveRoom(socket_id, lobby_id) {
     const lobby = Lobbies.get(lobby_id);
+    lobby.dbLeavePlayer(socket_id);
+
     const res = lobby.leavePlayer(socket_id);
 
     const lobbies = db.collection("Lobbies").doc(lobby_id);
     if (!res) {
-      const state_res = await lobbies.update({ state: "DISCONNECTED" });
+      const state_res = await lobbies.update({
+        state: constants.GAME_DISCONNECTED,
+      });
     }
 
     const host_res = await lobbies.update({ hostId: lobby.host.id });
-    //TODO: update the player in the lobby record in db
 
     return {
       success: true,
@@ -55,6 +60,11 @@ module.exports = function () {
     lobby.changeSetting(setting);
   }
 
+  async function addCustomWords(lobby_id, customWords) {
+    const lobby = Lobbies.get(lobby_id);
+    lobby.addToWords(customWords);
+  }
+
   async function changeLobbyState(lobby_id, state) {
     // Update the DB
     try {
@@ -63,7 +73,7 @@ module.exports = function () {
 
       lobby = Lobbies.get(lobby_id);
       //TODO: should probably use a function in Lobby class
-      lobby.state = state;
+      lobby.changeLobbyState(state);
 
       return { success: true };
     } catch (error) {
@@ -91,7 +101,7 @@ module.exports = function () {
       });
       return {success: true, 'name': name, 'correctGuess': correctGuess};
     } catch (error) {
-      return {success: false, message: error}
+      return { success: false, message: error };
     }
   }
 
@@ -109,14 +119,72 @@ module.exports = function () {
     return chatLog  
   }
 
+  async function addReport(lobby_id, user_id, name, reason) {
+    var reasons = "";
+    if (reason.cheating) {
+      reasons += "Cheating. ";
+    }
+    if (reason.verbalAbuse) {
+      reasons += "Verbal Abuse. ";
+    }
+    if (reason.inappropriateName) {
+      reasons += "Inappropriate Name. ";
+    }
+
+    try {
+      //console.log(new Timestamp());
+      db.collection("Reports").add({
+        date: admin.firestore.Timestamp.now(),
+        lobbyID: lobby_id,
+        name: name,
+        playerID: user_id,
+        reason: reasons,
+      });
+      return { success: true, name: name };
+    } catch (error) {
+      return { success: false, message: error };
+    }
+  }
+
+  function addStroke(lobby_id, stroke) {
+    const lobby = Lobbies.get(lobby_id);
+    return lobby.saveStroke(stroke);
+  }
+
+  function initNotifier(lobby_id, notifier_func, io) {
+    const lobby = Lobbies.get(lobby_id);
+    lobby.init_sock(notifier_func, io);
+  }
+
+  function getGameStatus(lobby_id, user_id) {
+    const lobby = Lobbies.get(lobby_id);
+    return lobby.getRoundStatus(user_id);
+  }
+
+  function getSyncTime(lobby_id, user_id) {
+    const lobby = Lobbies.get(lobby_id);
+    return lobby.getRoundStatus(user_id).timer;
+  }
+
+  function startTurn(lobby_id, word) {
+    const lobby = Lobbies.get(lobby_id);
+    lobby.startTurn(word);
+  }
 
   return {
     createNewRoom,
     joinRoom,
     leaveRoom,
     changeLobbySetting,
+    addCustomWords,
     changeLobbyState,
     addChat,
-    getChatLog
+    getChatLog,
+    addReport,
+    addStroke,
+    initNotifier,
+    getGameStatus,
+    getSyncTime,
+    startTurn,
   };
 };

@@ -1,0 +1,29 @@
+.words-modal {
+  width: max-content;
+  margin: auto;
+}
+
+.words-modal .card-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  background:#FFEDD2;
+}
+
+.words-modal .card-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  background:#FFEDD2;
+}
+
+.word-btn {
+  margin: 0px 5px;
+  background-color: white !important;
+}
+
+.word-btn:hover {
+  margin: 0px 5px;
+  color: black !important;
+  background-color: lavenderblush !important;
+}

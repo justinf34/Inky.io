@@ -1,21 +1,38 @@
 .game-page {
-  height: 95vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
-.game-content {
-  text-align: start;
-  background-color: white;
+.game-contents {
+  height: 70vh;
   display: flex;
   flex-direction: row;
-  width: 90%;
-  max-width: 1200px;
-  height: 90%;
-  max-height: 90%;
+  justify-content: center;
   margin: auto;
-  padding: 30px 50px;
-  border: 1px solid;
-  border-radius: 10px;
+  width: 100%;
+}
+
+.canvas-container {
+  height: 90%;
+  width: 50%;
+  max-width: 1200px;
+}
+
+.chat-container {
+  height: 90%;
+  width: 25%;
+  max-width: 400px;
+  margin: 0px 10px;
+}
+
+.players-container {
+  height: 90%;
+  width: 15%;
+  margin: 0px 10px;
+  overflow-y: auto;
+  max-width: 230px;
+}
+
+.game-page .leave-lobby-btn{
+  margin: 10px auto 10px 20px;
 }

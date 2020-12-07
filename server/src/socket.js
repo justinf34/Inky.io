@@ -1,4 +1,5 @@
 const { settings } = require("../config/db");
+const constants = require("./Constants");
 
 module.exports = function (Manager, io) {
   return function (socket) {
@@ -50,17 +51,49 @@ module.exports = function (Manager, io) {
       socket.to(lobby_id).emit("setting-change", setting); // Send it to other clients
     });
 
-    socket.on("start-game", (lobby_id) => {
-      console.log(lobby_id);
-      Manager.changeLobbyState(lobby_id, "IN_GAME").then(() => {
-        io.to(lobby_id).emit("state-change", "IN_GAME");
+    socket.on("lobby-state-change", (lobby_id, state) => {
+      console.log(`Lobby ${lobby_id} is in state ${state}`);
+      // Set up the game notifer for the lobby to send messages
+      if (state === constants.IN_GAME) {
+        function gameNotifier() {
+          io.to(lobby_id).emit("new-round-status");
+        }
+        Manager.initNotifier(lobby_id, gameNotifier, io);
+      }
+
+      Manager.changeLobbyState(lobby_id, state).then(() => {
+        io.to(lobby_id).emit("state-change", state);
       });
+    });
+
+    socket.on("add-words", (lobby_id, customWords) => {
+      Manager.addCustomWords(lobby_id, customWords);
+    });
+
+    socket.on("start-game", (lobby_id) => {
+      Manager.changeLobbyState(lobby_id, constants.IN_GAME).then(() => {
+        io.to(lobby_id).emit("state-change", constants.IN_GAME);
+      });
+    });
+
+    socket.on("turn-start", (lobby_id, word) => {
+      console.log(`Starting game in ${lobby_id} with ${word}`);
+      Manager.startTurn(lobby_id, word);
+    });
+
+    socket.on("game-status", (lobby_id, user_id) => {
+      const status = Manager.getGameStatus(lobby_id, user_id);
+      socket.emit("game-status", status);
+    });
+
+    socket.on("timesync", (lobby_id, user_id) => {
+      socket.emit("timesync", Manager.getSyncTime(lobby_id, user_id));
     });
 
     socket.on("draw", (lobby_id, msg) => {
       // console.log("draw: ", msg);
-      // TODO: save the strokes
-      socket.to(lobby_id).emit("draw", msg);
+      const strokes = Manager.addStroke(lobby_id, msg);
+      socket.to(lobby_id).emit("draw", msg, strokes);
     });
 
     socket.on("chat", async (lobby_id, msg) => {
@@ -76,6 +109,20 @@ module.exports = function (Manager, io) {
           console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`)
         }
       });
+    });
+
+    socket.on("report", async (lobby_id, user_id, name, reason) => {
+      const status = Manager.addReport(lobby_id, user_id, name, reason).then(
+        (result) => {
+          if (result.success) {
+            socket.emit("report", result.success);
+            console.log("sucessful created report");
+          } else {
+            socket.emit("report", result.success);
+            console.log("failed creating report");
+          }
+        }
+      );
     });
   };
 };

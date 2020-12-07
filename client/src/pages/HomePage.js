@@ -11,6 +11,7 @@ import {
 import NavBar from "../components/NavBar";
 
 import AuthContext from "../context/AuthContext";
+import { withDeviceDetect } from "../Utils/DeviceDetect";
 
 class HomePage extends React.Component {
   constructor(props) {
@@ -35,7 +36,6 @@ class HomePage extends React.Component {
   }
 
   handleCreateGameClicked() {
-    console.log("hello");
     const user = this.props.authCreds.auth.user;
     fetch(
       `http://localhost:8888/lobby/create?hostId=${user.id}&hostName=${user.name}`,
@@ -54,7 +54,6 @@ class HomePage extends React.Component {
         throw new Error("failed create new room");
       })
       .then((responseJson) => {
-        console.log(responseJson);
         // redirect to lobby
         const location = {
           pathname: `/game/${responseJson.code}`,
@@ -109,7 +108,7 @@ class HomePage extends React.Component {
     const user = this.props.authCreds.auth.user;
     return (
       <div className="page">
-        <div className="content">
+        <div className="homepage-content">
           <h3>{user.name || "kirby placeholder"}</h3>
           <img
             className="profile-picture"
@@ -122,18 +121,23 @@ class HomePage extends React.Component {
           ></img>
 
           <NavBar
-            showCreateGame={true}
+            showCreateGame={!this.props.mobile}
             createGameClick={this.handleCreateGameClicked}
           ></NavBar>
           <InputGroup style={{ maxWidth: "70%", margin: "10px auto" }}>
             <FormControl
+              disabled={this.props.mobile}
               placeholder="Enter lobby code to join a game"
               value={this.state.gameCode}
               onChange={this.handleGameCodeChange}
               aria-label="Lobby Code"
             />
             <InputGroup.Append>
-              <Button variant="success" onClick={this.handleJoinGameClicked}>
+              <Button
+                disabled={this.props.mobile}
+                variant="success"
+                onClick={this.handleJoinGameClicked}
+              >
                 Join Game
               </Button>
             </InputGroup.Append>
@@ -151,7 +155,7 @@ class HomePage extends React.Component {
             </Toast.Body>
           </Toast>
 
-          <Accordion className="info">
+          <Accordion defaultActiveKey="0" className="info">
             <Card>
               <Card.Header>
                 <Accordion.Toggle as={Button} variant="link" eventKey="0">
@@ -161,15 +165,17 @@ class HomePage extends React.Component {
               <Accordion.Collapse eventKey="0">
                 <Card.Body>
                   Create a game lobby and invite your friends to play or join an
-                  existing lobby above. Adjust the settings to your liking and
-                  start the game. When its your turn to draw, you will have to
-                  choose one of the three words that appear and visualize that
-                  word in a set amount of time. The more people that get the
-                  word right, the more points you win! When somebody else is
-                  drawing you have to type your guess into the chat to gain
-                  points, be quick, the earlier you guess a word the more points
-                  you get! Tip: hints will appear above the canvas as time
-                  passes.
+                  existing lobby above. Adjust the settings to your liking then
+                  start the game. When it's your turn to draw, choose one of the
+                  three words and visualize it before the time runs out. The
+                  more people that get the word right, the more points you win!
+                  When somebody else is drawing, type your guess into the chat
+                  to gain points. Be quick, the earlier you guess a word the
+                  more points you get! <br />
+                  <u>Tip:</u> hints will appear above the canvas as time passes.{" "}
+                  <br />
+                  <u>Note:</u> if you a player is making you feel uncomfortable
+                  at anytime, click their card on the left to report them
                 </Card.Body>
               </Accordion.Collapse>
             </Card>
@@ -180,4 +186,4 @@ class HomePage extends React.Component {
   }
 }
 
-export default AuthContext(HomePage);
+export default AuthContext(withDeviceDetect(HomePage));

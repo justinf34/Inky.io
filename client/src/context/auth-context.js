@@ -60,4 +60,11 @@ const AuthProvider = ({ children }) => {
 
 const useAuth = () => React.useContext(AuthContext);
 
-export { useAuth, AuthProvider };
+function withAuth(Component) {
+  return function WrappedComponent(props) {
+    const authCreds = useAuth();
+    return <Component {...props} authCreds={authCreds} />;
+  };
+}
+
+export { useAuth, AuthProvider, withAuth };

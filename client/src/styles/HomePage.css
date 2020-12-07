@@ -5,15 +5,14 @@
   justify-content: center;
 }
 
-.content {
+.homepage-content {
   text-align: center;
   background-color: white;
   display: flex;
   flex-direction: column;
   width: 90%;
   max-width: 1200px;
-  height: 90%;
-  max-height: 90%;
+  height: auto;
   margin:auto;
   padding: 30px 50px;
   border: 1px solid;
@@ -28,7 +27,7 @@
 }
 
 .info {
-  padding: 20px 0px;
+  padding-top: 10px;
   text-align: start;
 }
 
@@ -37,14 +36,14 @@
   margin: 20px auto;
 }
 
-.card-header.collapsed {
+.homepage-content .card-header.collapsed {
   background:#FFEDD2;
 }
 
-.card-header:not(.collapsed) {
+.homepage-content .card-header:not(.collapsed) {
   background:#FFEDD2;
 }
 
-.card-body {
+.homepage-content .card-body {
   background:#FFEDD2;
 }

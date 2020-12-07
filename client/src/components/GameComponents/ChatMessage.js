@@ -9,7 +9,7 @@ export default class ChatMessage extends Component {
     return (
       <React.Fragment>
         <p className="message">
-          <span className="message-name">{this.props.message.name}:  </span>
+          <span className="message-name"><b>{this.props.message.name}</b>:  </span>
           <span className="message-content">{this.props.message.content}</span>
         </p>
       </React.Fragment>
