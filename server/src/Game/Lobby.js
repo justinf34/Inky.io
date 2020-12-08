@@ -29,8 +29,8 @@ class Lobby {
 
     this.interval = null; //Timer interval
 
-    this.word = "placeholder";
-    this.word_list = ["apple", "banana", "cat"];
+    this.word = "";
+    this.word_list = [];
   }
 
   init_sock(notifier_func, io) {
@@ -71,7 +71,7 @@ class Lobby {
 
   newTurn() {
     this.drawer = this.drawer_order.shift();
-    this.word_list = ["apple", "banana", "cat"]; // Generate word choices
+    this.word_list = this.getWordOptions(); // Generate word choices
     this.round_state = 0; // State to choosing
 
     // Restart timer but do not start it
@@ -393,9 +393,9 @@ class Lobby {
   getWordOptions() {
     // removes last word from possible words to be chosen from
     // will be added back
-    for (let i = 0; i < this.word_list; i++) {
-      if (this.word_list[i] === this.word) {
-        this.word_list.splice(i, 1);
+    for (let i = 0; i < word_list.length; i++) {
+      if (word_list[i] === this.word) {
+        word_list.splice(i, 1);
         break;
       }
     }
@@ -403,14 +403,14 @@ class Lobby {
     let wordOptions = [];
     // gets 3 random words from list and add them to word options
     for (let i = 0; i < 3; i++) {
-      let index = this.rndInt(0, this.word_list.length - 1);
-      wordOptions.push(this.word_list[index]);
-      this.word_list.splice(index, 1);
+      let index = this.rndInt(0, word_list.length - 1);
+      wordOptions.push(word_list[index]);
+      word_list.splice(index, 1);
     }
 
     // add back wordOptions and word to word list
-    this.word_list.concat(wordOptions);
-    this.word_list.push(this.word);
+    word_list.concat(wordOptions);
+    word_list.push(this.word);
 
     return wordOptions;
   }
@@ -425,7 +425,13 @@ class Lobby {
         wordsToAdd.push(newWords[word]);
       }
     }
-    this.word_list = [...new Set(this.word_list.concat(wordsToAdd))];
+    word_list = [...new Set(word_list.concat(wordsToAdd))];
+  }
+
+  // uses current time and round time to get score between 0 and 100
+  generateScore() {
+    const score =  this.timer / this.drawing_time * 100;
+    return Math.round(score);
   }
 }
 

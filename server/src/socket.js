@@ -102,6 +102,7 @@ module.exports = function (Manager, io) {
           console.log(result.message);
         } else if (result.correctGuess) {
           socket.to(lobby_id).emit("chat",'Inky',`${result.name} guessed correctly`)
+          // TODO: generate score and add to players score and emit to lobby
           socket.emit("chat", result.name, msg)
           socket.emit("chat",'Inky',`You guessed correctly`)
         } else {
