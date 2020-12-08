@@ -18,7 +18,7 @@ class Lobby {
     this.rounds = 1; // Number of rounds in the game
     this.curr_round = 1; // Current round in the game
     this.round_state = 0;
-    this.players_guessed = []; //Number of players that correctly guessed the word
+    this.players_guessed = new Set(); //Number of players that correctly guessed the word
 
     this.drawing_time = 30;
     this.timer = null; // Timer for the game
@@ -59,7 +59,7 @@ class Lobby {
     if (state === constants.IN_GAME) {
       //Init game settings
       this.curr_round = 1;
-      this.players_guessed = [];
+      this.players_guessed.clear();
 
       this.timer = this.drawing_time;
       // Setting draw order
@@ -426,6 +426,14 @@ class Lobby {
       }
     }
     this.word_list = [...new Set(this.word_list.concat(wordsToAdd))];
+  }
+
+  checkGuess(user_id, guess) {
+    if (this.word === guess) {
+      this.players_guessed.add(user_id);
+      return true;
+    }
+    return false;
   }
 }
 
