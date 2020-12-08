@@ -1,3 +1,4 @@
+const { collection } = require("../../config/db");
 const db = require("../../config/db");
 const constants = require("../Constants");
 const word_list = require("./word-list");
@@ -17,7 +18,7 @@ class Lobby {
     this.rounds = 1; // Number of rounds in the game
     this.curr_round = 1; // Current round in the game
     this.round_state = 0;
-    this.players_guessed = []; //Number of players that correctly guessed the word
+    this.players_guessed = new Set(); //Number of players that correctly guessed the word
 
     this.drawing_time = 30;
     this.timer = null; // Timer for the game
@@ -42,7 +43,10 @@ class Lobby {
       rounds: this.rounds,
       curr_round: this.curr_round,
       round_state: this.round_state,
-      drawer: this.drawer, // user_id of the drawer
+      drawer: {
+        id: this.drawer,
+        name: this.players.get(this.drawer).name,
+      },
       word_list: this.drawer === user_id ? this.word_list : [],
       word: this.drawer === user_id ? this.word : "_".repeat(this.word.length),
       strokes: this.strokes,
@@ -55,7 +59,7 @@ class Lobby {
     if (state === constants.IN_GAME) {
       //Init game settings
       this.curr_round = 1;
-      this.players_guessed = [];
+      this.players_guessed.clear();
 
       this.timer = this.drawing_time;
       // Setting draw order
@@ -104,7 +108,7 @@ class Lobby {
    * all the guesser guessed the word, or when
    * the drawer disconnects
    */
-  endTurn() {
+  async endTurn() {
     clearInterval(this.interval); // Clear interval
 
     // Clear canvas
@@ -130,14 +134,48 @@ class Lobby {
     } else {
       this.state = constants.IN_LOBBY;
       this.round_state = 3;
-      db.collection("Lobbies")
-        .doc(this.id)
-        .update({
+      try {
+        const res = db.collection("Lobbies").doc(this.id).update({
           state: constants.IN_LOBBY,
-        })
-        .then((_) => {
-          this.io.to(this.id).emit("state-change", constants.IN_LOBBY);
         });
+
+        this.io.to(this.id).emit("state-change", constants.IN_LOBBY);
+      } catch (error) {
+        //TODO: Handle properly
+        console.log("Cannot update lobby state in db ");
+      }
+
+      try {
+        // Create new new Game document
+        const docRef = await db
+          .collection("Lobbies")
+          .doc(this.id)
+          .collection("Games")
+          .add({
+            date: new Date(),
+            rounds: this.rounds,
+          });
+
+        const scores = db
+          .collection("Lobbies")
+          .doc(this.id)
+          .collection("Games")
+          .doc(docRef.id)
+          .collection("Scores");
+
+        const batch = db.batch();
+        const players = Array.from(this.players.values());
+        players.forEach((player) => {
+          const playerRef = scores.doc(player.id);
+          batch.set(playerRef, { name: player.name, score: player.score });
+        });
+
+        const res = await batch.commit();
+        console.log("Successfully upload scores to db");
+      } catch (error) {
+        //TODO: Handle properly
+        console.log("Something went wrong in uploading score... ");
+      }
     }
   }
 
@@ -388,6 +426,14 @@ class Lobby {
       }
     }
     this.word_list = [...new Set(this.word_list.concat(wordsToAdd))];
+  }
+
+  checkGuess(user_id, guess) {
+    if (this.word === guess) {
+      this.players_guessed.add(user_id);
+      return true;
+    }
+    return false;
   }
 }
 

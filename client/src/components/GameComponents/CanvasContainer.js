@@ -1,7 +1,6 @@
 import React from "react";
 import Canvas from "./Canvas";
 import WordsModal from "./WordsModal";
-
 import "./Canvas.css";
 
 export default function CanvasContainer(props) {

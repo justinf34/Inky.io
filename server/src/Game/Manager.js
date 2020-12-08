@@ -81,17 +81,12 @@ module.exports = function () {
     }
   }
 
-  // this function is meant to be replaced by an actual function in the game engine
-  function isCorrectGuess(message) {
-    return (message === 'proton');
-  }
-
   async function addChat(lobby_id, socket_id, message) {
     try {
       lobby = Lobbies.get(lobby_id);
       let user_id = lobby.connected_players.get(socket_id);
       let name = lobby.players.get(user_id).name;
-      let correctGuess = isCorrectGuess(message)
+      let correctGuess = lobby.checkGuess(user_id, message);
       db.collection("Chats").add({
         'name': name,
         'lobbyID': lobby_id,

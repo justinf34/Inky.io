@@ -9,7 +9,8 @@ import {
   Button,
 } from "react-bootstrap";
 import NavBar from "../components/NavBar";
-
+import { Redirect, withRouter } from "react-router-dom";
+import BanPage from "./BanPage";
 import AuthContext from "../context/AuthContext";
 import { withDeviceDetect } from "../Utils/DeviceDetect";
 
@@ -106,6 +107,9 @@ class HomePage extends React.Component {
 
   render() {
     const user = this.props.authCreds.auth.user;
+    if (user.ban) {
+      return <Redirect to={"/BanPage"} />;
+    } else {
     return (
       <div className="page">
         <div className="homepage-content">
@@ -183,6 +187,7 @@ class HomePage extends React.Component {
         </div>
       </div>
     );
+          }
   }
 }
 
