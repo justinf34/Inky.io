@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import GameLobbyPage from "./GameLobbyPage";
 import GamePage from "./GamePage";
+import GameEndingPage from "./GameEndingPage";
 
 import { Redirect, withRouter } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
@@ -117,6 +118,14 @@ class Game extends Component {
     if (this.state.state === constants.IN_GAME)
       return (
         <GamePage players={this.state.players} socket={this.state.socket} />
+      );
+    if (this.state.state === constants.GAME_ENDED)
+      return (
+        <GameEndingPage
+          players={this.state.players}
+          socket={this.state.socket}
+          isHost={this.state.host}
+        />
       );
 
     if (this.state.state === constants.GAME_DISCONNECTED)

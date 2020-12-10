@@ -132,14 +132,14 @@ class Lobby {
       this.newTurn();
       this.notifier(); // Let all the players know that turn ended
     } else {
-      this.state = constants.IN_LOBBY;
+      this.state = constants.GAME_ENDED;
       this.round_state = 3;
       try {
         const res = db.collection("Lobbies").doc(this.id).update({
-          state: constants.IN_LOBBY,
+          state: constants.GAME_ENDED,
         });
 
-        this.io.to(this.id).emit("state-change", constants.IN_LOBBY);
+        this.io.to(this.id).emit("state-change", constants.GAME_ENDED);
       } catch (error) {
         //TODO: Handle properly
         console.log("Cannot update lobby state in db ");

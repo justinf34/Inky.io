@@ -11,7 +11,7 @@ class GameEndingPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      usersInLobby: [
+      usersInLobby: this.sortWinner([
         {
           playerName: "player1",
           playerProfilePic:
@@ -48,13 +48,14 @@ class GameEndingPage extends React.Component {
             "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png",
           playerScore: 50,
         },
-      ],
+      ]),
+      playerArray: this.props.players,
+      host: this.props.host,
     };
     this.sortWinner = this.sortWinner.bind(this);
   }
 
-  sortWinner() {
-    let arr = this.state.usersInLobby;
+  sortWinner(arr) {
     let len = arr.length;
     for (let i = len - 1; i >= 0; i--) {
       for (let j = 1; j <= i; j++) {
@@ -82,12 +83,6 @@ class GameEndingPage extends React.Component {
     }
     return displayarray;
   }
-  componentWillMount() {
-    let arr = this.sortWinner();
-    this.setState({
-      usersInLobby: arr,
-    });
-  }
 
   render() {
     return (
@@ -113,12 +108,12 @@ class GameEndingPage extends React.Component {
           <div className="buttonSet">
             <Link to="/" className="linkContainer">
               <Button className="playAgain" variant="secondary">
-                Leave
+                Play Again
               </Button>
             </Link>
             <Link className="linkContainer">
               <Button className="leave" variant="success">
-                Play Again
+                Leave
               </Button>
             </Link>
           </div>
