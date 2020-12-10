@@ -47,7 +47,6 @@ class Game extends Component {
 
     // Listen to player list updates
     this.state.socket.on("player-list-update", (lobby) => {
-      console.log("PLAYER UPDATE" + lobby.players.length);
       this.setState({
         host: lobby.host.id === user.id,
         host_info: lobby.host,
@@ -61,6 +60,7 @@ class Game extends Component {
       player: {
         id: user.id,
         name: user.name,
+        profileKey: user.profileKey,
       },
     });
 
@@ -88,7 +88,6 @@ class Game extends Component {
   }
 
   onJoin(res) {
-    console.log(res);
     const user = this.props.authCreds.auth.user;
     if (res.success) {
       this.setState({
