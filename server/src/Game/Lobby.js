@@ -428,9 +428,18 @@ class Lobby {
     this.word_list = [...new Set(this.word_list.concat(wordsToAdd))];
   }
 
+  calculatePoints() {
+    return (this.drawing_time - this.timer) / this.drawing_time * 100;
+  }
+
+  handleCorrectGuess(user_id) {
+    this.players.get(user_id).score += this.calculatePoints();
+    this.players_guessed.add(user_id);
+  }
+
   checkGuess(user_id, guess) {
     if (this.word === guess) {
-      this.players_guessed.add(user_id);
+      this.handleCorrectGuess(user_id);
       return true;
     }
     return false;
