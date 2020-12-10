@@ -12,7 +12,6 @@ class WordsModal extends React.Component {
 
   handleClick(word) {
     const { match } = this.props;
-    console.log(`${word} to ${match.params.lobbyID} `);
     this.props.socket.emit("turn-start", match.params.lobbyID, word);
   }
 

@@ -20,7 +20,7 @@ class Lobby {
     this.round_state = 0;
     this.players_guessed = new Set(); //Number of players that correctly guessed the word
 
-    this.drawing_time = 30;
+    this.drawing_time = 2;
     this.timer = null; // Timer for the game
 
     this.drawer = null; // user_id of drawer
@@ -29,8 +29,10 @@ class Lobby {
 
     this.interval = null; //Timer interval
 
-    this.word = "placeholder";
-    this.word_list = ["apple", "banana", "cat"];
+    this.word = ""; //word being guessed
+    this.word_list = []; //word options given to drawer. 3 words
+    this.hint = []; //hint to display to all
+    this.numberOfHints = 0;
   }
 
   init_sock(notifier_func, io) {
@@ -49,6 +51,7 @@ class Lobby {
       },
       word_list: this.drawer === user_id ? this.word_list : [],
       word: this.drawer === user_id ? this.word : "_".repeat(this.word.length),
+      hint: this.hint,
       strokes: this.strokes,
       timer: this.timer,
     };
@@ -71,7 +74,7 @@ class Lobby {
 
   newTurn() {
     this.drawer = this.drawer_order.shift();
-    this.word_list = ["apple", "banana", "cat"]; // Generate word choices
+    this.word_list = this.getWordOptions(); // Generate word choices
     this.round_state = 0; // State to choosing
 
     // Restart timer but do not start it
@@ -83,6 +86,7 @@ class Lobby {
     // this.word_list = word_list;
     this.round_state = 1;
     this.word = word; // Current word
+    this.setHints(word);
 
     setTimeout(() => {
       this.startTimer(); // Start timer
@@ -95,6 +99,7 @@ class Lobby {
       if (this.timer > 0) {
         this.timer -= 1;
         this.io.to(this.id).emit("time-update", this.timer);
+        this.generateHint();
         // console.log("timer now:", this.timer);
       } else {
         clearInterval(this.interval);
@@ -120,7 +125,9 @@ class Lobby {
     //check if all the players already had a turn to draw
     if (this.drawer_order.length === 0) {
       //check for last round
-      if (this.curr_round === this.rounds) {
+      console.log(`Round ${this.curr_round} of ${this.rounds}`);
+      if (this.curr_round >= this.rounds) {
+        console.log(`Ending game...`);
         endGame = true;
       } else {
         this.curr_round += 1;
@@ -186,6 +193,7 @@ class Lobby {
         id: player_info.id,
         name: player_info.name,
         state: constants.CONNECTED,
+        profileKey: player_info.profileKey,
         score: 0,
       });
     } else {
@@ -313,7 +321,7 @@ class Lobby {
   hostChange() {
     const next_hostId = this.connected_players.values().next().value;
     const next_host = this.players.get(next_hostId);
-    console.log(`New host id: ${next_host}`);
+    // console.log(`New host id: ${next_host}`);
     this.host = {
       id: next_host.id,
       name: next_host.name,
@@ -393,9 +401,9 @@ class Lobby {
   getWordOptions() {
     // removes last word from possible words to be chosen from
     // will be added back
-    for (let i = 0; i < this.word_list; i++) {
-      if (this.word_list[i] === this.word) {
-        this.word_list.splice(i, 1);
+    for (let i = 0; i < word_list.length; i++) {
+      if (word_list[i] === this.word) {
+        word_list.splice(i, 1);
         break;
       }
     }
@@ -403,14 +411,14 @@ class Lobby {
     let wordOptions = [];
     // gets 3 random words from list and add them to word options
     for (let i = 0; i < 3; i++) {
-      let index = this.rndInt(0, this.word_list.length - 1);
-      wordOptions.push(this.word_list[index]);
-      this.word_list.splice(index, 1);
+      let index = this.rndInt(0, word_list.length - 1);
+      wordOptions.push(word_list[index]);
+      word_list.splice(index, 1);
     }
 
     // add back wordOptions and word to word list
-    this.word_list.concat(wordOptions);
-    this.word_list.push(this.word);
+    word_list.concat(wordOptions);
+    word_list.push(this.word);
 
     return wordOptions;
   }
@@ -425,7 +433,47 @@ class Lobby {
         wordsToAdd.push(newWords[word]);
       }
     }
-    this.word_list = [...new Set(this.word_list.concat(wordsToAdd))];
+    word_list = [...new Set(word_list.concat(wordsToAdd))];
+  }
+
+  generateHint() {
+    const timeIntervals = Math.round(
+      this.drawing_time / (this.numberOfHints + 1)
+    );
+    if (this.numberOfHints && this.timer % timeIntervals === 0) {
+      let possible = [];
+      for (let i = 0; i < this.hint.length; i++) {
+        if (this.hint[i] === "_") {
+          possible.push(i);
+        }
+      }
+      const randomIndex = possible[this.rndInt(0, possible.length - 1)];
+
+      this.hint[parseInt(randomIndex)] = this.word.charAt(randomIndex);
+      console.log(this.hint);
+    }
+  }
+
+  setHints(word) {
+    let emptyHint = [];
+    let numeberOfLetters = 0;
+    for (let letter of word) {
+      if (letter.match(/[a-z]/i)) {
+        emptyHint.push("_");
+        numeberOfLetters++;
+      } else {
+        emptyHint.push(letter);
+      }
+    }
+    this.hint = emptyHint;
+
+    this.numberOfHints = Math.round(numeberOfLetters * 0.25);
+  }
+
+  // uses current time and round time to get score between 0 and 100
+  generateScore() {
+    const score = (this.timer / this.drawing_time) * 100;
+    return Math.round(score);
   }
 
   checkGuess(user_id, guess) {
