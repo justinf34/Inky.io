@@ -48,8 +48,8 @@ class Canvas extends Component {
 
     sketch.draw = () => {
       if (this.start) {
-        console.log("Drawin old stuff");
-        console.log(this.strokes);
+        // console.log("Drawin old stuff");
+        // console.log(this.props.strokes);
         this.props.strokes.forEach((stroke) => {
           sketch.strokeWeight(stroke.weight);
           sketch.stroke(stroke.color);
