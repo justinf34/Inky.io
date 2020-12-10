@@ -29,8 +29,10 @@ class Lobby {
 
     this.interval = null; //Timer interval
 
-    this.word = "";
-    this.word_list = [];
+    this.word = ""; //word being guessed
+    this.word_list = []; //word options given to drawer. 3 words
+    this.hint = []; //hint to display to all
+    this.numberOfHints = 0;
   }
 
   init_sock(notifier_func, io) {
@@ -49,6 +51,7 @@ class Lobby {
       },
       word_list: this.drawer === user_id ? this.word_list : [],
       word: this.drawer === user_id ? this.word : "_".repeat(this.word.length),
+      hint: this.hint,
       strokes: this.strokes,
       timer: this.timer,
     };
@@ -83,6 +86,7 @@ class Lobby {
     // this.word_list = word_list;
     this.round_state = 1;
     this.word = word; // Current word
+    this.setHints(word);
 
     setTimeout(() => {
       this.startTimer(); // Start timer
@@ -95,6 +99,7 @@ class Lobby {
       if (this.timer > 0) {
         this.timer -= 1;
         this.io.to(this.id).emit("time-update", this.timer);
+        this.generateHint();
         // console.log("timer now:", this.timer);
       } else {
         clearInterval(this.interval);
@@ -426,6 +431,38 @@ class Lobby {
       }
     }
     word_list = [...new Set(word_list.concat(wordsToAdd))];
+  }
+
+  generateHint() {
+    const timeIntervals = Math.round(this.drawing_time / (this.numberOfHints + 1));
+    if(this.numberOfHints && this.timer % timeIntervals === 0) {
+      let possible = [];
+      for(let i = 0; i < this.hint.length; i++) {
+        if(this.hint[i] === '_') {
+          possible.push(i);
+        }
+      }
+      const randomIndex = possible[this.rndInt(0, possible.length - 1)];
+
+      this.hint[parseInt(randomIndex)] = this.word.charAt(randomIndex);
+      console.log(this.hint);
+    }
+  }
+
+  setHints(word) {
+    let emptyHint = [];
+    let numeberOfLetters = 0;
+    for(let letter of word) {
+      if(letter.match(/[a-z]/i)) {
+        emptyHint.push('_');
+        numeberOfLetters++;
+      } else {
+        emptyHint.push(letter);
+      }
+    }
+    this.hint = emptyHint;
+
+    this.numberOfHints = Math.round(numeberOfLetters * 0.25);
   }
 
   // uses current time and round time to get score between 0 and 100
