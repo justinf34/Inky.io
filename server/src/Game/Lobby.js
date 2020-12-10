@@ -193,6 +193,7 @@ class Lobby {
         id: player_info.id,
         name: player_info.name,
         state: constants.CONNECTED,
+        profileKey: player_info.profileKey,
         score: 0,
       });
     } else {
@@ -436,11 +437,13 @@ class Lobby {
   }
 
   generateHint() {
-    const timeIntervals = Math.round(this.drawing_time / (this.numberOfHints + 1));
-    if(this.numberOfHints && this.timer % timeIntervals === 0) {
+    const timeIntervals = Math.round(
+      this.drawing_time / (this.numberOfHints + 1)
+    );
+    if (this.numberOfHints && this.timer % timeIntervals === 0) {
       let possible = [];
-      for(let i = 0; i < this.hint.length; i++) {
-        if(this.hint[i] === '_') {
+      for (let i = 0; i < this.hint.length; i++) {
+        if (this.hint[i] === "_") {
           possible.push(i);
         }
       }
@@ -454,9 +457,9 @@ class Lobby {
   setHints(word) {
     let emptyHint = [];
     let numeberOfLetters = 0;
-    for(let letter of word) {
-      if(letter.match(/[a-z]/i)) {
-        emptyHint.push('_');
+    for (let letter of word) {
+      if (letter.match(/[a-z]/i)) {
+        emptyHint.push("_");
         numeberOfLetters++;
       } else {
         emptyHint.push(letter);
@@ -469,7 +472,7 @@ class Lobby {
 
   // uses current time and round time to get score between 0 and 100
   generateScore() {
-    const score =  this.timer / this.drawing_time * 100;
+    const score = (this.timer / this.drawing_time) * 100;
     return Math.round(score);
   }
 }

@@ -59,6 +59,7 @@ class Game extends Component {
       player: {
         id: user.id,
         name: user.name,
+        profileKey: user.profileKey,
       },
     });
 
