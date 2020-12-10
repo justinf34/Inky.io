@@ -20,7 +20,7 @@ class Lobby {
     this.round_state = 0;
     this.players_guessed = []; //Number of players that correctly guessed the word
 
-    this.drawing_time = 30;
+    this.drawing_time = 2;
     this.timer = null; // Timer for the game
 
     this.drawer = null; // user_id of drawer
@@ -120,7 +120,9 @@ class Lobby {
     //check if all the players already had a turn to draw
     if (this.drawer_order.length === 0) {
       //check for last round
-      if (this.curr_round === this.rounds) {
+      console.log(`Round ${this.curr_round} of ${this.rounds}`);
+      if (this.curr_round >= this.rounds) {
+        console.log(`Ending game...`);
         endGame = true;
       } else {
         this.curr_round += 1;
@@ -313,7 +315,7 @@ class Lobby {
   hostChange() {
     const next_hostId = this.connected_players.values().next().value;
     const next_host = this.players.get(next_hostId);
-    console.log(`New host id: ${next_host}`);
+    // console.log(`New host id: ${next_host}`);
     this.host = {
       id: next_host.id,
       name: next_host.name,
