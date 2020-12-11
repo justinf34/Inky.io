@@ -89,6 +89,7 @@ module.exports = function () {
       let user_id = lobby.connected_players.get(socket_id);
       let name = lobby.players.get(user_id).name;
       let correctGuess = lobby.checkGuess(user_id, message);
+      
       db.collection("Chats").add({
         'name': name,
         'lobbyID': lobby_id,

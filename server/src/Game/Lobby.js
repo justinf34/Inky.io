@@ -470,14 +470,15 @@ class Lobby {
     this.numberOfHints = Math.round(numeberOfLetters * 0.25);
   }
 
-
   calculatePoints() {
-    return Math.round(1 - ((this.drawing_time - this.timer) / this.drawing_time) * 300);
+    return Math.round( (1 - (1.0*this.drawing_time - this.timer) / this.drawing_time) * 250);
   }
 
   handleCorrectGuess(user_id) {
-    this.players.get(user_id).score += this.calculatePoints();
-    this.players_guessed.add(user_id);
+    if (!this.players_guessed.has(user_id)) {
+      this.players.get(user_id).score += this.calculatePoints();
+      this.players_guessed.add(user_id);
+    }
   }
 
   // this should maybe be refactored
