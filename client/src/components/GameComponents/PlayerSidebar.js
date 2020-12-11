@@ -8,6 +8,7 @@ export default class PlayerSidebar extends React.Component {
     this.state = {};
   }
 
+
   render() {
     return (
       <div className="player-sidebar">

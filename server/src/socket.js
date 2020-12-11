@@ -99,12 +99,12 @@ module.exports = function (Manager, io) {
     socket.on("chat", async (lobby_id, msg) => {
       Manager.addChat(lobby_id, socket.id, msg).then((result) => {
         if (!result.success) {
-          console.log(result.message);
+          console.error(result.message);
         } else if (result.correctGuess) {
           socket.to(lobby_id).emit("chat",'Inky',`${result.name} guessed correctly`)
-          // TODO: generate score and add to players score and emit to lobby
           socket.emit("chat", result.name, msg)
           socket.emit("chat",'Inky',`You guessed correctly`)
+          io.in(lobby_id).emit("score", Manager.getScore(lobby_id, socket.id));
         } else {
           io.to(lobby_id).emit("chat", result.name, msg)
           console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`)
@@ -112,6 +112,7 @@ module.exports = function (Manager, io) {
       });
     });
 
+    
     socket.on("report", async (lobby_id, user_id, name, reason) => {
       const status = Manager.addReport(lobby_id, user_id, name, reason).then(
         (result) => {
