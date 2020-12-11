@@ -20,7 +20,7 @@ class Lobby {
     this.round_state = 0;
     this.players_guessed = []; //Number of players that correctly guessed the word
 
-    this.drawing_time = 2;
+    this.drawing_time = 20;
     this.timer = null; // Timer for the game
 
     this.drawer = null; // user_id of drawer
@@ -440,7 +440,11 @@ class Lobby {
     const timeIntervals = Math.round(
       this.drawing_time / (this.numberOfHints + 1)
     );
-    if (this.numberOfHints && this.timer % timeIntervals === 0) {
+    if (this.timer === 0) {
+      // revieal full word when time runs out
+      this.hint = this.word.split("");
+      this.notifier();
+    } else if (this.numberOfHints && this.timer % timeIntervals === 0) {
       let possible = [];
       for (let i = 0; i < this.hint.length; i++) {
         if (this.hint[i] === "_") {
@@ -450,7 +454,7 @@ class Lobby {
       const randomIndex = possible[this.rndInt(0, possible.length - 1)];
 
       this.hint[parseInt(randomIndex)] = this.word.charAt(randomIndex);
-      console.log(this.hint);
+      this.notifier();
     }
   }
 

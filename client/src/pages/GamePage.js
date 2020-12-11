@@ -81,7 +81,7 @@ class GamePage extends Component {
           <Button variant="outline-secondary">Leave Lobby</Button>
         </Link>
         <div className="game-contents">
-          <div className="hints">{/* TODO */}</div>
+          <div className="hints">{console.log(this.state.hint)}</div>
           <div className="timer">
             <Timer socket={this.props.socket} timer={this.state.timer} />
           </div>
