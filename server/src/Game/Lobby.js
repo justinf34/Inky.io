@@ -20,7 +20,7 @@ class Lobby {
     this.round_state = 0;
     this.players_guessed = new Set(); //Number of players that correctly guessed the word
 
-    this.drawing_time = 2;
+    this.drawing_time = 30;
     this.timer = null; // Timer for the game
 
     this.drawer = null; // user_id of drawer
