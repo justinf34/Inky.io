@@ -53,27 +53,29 @@
 .player {
   text-align: center;
   margin: auto;
+  border-style: none !important;
 }
+
 .card-body {
   padding: 0;
 }
 .restPlayers {
   display: flex;
   justify-content: space-around;
+  margin-top: 10px;
 }
+
 .buttonSet {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
 }
-.restPlayers {
-  margin-top: 10px;
-}
 .playAgain,
 .leave {
   width: 100%;
+  margin: 0 10px;
 }
-.linkContainer {
-  margin: 10px 30px;
-  width: 100%;
+
+.playerGameInfo {
+  text-align: center;
 }
