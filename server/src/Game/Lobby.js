@@ -470,14 +470,9 @@ class Lobby {
     this.numberOfHints = Math.round(numeberOfLetters * 0.25);
   }
 
-  // uses current time and round time to get score between 0 and 100
-  generateScore() {
-    const score = (this.timer / this.drawing_time) * 100;
-    return Math.round(score);
-  }
 
   calculatePoints() {
-    return (this.drawing_time - this.timer) / this.drawing_time * 100;
+    return Math.round(1 - ((this.drawing_time - this.timer) / this.drawing_time) * 300);
   }
 
   handleCorrectGuess(user_id) {
@@ -485,8 +480,9 @@ class Lobby {
     this.players_guessed.add(user_id);
   }
 
+  // this should maybe be refactored
   checkGuess(user_id, guess) {
-    if (this.word === guess) {
+    if (this.word === guess && this.drawer !== user_id) {
       this.handleCorrectGuess(user_id);
       return true;
     }
