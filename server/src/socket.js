@@ -66,6 +66,15 @@ module.exports = function (Manager, io) {
       });
     });
 
+    socket.on("dc-game", (lobby_id) => {
+      console.log(`Closing lobby ${lobby_id}`);
+
+      Manager.dcGame(lobby_id); // Tell manager to handle event
+
+      //let every client
+      io.to(lobby_id).emit("state-change", constants.GAME_DISCONNECTED);
+    });
+
     socket.on("add-words", (lobby_id, customWords) => {
       Manager.addCustomWords(lobby_id, customWords);
     });
@@ -101,13 +110,15 @@ module.exports = function (Manager, io) {
         if (!result.success) {
           console.log(result.message);
         } else if (result.correctGuess) {
-          socket.to(lobby_id).emit("chat",'Inky',`${result.name} guessed correctly`)
+          socket
+            .to(lobby_id)
+            .emit("chat", "Inky", `${result.name} guessed correctly`);
           // TODO: generate score and add to players score and emit to lobby
-          socket.emit("chat", result.name, msg)
-          socket.emit("chat",'Inky',`You guessed correctly`)
+          socket.emit("chat", result.name, msg);
+          socket.emit("chat", "Inky", `You guessed correctly`);
         } else {
-          io.to(lobby_id).emit("chat", result.name, msg)
-          console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`)
+          io.to(lobby_id).emit("chat", result.name, msg);
+          console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`);
         }
       });
     });

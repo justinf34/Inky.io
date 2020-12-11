@@ -81,6 +81,14 @@ module.exports = function () {
     }
   }
 
+  function dcGame(lobby_id) {
+    const lobby = Lobbies.get(lobby_id);
+    Lobbies.delete(lobby_id);
+
+    // Tell lobby instance to handle disconnect
+    const res = lobby.dcLobby();
+  }
+
   async function addChat(lobby_id, socket_id, message) {
     try {
       lobby = Lobbies.get(lobby_id);
@@ -88,30 +96,31 @@ module.exports = function () {
       let name = lobby.players.get(user_id).name;
       let correctGuess = lobby.checkGuess(user_id, message);
       db.collection("Chats").add({
-        'name': name,
-        'lobbyID': lobby_id,
-        'message': message,
-        'correctGuess' : correctGuess,
-        'timestamp' : Date.now()
+        name: name,
+        lobbyID: lobby_id,
+        message: message,
+        correctGuess: correctGuess,
+        timestamp: Date.now(),
       });
-      return {success: true, 'name': name, 'correctGuess': correctGuess};
+      return { success: true, name: name, correctGuess: correctGuess };
     } catch (error) {
       return { success: false, message: error };
     }
   }
 
   async function getChatLog(lobby_id) {
-    let chatLog = []
-    db.collection('Chats')
-      .where('lobbyID', '==', lobby_id)
-      .where('isCorrect','==', false)
-      .orderBy('timestamp')
-      .get().then((snapshot) => {
-        snapshot.forEach(doc => {
-          chatLog.push({'name': doc.name(), 'message': doc.message()});
-        })
-      })
-    return chatLog  
+    let chatLog = [];
+    db.collection("Chats")
+      .where("lobbyID", "==", lobby_id)
+      .where("isCorrect", "==", false)
+      .orderBy("timestamp")
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          chatLog.push({ name: doc.name(), message: doc.message() });
+        });
+      });
+    return chatLog;
   }
 
   async function addReport(lobby_id, user_id, name, reason) {
@@ -181,5 +190,6 @@ module.exports = function () {
     getGameStatus,
     getSyncTime,
     startTurn,
+    dcGame,
   };
 };

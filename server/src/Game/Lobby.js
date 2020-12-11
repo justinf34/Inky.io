@@ -328,6 +328,26 @@ class Lobby {
     };
   }
 
+  dcLobby() {
+    this.state = constants.GAME_DISCONNECTED; // set the correct
+    // update db
+    db.collection("Lobbies")
+      .doc(this.id)
+      .update({
+        state: constants.GAME_DISCONNECTED,
+      })
+      .then((_) => {
+        return true;
+      })
+      .catch((err) => {
+        console.log(
+          `Cannot update lobby ${this.id} to GAME_DISCONNECTED with ${err}`
+        );
+        return false;
+      });
+    // return if true or false if db was updated successfully
+  }
+
   getLobbyStatus() {
     return {
       state: this.state,

@@ -3,14 +3,14 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import "../styles/EndOfGamePage.css";
 //import AuthContext from "../context/AuthContext";
+import { Redirect, withRouter } from "react-router-dom";
+import constants from "../Utils/Constants";
 
-import { Redirect } from "react-router-dom";
 class GameEndingPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       usersInLobby: this.sortWinner(this.props.players),
-      host: this.props.host,
     };
     this.sortWinner = this.sortWinner.bind(this);
     this.playAgainClicked = this.playAgainClicked.bind(this);
@@ -52,10 +52,20 @@ class GameEndingPage extends React.Component {
     }
     return displayarray;
   }
-  playAgainClicked() {}
+  playAgainClicked() {
+    const lobby_id = this.props.match.params.lobbyID;
+    this.props.socket.emit("lobby-state-change", lobby_id, constants.IN_LOBBY);
+  }
+
   leaveClicked() {
+    if (this.props.isHost) {
+      const lobby_id = this.props.match.params.lobbyID;
+      this.props.socket.emit("dc-game", lobby_id);
+    }
+
     return <Redirect to={"/"} />;
   }
+
   render() {
     return (
       <div className="page">
@@ -78,7 +88,7 @@ class GameEndingPage extends React.Component {
             {[...this.state.usersInLobby.slice(3)]}
           </div>
           <div className="buttonSet">
-            {this.state.host ? (
+            {this.props.isHost ? (
               <Button
                 className="playAgain"
                 variant="secondary"
@@ -103,4 +113,4 @@ class GameEndingPage extends React.Component {
     );
   }
 }
-export default GameEndingPage;
+export default withRouter(GameEndingPage);

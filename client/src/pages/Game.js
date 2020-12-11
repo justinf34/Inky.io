@@ -65,6 +65,7 @@ class Game extends Component {
     });
 
     this.state.socket.on("state-change", (new_state) => {
+      console.log(`Changing state to ${new_state}`);
       this.setState({
         state: new_state,
       });
