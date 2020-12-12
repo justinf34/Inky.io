@@ -21,7 +21,7 @@ export default class App extends Component {
             <ProtectedRoute exact path="/" component={HomePage} />
             <ProtectedRoute exact path="/banPage" component={BanPage} />
             <ProtectedRoute exact path="/profile" component={ProfilePage} />
-            <ProtectedRoute exact path="/profile" component={ProfilePage} />
+            <ProtectedRoute exact path="/game/:lobbyID" component={Game} />
             <ProtectedRoute exact path="/history" component={MatchHistoryPage} />
             <ProtectedRoute exact path="/report" component={AdminPage} />
           </Switch>
