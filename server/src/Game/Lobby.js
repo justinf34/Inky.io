@@ -62,8 +62,7 @@ class Lobby {
     if (state === constants.IN_GAME) {
       //Init game settings
       this.curr_round = 1;
-      this.players_guessed.clear();
-
+      
       this.timer = this.drawing_time;
       // Setting draw order
       this.drawer_order = Array.from(this.connected_players.values());
@@ -76,7 +75,8 @@ class Lobby {
     this.drawer = this.drawer_order.shift();
     this.word_list = this.getWordOptions(); // Generate word choices
     this.round_state = 0; // State to choosing
-
+    this.players_guessed.clear();
+    
     // Restart timer but do not start it
     this.timer = this.drawing_time;
   }
