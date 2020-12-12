@@ -5,11 +5,19 @@ import { Table } from "react-bootstrap";
 // props: userId, numRounds, date, scores[{playerName, playerId, score}]
 // scores should be ordered from highest to lowest already
 export default function GameRecord(props) {
-  
+  const getUserPlacementString = () => {
+    let placement = props.scores.findIndex((obj) => obj.id === props.userId) + 1;
+    return "#" + placement
+  };
+
+  const getUserScore = () => {
+    return props.scores.find((obj) => obj.id === props.userId).score;
+  }
+
   return (
     <div class="game-record">
-      <h2>{getUserPlacementString(props.userId, props.scores)}</h2>
-      <p>Score: {getUserPlacementString}</p><br/>
+      <h2>{getUserPlacementString}</h2>
+      <p>Score: {getUserScore}</p><br/>
       <p>Match date: {props.date}</p><br/>
       <p>Rounds: {props.numRounds}</p><br/>
       <Table responsive>
@@ -34,19 +42,5 @@ export default function GameRecord(props) {
       </Table>
     </div>
   );
-}
-
-/**
- * 
- * @param {string} userId 
- * @param {any[]} scores 
- */
-function getUserPlacementString(userId, scores) {
-  placement = scores.findIndex((obj) => obj.id === userId) + 1;
-  return "#" + placement
-}
-
-function getUserPlacementString(userId, scores) {
-  return scores.find((obj) => obj.id === userId).score;
 }
 

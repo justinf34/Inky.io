@@ -4,6 +4,7 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import AuthContext from "../context/AuthContext";
 import GameRecord from "../components/GameRecord";
+import NavBar from "../components/NavBar";
 
 class MatchHistoryPage extends React.Component {
   constructor(props) {
@@ -67,4 +68,4 @@ class MatchHistoryPage extends React.Component {
   }
 }
 
-export default AuthContext(withDeviceDetect(MatchHistoryPage));
+export default AuthContext(MatchHistoryPage);
