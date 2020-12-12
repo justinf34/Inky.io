@@ -19,9 +19,7 @@ module.exports = function (Manager, io) {
     });
     socket.on("kickPlayer", (lobby_id, playerId) => {
       console.log("kicking works");
-      console.log(lobby_id);
-      console.log(playerId);
-      console.log(socket.id);
+
       const playerSocketId = Manager.kickPlayer(lobby_id, playerId);
       io.to(playerSocketId).emit("kick", "");
     });

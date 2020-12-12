@@ -35,12 +35,11 @@ class Lobby {
     this.numberOfHints = 0;
   }
   findSocketId(playerID) {
-    console.log(playerID);
     let sockedIdofPlayer;
     for (let [key, value] of this.connected_players.entries()) {
       if (value === playerID) sockedIdofPlayer = key;
     }
-    console.log(sockedIdofPlayer, "this is socketid of player");
+
     return sockedIdofPlayer;
   }
 
@@ -206,14 +205,17 @@ class Lobby {
         score: 0,
       });
     } else {
-      this.players.get(player_info.id).state = constants.CONNECTED;
+      if (this.players.get(player_info.id).state !== constants.KICKED) {
+        this.players.get(player_info.id).state = constants.CONNECTED;
+      }
     }
+    if (this.players.get(player_info.id).state !== constants.KICKED) {
+      this.connected_players.set(socket_id, player_info.id);
 
-    this.connected_players.set(socket_id, player_info.id);
-
-    // Adding player to draw order when in game
-    if (this.state === constants.IN_GAME)
-      this.drawer_order.push(player_info.id);
+      // Adding player to draw order when in game
+      if (this.state === constants.IN_GAME)
+        this.drawer_order.push(player_info.id);
+    }
   }
 
   /**
@@ -294,20 +296,25 @@ class Lobby {
    * @param {id: string, username: string} player_info
    */
   dbLeavePlayer(socket_id) {
-    let player = this.connected_players.get(socket_id);
-    try {
-      db.collection("Lobbies")
-        .doc(this.id)
-        .collection("Players")
-        .doc(player)
-        .update({
-          state: constants.DISCONNECTED,
-        })
-        .then(() => {
-          return constants.DISCONNECTED;
-        });
-    } catch (err) {
-      return err;
+    let playerID = this.connected_players.get(socket_id);
+    let playerState = this.players.get(playerID).state;
+    console.log(this.players.get(playerID).state);
+    if (playerState !== constants.KICKED) {
+      console.log("getting to storing state");
+      try {
+        db.collection("Lobbies")
+          .doc(this.id)
+          .collection("Players")
+          .doc(playerID)
+          .update({
+            state: constants.DISCONNECTED,
+          })
+          .then(() => {
+            return constants.DISCONNECTED;
+          });
+      } catch (err) {
+        return err;
+      }
     }
   }
 
