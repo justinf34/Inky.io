@@ -259,7 +259,8 @@ class Lobby {
   }
   leavePlayer(socket_id) {
     const user_id = this.connected_players.get(socket_id);
-    this.players.get(user_id).state = constants.DISCONNECTED;
+    if (this.players.get(user_id).state !== constants.KICKED)
+      this.players.get(user_id).state = constants.DISCONNECTED;
     this.connected_players.delete(socket_id);
 
     //TODO: If in game, and only 1 player -> black to lobby
