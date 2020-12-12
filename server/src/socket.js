@@ -17,6 +17,14 @@ module.exports = function (Manager, io) {
         socket.emit("join", { success: false });
       }
     });
+    socket.on("kickPlayer", (lobby_id, playerId) => {
+      console.log("kicking works");
+      console.log(lobby_id);
+      console.log(playerId);
+      console.log(socket.id);
+      const playerSocketId = Manager.kickPlayer(lobby_id, playerId);
+      io.to(playerSocketId).emit("kick", "");
+    });
 
     socket.on("leave", (lobby_id, player) => {
       console.log(`socket: ${player.id} is leaving ${lobby_id}`);

@@ -55,6 +55,13 @@ module.exports = function () {
     };
   }
 
+  function kickPlayer(lobby_id, playerId) {
+    const lobby = Lobbies.get(lobby_id);
+    const playerSocketId = lobby.kickPlayer(playerId);
+    lobby.dbKickPlayer(playerId);
+    return playerSocketId;
+  }
+
   function changeLobbySetting(lobby_id, setting) {
     const lobby = Lobbies.get(lobby_id);
     lobby.changeSetting(setting);
@@ -191,5 +198,6 @@ module.exports = function () {
     getSyncTime,
     startTurn,
     dcGame,
+    kickPlayer,
   };
 };

@@ -12,7 +12,7 @@ class Lobby {
     this.notifier = null;
     this.io = null;
 
-    this.players = new Map(); // Keep track of the players(key = id, value = {socket_id, name, score})
+    this.players = new Map(); // Keep track of the players(key = id, value = {id, name, state,profilekey,score})
     this.connected_players = new Map(); // key = socket id, value = player id
 
     this.rounds = 1; // Number of rounds in the game
@@ -33,6 +33,15 @@ class Lobby {
     this.word_list = []; //word options given to drawer. 3 words
     this.hint = []; //hint to display to all
     this.numberOfHints = 0;
+  }
+  findSocketId(playerID) {
+    console.log(playerID);
+    let sockedIdofPlayer;
+    for (let [key, value] of this.connected_players.entries()) {
+      if (value === playerID) sockedIdofPlayer = key;
+    }
+    console.log(sockedIdofPlayer, "this is socketid of player");
+    return sockedIdofPlayer;
   }
 
   init_sock(notifier_func, io) {
@@ -242,7 +251,12 @@ class Lobby {
       return constants.ERR;
     }
   }
-
+  kickPlayer(playerId) {
+    const playerSocketId = this.findSocketId(playerId);
+    const user_id = this.connected_players.get(playerSocketId);
+    this.players.get(user_id).state = constants.KICKED;
+    return playerSocketId;
+  }
   leavePlayer(socket_id) {
     const user_id = this.connected_players.get(socket_id);
     this.players.get(user_id).state = constants.DISCONNECTED;
@@ -381,15 +395,15 @@ class Lobby {
 
   /**
    * sets player state in db to kicked
-   * @param {id: string, username: string} player_info
+   * @param {id: string} player_info
    */
   dbKickPlayer(player_info) {
     try {
       db.collection("Lobbies")
         .doc(this.id)
         .collection("Players")
-        .doc(player_info.id)
-        .set({
+        .doc(player_info + "")
+        .update({
           state: constants.KICKED,
         })
         .then(() => {

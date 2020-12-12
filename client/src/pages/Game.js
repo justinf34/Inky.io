@@ -112,6 +112,7 @@ class Game extends Component {
           isHost={this.state.host}
           players={this.state.players}
           settings={this.state.settings}
+          hostId={this.state.host_info.id}
         />
       );
 

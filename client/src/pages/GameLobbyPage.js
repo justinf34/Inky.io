@@ -3,7 +3,7 @@ import "../styles/GameLobbyPage.css";
 import { Form, InputGroup, Col, Button } from "react-bootstrap";
 import constants from "../Utils/Constants";
 
-import { withRouter, Link } from "react-router-dom";
+import { withRouter, Link, Redirect } from "react-router-dom";
 
 //takes in prop isHost: bool
 class GameLobbyPage extends React.Component {
@@ -39,6 +39,8 @@ class GameLobbyPage extends React.Component {
     this.handleCustomWordChange = this.handleCustomWordChange.bind(this);
     this.handleCopyClicked = this.handleCopyClicked.bind(this);
     this.startGame = this.startGame.bind(this);
+    this.kickPlayerClicked = this.kickPlayerClicked.bind(this);
+    this.kick = this.kick.bind(this);
   }
 
   componentDidMount() {
@@ -49,6 +51,13 @@ class GameLobbyPage extends React.Component {
         drawingTime: setting.draw_time,
       });
     });
+    this.props.socket.on("kick", (playerId) => {
+      console.log("we are getting here to kick");
+      this.kick();
+    });
+  }
+  kick() {
+    this.props.history.push("/");
   }
 
   componentWillUnmount() {
@@ -116,6 +125,11 @@ class GameLobbyPage extends React.Component {
       if (!player.disconnected) count++;
     });
     return count;
+  }
+  kickPlayerClicked(event) {
+    const playerID = event.target.parentNode.id;
+    const lobby_id = this.props.match.params.lobbyID;
+    this.props.socket.emit("kickPlayer", lobby_id, playerID);
   }
 
   render() {
@@ -231,7 +245,23 @@ class GameLobbyPage extends React.Component {
                   return "";
                 }
                 return (
-                  <div key={index} className="player-container">
+                  <div key={index} className="player-container" id={player.id}>
+                    {this.props.isHost ? (
+                      player.id !== this.props.hostId ? (
+                        <Button
+                          variant="danger"
+                          onClick={this.kickPlayerClicked}
+                          className="kickButton"
+                        >
+                          X
+                        </Button>
+                      ) : (
+                        ""
+                      )
+                    ) : (
+                      ""
+                    )}
+
                     <img
                       className="player-pfp"
                       src={
