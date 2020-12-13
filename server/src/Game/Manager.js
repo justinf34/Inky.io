@@ -55,6 +55,13 @@ module.exports = function () {
     };
   }
 
+  function kickPlayer(lobby_id, playerId) {
+    const lobby = Lobbies.get(lobby_id);
+    const playerSocketId = lobby.kickPlayer(playerId);
+    lobby.dbKickPlayer(playerId);
+    return playerSocketId;
+  }
+
   function changeLobbySetting(lobby_id, setting) {
     const lobby = Lobbies.get(lobby_id);
     lobby.changeSetting(setting);
@@ -95,6 +102,7 @@ module.exports = function () {
       let user_id = lobby.connected_players.get(socket_id);
       let name = lobby.players.get(user_id).name;
       let correctGuess = lobby.checkGuess(user_id, message);
+
       db.collection("Chats").add({
         name: name,
         lobbyID: lobby_id,
@@ -105,6 +113,19 @@ module.exports = function () {
       return { success: true, name: name, correctGuess: correctGuess };
     } catch (error) {
       return { success: false, message: error };
+    }
+  }
+
+  function getScore(lobby_id, socket_id) {
+    try {
+      lobby = Lobbies.get(lobby_id);
+      let user_id = lobby.connected_players.get(socket_id);
+      let score = lobby.players.get(user_id).score;
+      let results = { user_id: user_id, score: score };
+      console.log(results);
+      return results;
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -191,5 +212,7 @@ module.exports = function () {
     getSyncTime,
     startTurn,
     dcGame,
+    kickPlayer,
+    getScore,
   };
 };

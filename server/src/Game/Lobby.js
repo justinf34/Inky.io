@@ -12,7 +12,7 @@ class Lobby {
     this.notifier = null;
     this.io = null;
 
-    this.players = new Map(); // Keep track of the players(key = id, value = {socket_id, name, score})
+    this.players = new Map(); // Keep track of the players(key = id, value = {id, name, state,profilekey,score})
     this.connected_players = new Map(); // key = socket id, value = player id
 
     this.rounds = 1; // Number of rounds in the game
@@ -20,7 +20,7 @@ class Lobby {
     this.round_state = 0;
     this.players_guessed = new Set(); //Number of players that correctly guessed the word
 
-    this.drawing_time = 2;
+    this.drawing_time = 30;
     this.timer = null; // Timer for the game
 
     this.drawer = null; // user_id of drawer
@@ -33,6 +33,14 @@ class Lobby {
     this.word_list = []; //word options given to drawer. 3 words
     this.hint = []; //hint to display to all
     this.numberOfHints = 0;
+  }
+  findSocketId(playerID) {
+    let sockedIdofPlayer;
+    for (let [key, value] of this.connected_players.entries()) {
+      if (value === playerID) sockedIdofPlayer = key;
+    }
+
+    return sockedIdofPlayer;
   }
 
   init_sock(notifier_func, io) {
@@ -62,8 +70,7 @@ class Lobby {
     if (state === constants.IN_GAME) {
       //Init game settings
       this.curr_round = 1;
-      this.players_guessed.clear();
-
+      
       this.timer = this.drawing_time;
       // Setting draw order
       this.drawer_order = Array.from(this.connected_players.values());
@@ -76,7 +83,8 @@ class Lobby {
     this.drawer = this.drawer_order.shift();
     this.word_list = this.getWordOptions(); // Generate word choices
     this.round_state = 0; // State to choosing
-
+    this.players_guessed.clear();
+    
     // Restart timer but do not start it
     this.timer = this.drawing_time;
   }
@@ -197,14 +205,17 @@ class Lobby {
         score: 0,
       });
     } else {
-      this.players.get(player_info.id).state = constants.CONNECTED;
+      if (this.players.get(player_info.id).state !== constants.KICKED) {
+        this.players.get(player_info.id).state = constants.CONNECTED;
+      }
     }
+    if (this.players.get(player_info.id).state !== constants.KICKED) {
+      this.connected_players.set(socket_id, player_info.id);
 
-    this.connected_players.set(socket_id, player_info.id);
-
-    // Adding player to draw order when in game
-    if (this.state === constants.IN_GAME)
-      this.drawer_order.push(player_info.id);
+      // Adding player to draw order when in game
+      if (this.state === constants.IN_GAME)
+        this.drawer_order.push(player_info.id);
+    }
   }
 
   /**
@@ -242,10 +253,16 @@ class Lobby {
       return constants.ERR;
     }
   }
-
+  kickPlayer(playerId) {
+    const playerSocketId = this.findSocketId(playerId);
+    const user_id = this.connected_players.get(playerSocketId);
+    this.players.get(user_id).state = constants.KICKED;
+    return playerSocketId;
+  }
   leavePlayer(socket_id) {
     const user_id = this.connected_players.get(socket_id);
-    this.players.get(user_id).state = constants.DISCONNECTED;
+    if (this.players.get(user_id).state !== constants.KICKED)
+      this.players.get(user_id).state = constants.DISCONNECTED;
     this.connected_players.delete(socket_id);
 
     //TODO: If in game, and only 1 player -> black to lobby
@@ -279,20 +296,25 @@ class Lobby {
    * @param {id: string, username: string} player_info
    */
   dbLeavePlayer(socket_id) {
-    let player = this.connected_players.get(socket_id);
-    try {
-      db.collection("Lobbies")
-        .doc(this.id)
-        .collection("Players")
-        .doc(player)
-        .update({
-          state: constants.DISCONNECTED,
-        })
-        .then(() => {
-          return constants.DISCONNECTED;
-        });
-    } catch (err) {
-      return err;
+    let playerID = this.connected_players.get(socket_id);
+    let playerState = this.players.get(playerID).state;
+    console.log(this.players.get(playerID).state);
+    if (playerState !== constants.KICKED) {
+      console.log("getting to storing state");
+      try {
+        db.collection("Lobbies")
+          .doc(this.id)
+          .collection("Players")
+          .doc(playerID)
+          .update({
+            state: constants.DISCONNECTED,
+          })
+          .then(() => {
+            return constants.DISCONNECTED;
+          });
+      } catch (err) {
+        return err;
+      }
     }
   }
 
@@ -381,15 +403,15 @@ class Lobby {
 
   /**
    * sets player state in db to kicked
-   * @param {id: string, username: string} player_info
+   * @param {id: string} player_info
    */
   dbKickPlayer(player_info) {
     try {
       db.collection("Lobbies")
         .doc(this.id)
         .collection("Players")
-        .doc(player_info.id)
-        .set({
+        .doc(player_info + "")
+        .update({
           state: constants.KICKED,
         })
         .then(() => {
@@ -490,15 +512,21 @@ class Lobby {
     this.numberOfHints = Math.round(numeberOfLetters * 0.25);
   }
 
-  // uses current time and round time to get score between 0 and 100
-  generateScore() {
-    const score = (this.timer / this.drawing_time) * 100;
-    return Math.round(score);
+  calculatePoints() {
+    return Math.round( (1 - (1.0*this.drawing_time - this.timer) / this.drawing_time) * 250);
   }
 
-  checkGuess(user_id, guess) {
-    if (this.word === guess) {
+  handleCorrectGuess(user_id) {
+    if (!this.players_guessed.has(user_id)) {
+      this.players.get(user_id).score += this.calculatePoints();
       this.players_guessed.add(user_id);
+    }
+  }
+
+  // this should maybe be refactored
+  checkGuess(user_id, guess) {
+    if (this.word === guess && this.drawer !== user_id) {
+      this.handleCorrectGuess(user_id);
       return true;
     }
     return false;

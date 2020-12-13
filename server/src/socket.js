@@ -17,6 +17,12 @@ module.exports = function (Manager, io) {
         socket.emit("join", { success: false });
       }
     });
+    socket.on("kickPlayer", (lobby_id, playerId) => {
+      console.log("kicking works");
+
+      const playerSocketId = Manager.kickPlayer(lobby_id, playerId);
+      io.to(playerSocketId).emit("kick", "");
+    });
 
     socket.on("leave", (lobby_id, player) => {
       console.log(`socket: ${player.id} is leaving ${lobby_id}`);
@@ -108,14 +114,14 @@ module.exports = function (Manager, io) {
     socket.on("chat", async (lobby_id, msg) => {
       Manager.addChat(lobby_id, socket.id, msg).then((result) => {
         if (!result.success) {
-          console.log(result.message);
+          console.error(result.message);
         } else if (result.correctGuess) {
           socket
             .to(lobby_id)
             .emit("chat", "Inky", `${result.name} guessed correctly`);
-          // TODO: generate score and add to players score and emit to lobby
           socket.emit("chat", result.name, msg);
           socket.emit("chat", "Inky", `You guessed correctly`);
+          io.in(lobby_id).emit("score", Manager.getScore(lobby_id, socket.id));
         } else {
           io.to(lobby_id).emit("chat", result.name, msg);
           console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`);

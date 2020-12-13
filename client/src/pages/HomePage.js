@@ -56,6 +56,7 @@ class HomePage extends React.Component {
       })
       .then((responseJson) => {
         // redirect to lobby
+
         const location = {
           pathname: `/game/${responseJson.code}`,
         };
@@ -83,6 +84,7 @@ class HomePage extends React.Component {
       })
       .then((res_json) => {
         if (res_json.success) {
+          console.log(res_json);
           const location = {
             pathname: `/game/${res_json.code}`,
           };
