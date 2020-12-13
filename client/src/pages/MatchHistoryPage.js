@@ -20,7 +20,10 @@ class MatchHistoryPage extends React.Component {
 
   componentDidMount() {
     const user = this.props.authCreds.auth.user;
+<<<<<<< HEAD
     this.getLobbies();
+=======
+>>>>>>> df218e2c76c463ef019222145f034c9fb1cd7ad0
     // TODO: get all lobbies from db that user was in
     // is this what were using this function to do idk
   }
