@@ -14,7 +14,6 @@ class Canvas extends Component {
     super(props);
 
     this.myRef = React.createRef();
-    this.start = true;
     this.strokes = this.props.strokes;
 
     this.state = {
@@ -38,34 +37,45 @@ class Canvas extends Component {
         this.myRef.current.offsetWidth,
         this.myRef.current.offsetHeight
       );
-      sketch.background("#ffffff");
-      sketch.strokeCap(p5.ROUND);
       // sketch.frameRate(20);
+      sketch.background("#ffffff");
     };
 
-    sketch.draw = () => {
-      if (this.start) {
-        console.log("Redrawing...");
-        this.props.strokes.forEach((stroke) => {
-          sketch.strokeWeight(stroke.weight);
-          sketch.stroke(stroke.color);
-          sketch.line(stroke.x1, stroke.y1, stroke.x2, stroke.y2);
-        });
-        this.start = false;
-      }
+    sketch.draw = () => {};
+
+    sketch.reset = () => {
+      console.log("Clearing canvas..");
+
+      sketch.clear();
+      sketch.background("#ffffff");
+      sketch.strokeCap(p5.ROUND);
+
+      const w = sketch.width;
+      const h = sketch.height;
+
+      this.strokes.forEach((stroke) => {
+        sketch.strokeWeight(stroke.weight);
+        sketch.stroke(stroke.color);
+        sketch.line(stroke.x1 * w, stroke.y1 * h, stroke.x2 * w, stroke.y2 * h);
+      });
     };
 
     sketch.mouseDragged = () => {
+      const w = sketch.width;
+      const h = sketch.height;
+
       if (this.props.drawing && this.props.round_state !== 0) {
         const msg = {
           type: 0,
-          x1: sketch.pmouseX,
-          y1: sketch.pmouseY,
-          x2: sketch.mouseX,
-          y2: sketch.mouseY,
+          x1: sketch.pmouseX / w,
+          y1: sketch.pmouseY / h,
+          x2: sketch.mouseX / w,
+          y2: sketch.mouseY / h,
           color: this.state.color,
           weight: this.state.weight,
         };
+
+        this.strokes.push(msg);
 
         const { match } = this.props;
         this.props.socket.emit("draw", match.params.lobbyID, msg);
@@ -78,31 +88,34 @@ class Canvas extends Component {
           sketch.mouseX,
           sketch.mouseY
         );
+
+        // console.log(`${this.strokes}`);
+        // sketch.reset();
       }
     };
 
-    sketch.onNewDrawing = (data, strokes) => {
-      if (data.type === 1) {
+    sketch.onNewDrawing = (stroke, strokes) => {
+      if (stroke.type === 1) {
         sketch.clear();
         sketch.background("#ffffff");
       } else {
-        sketch.strokeWeight(data.weight);
-        sketch.stroke(data.color);
-        sketch.line(data.x1, data.y1, data.x2, data.y2);
+        const w = sketch.width;
+        const h = sketch.height;
+
+        sketch.strokeWeight(stroke.weight);
+        sketch.stroke(stroke.color);
+        sketch.line(stroke.x1 * w, stroke.y1 * h, stroke.x2 * w, stroke.y2 * h);
       }
       this.strokes = strokes;
     };
 
     sketch.windowResized = () => {
-      console.log("Resized...");
       if (this.myRef.current)
         sketch.resizeCanvas(
           this.myRef.current.offsetWidth,
           this.myRef.current.offsetHeight
         );
-      sketch.clear();
-      sketch.background("#ffffff");
-      this.start = true;
+      sketch.reset();
     };
 
     this.sketch = sketch;
