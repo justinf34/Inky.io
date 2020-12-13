@@ -13,6 +13,7 @@ export default class PlayerContainer extends React.Component {
       cheating: false,
       verbalAbuse: false,
       inappropriateName: false,
+      score: 0
     };
     this.cardRef = React.createRef();
     this.reportPlayer = this.reportPlayer.bind(this);
@@ -59,6 +60,17 @@ export default class PlayerContainer extends React.Component {
       verbalAbuse: false,
       inappropriateName: false,
       showReportModal: false,
+    });
+  }
+
+  componentDidMount() {
+    this.props.socket.on("score", (res) => {
+      console.log(`score update player: ${res.user_id}, score: ${res.score}`);
+      if (res.user_id === this.props.player.id) {
+        this.setState({
+          score: res.score,
+        });
+      }
     });
   }
 
@@ -162,7 +174,7 @@ export default class PlayerContainer extends React.Component {
             <Card.Body>
               <Card.Text>
                 <b># {this.props.index + 1}&emsp;</b>
-                {this.props.player.score}
+                {this.state.score}
               </Card.Text>
             </Card.Body>
           </Card>

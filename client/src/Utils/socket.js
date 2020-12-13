@@ -37,6 +37,10 @@ function handlers() {
     socket.on("chat", msg)
   }
 
+  // function updateScores(player_id, msg) {
+  //   socket.on("score", score)
+  // }
+
   return {
     join,
     registerOnJoin,
@@ -44,6 +48,6 @@ function handlers() {
     registerDraw,
     disconnect,
     sendMessage,
-    getMessage
+    getMessage,
   };
 }

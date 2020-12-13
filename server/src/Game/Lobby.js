@@ -20,7 +20,7 @@ class Lobby {
     this.round_state = 0;
     this.players_guessed = new Set(); //Number of players that correctly guessed the word
 
-    this.drawing_time = 2;
+    this.drawing_time = 30;
     this.timer = null; // Timer for the game
 
     this.drawer = null; // user_id of drawer
@@ -70,8 +70,7 @@ class Lobby {
     if (state === constants.IN_GAME) {
       //Init game settings
       this.curr_round = 1;
-      this.players_guessed.clear();
-
+      
       this.timer = this.drawing_time;
       // Setting draw order
       this.drawer_order = Array.from(this.connected_players.values());
@@ -84,7 +83,8 @@ class Lobby {
     this.drawer = this.drawer_order.shift();
     this.word_list = this.getWordOptions(); // Generate word choices
     this.round_state = 0; // State to choosing
-
+    this.players_guessed.clear();
+    
     // Restart timer but do not start it
     this.timer = this.drawing_time;
   }
@@ -512,15 +512,21 @@ class Lobby {
     this.numberOfHints = Math.round(numeberOfLetters * 0.25);
   }
 
-  // uses current time and round time to get score between 0 and 100
-  generateScore() {
-    const score = (this.timer / this.drawing_time) * 100;
-    return Math.round(score);
+  calculatePoints() {
+    return Math.round( (1 - (1.0*this.drawing_time - this.timer) / this.drawing_time) * 250);
   }
 
-  checkGuess(user_id, guess) {
-    if (this.word === guess) {
+  handleCorrectGuess(user_id) {
+    if (!this.players_guessed.has(user_id)) {
+      this.players.get(user_id).score += this.calculatePoints();
       this.players_guessed.add(user_id);
+    }
+  }
+
+  // this should maybe be refactored
+  checkGuess(user_id, guess) {
+    if (this.word === guess && this.drawer !== user_id) {
+      this.handleCorrectGuess(user_id);
       return true;
     }
     return false;
