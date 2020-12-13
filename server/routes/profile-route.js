@@ -31,7 +31,7 @@ router.get("/matches", async (req, res) => {
   }
 
   try {
-    gameIds.forEach((game) => {
+    await gameIds.forEach((game) => {
       db.collection("Games")
       .doc(game)
       .get()
@@ -48,9 +48,12 @@ router.get("/matches", async (req, res) => {
               name: player.data().name,
               score: player.data().score
             }
+            console.log("game info inside player", gameInfo);
           });
         });
+        console.log("game info outside player", gameInfo);
         gameHistory.push(gameInfo);
+        console.log("Game Hist", gameHistory);
       });
     });
   } catch (error) {
