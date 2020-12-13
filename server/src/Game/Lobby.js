@@ -116,10 +116,6 @@ class Lobby {
   async endTurn() {
     clearInterval(this.interval); // Clear interval
 
-    // Clear canvas
-    this.strokes.length = 0; // Clear the canvas
-    this.io.to(this.id).emit("draw", { type: 1 }, this.strokes);
-
     let endGame = false;
 
     //check if all the players already had a turn to draw
@@ -134,6 +130,10 @@ class Lobby {
         this.drawer_order = Array.from(this.connected_players.values());
       }
     }
+
+    // Clear canvas
+    this.strokes.length = 0; // Clear the canvas
+    this.io.to(this.id).emit("draw", { type: 1 }, this.strokes);
 
     if (!endGame) {
       this.newTurn();
@@ -383,14 +383,16 @@ class Lobby {
   }
 
   saveStroke(stroke) {
-    if (stroke.type === 1) {
-      this.strokes = [];
-      console.log("should be 1");
+    if (this.round_state === 1) {
+      if (stroke.type === 1) {
+        this.strokes.length = 0;
+      } else {
+        this.strokes.push(stroke);
+      }
+      return this.strokes;
     } else {
-      this.strokes.push(stroke);
+      return undefined;
     }
-
-    return this.strokes;
   }
 
   // returns random int between min and max
@@ -442,7 +444,11 @@ class Lobby {
     const timeIntervals = Math.round(
       this.drawing_time / (this.numberOfHints + 1)
     );
-    if (this.numberOfHints && this.timer % timeIntervals === 0) {
+    if (this.timer === 0) {
+      // revieal full word when time runs out
+      this.hint = this.word.split("");
+      this.notifier();
+    } else if (this.numberOfHints && this.timer % timeIntervals === 0) {
       let possible = [];
       for (let i = 0; i < this.hint.length; i++) {
         if (this.hint[i] === "_") {
@@ -452,7 +458,7 @@ class Lobby {
       const randomIndex = possible[this.rndInt(0, possible.length - 1)];
 
       this.hint[parseInt(randomIndex)] = this.word.charAt(randomIndex);
-      console.log(this.hint);
+      this.notifier();
     }
   }
 

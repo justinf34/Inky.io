@@ -14,26 +14,24 @@ class Canvas extends Component {
     super(props);
 
     this.myRef = React.createRef();
+    this.strokes = this.props.strokes;
     this.start = true;
+    this.color = "#000000";
+    this.weight = 1;
 
-    this.state = {
-      color: "#000000",
-      weight: 1,
-    };
-
-    this.colorOptionOnClick = this.colorOptionOnClick.bind(this);
-    this.strokeOptionClick = this.strokeOptionClick.bind(this);
-    this.eraser = this.eraser.bind(this);
-    this.clearCanvas = this.clearCanvas.bind(this);
+    // this.state = {
+    //   weight: 1,
+    // };
   }
 
   componentDidMount() {
+    console.log(`Mounting canvas ${this.start}`);
     this.myP5 = new p5(this.Sketch, this.myRef.current);
     this.props.socket.on("draw", this.sketch.onNewDrawing);
   }
 
   componentWillUnmount() {
-    // this.start = true;
+    console.log("Unmounting canvas");
   }
 
   Sketch = (sketch) => {
@@ -42,40 +40,69 @@ class Canvas extends Component {
         this.myRef.current.offsetWidth,
         this.myRef.current.offsetHeight
       );
-      sketch.background("#ffffff");
-      sketch.frameRate(20);
+      // sketch.frameRate(20);
     };
 
     sketch.draw = () => {
       if (this.start) {
-        // console.log("Drawin old stuff");
-        // console.log(this.props.strokes);
+        sketch.background("#ffffff");
+
+        const w = sketch.width;
+        const h = sketch.height;
+
         this.props.strokes.forEach((stroke) => {
           sketch.strokeWeight(stroke.weight);
           sketch.stroke(stroke.color);
-          sketch.line(stroke.x1, stroke.y1, stroke.x2, stroke.y2);
+          sketch.line(
+            stroke.x1 * w,
+            stroke.y1 * h,
+            stroke.x2 * w,
+            stroke.y2 * h
+          );
         });
         this.start = false;
       }
     };
 
+    sketch.reset = () => {
+      console.log("Clearing canvas..");
+
+      sketch.clear();
+      sketch.background("#ffffff");
+      sketch.strokeCap(p5.ROUND);
+
+      const w = sketch.width;
+      const h = sketch.height;
+
+      this.strokes.forEach((stroke) => {
+        sketch.strokeWeight(stroke.weight);
+        sketch.stroke(stroke.color);
+        sketch.line(stroke.x1 * w, stroke.y1 * h, stroke.x2 * w, stroke.y2 * h);
+      });
+    };
+
     sketch.mouseDragged = () => {
+      const w = sketch.width;
+      const h = sketch.height;
+
       if (this.props.drawing && this.props.round_state !== 0) {
         const msg = {
           type: 0,
-          x1: sketch.pmouseX,
-          y1: sketch.pmouseY,
-          x2: sketch.mouseX,
-          y2: sketch.mouseY,
-          color: this.state.color,
-          weight: this.state.weight,
+          x1: sketch.pmouseX / w,
+          y1: sketch.pmouseY / h,
+          x2: sketch.mouseX / w,
+          y2: sketch.mouseY / h,
+          color: this.color,
+          weight: this.weight,
         };
+
+        this.strokes.push(msg);
 
         const { match } = this.props;
         this.props.socket.emit("draw", match.params.lobbyID, msg);
 
-        sketch.strokeWeight(this.state.weight);
-        sketch.stroke(this.state.color);
+        sketch.strokeWeight(this.weight);
+        sketch.stroke(this.color);
         sketch.line(
           sketch.pmouseX,
           sketch.pmouseY,
@@ -85,24 +112,28 @@ class Canvas extends Component {
       }
     };
 
-    sketch.onNewDrawing = (data, strokes) => {
-      if (data.type === 1) {
+    sketch.onNewDrawing = (stroke, strokes) => {
+      if (stroke.type === 1) {
+        sketch.clear();
         sketch.background("#ffffff");
       } else {
-        sketch.strokeWeight(data.weight);
-        sketch.stroke(data.color);
-        sketch.line(data.x1, data.y1, data.x2, data.y2);
+        const w = sketch.width;
+        const h = sketch.height;
+
+        sketch.strokeWeight(stroke.weight);
+        sketch.stroke(stroke.color);
+        sketch.line(stroke.x1 * w, stroke.y1 * h, stroke.x2 * w, stroke.y2 * h);
       }
+      this.strokes = strokes;
     };
 
     sketch.windowResized = () => {
-      if (this.myRef && this.myRef.current)
+      if (this.myRef.current)
         sketch.resizeCanvas(
           this.myRef.current.offsetWidth,
           this.myRef.current.offsetHeight
         );
-      sketch.background("#ffffff");
-      this.start = true;
+      sketch.reset();
     };
 
     this.sketch = sketch;
@@ -145,27 +176,32 @@ class Canvas extends Component {
     return options;
   }
 
-  colorOptionOnClick(color) {
+  colorOptionOnClick = (color) => {
     console.log(`Changing pen color to ${color}`);
-    this.setState({ color: color });
-  }
+    // this.setState({ color: color });
+    this.color = color;
+  };
 
-  strokeOptionClick(event) {
+  strokeOptionClick = (event) => {
     event.preventDefault();
     console.log(`Changing stroke weight to ${event.target.value}`);
-    this.setState({ weight: parseInt(event.target.value) });
-  }
+    // this.setState({ weight: parseInt(event.target.value) });
+    this.weight = parseInt(event.target.value);
+  };
 
-  eraser() {
-    this.setState({ color: "#FFFFFF" });
-  }
+  eraser = () => {
+    // this.setState({ color: "#FFFFFF" });
+    this.color = "#FFFFF";
+  };
 
-  clearCanvas() {
+  clearCanvas = () => {
     const { match } = this.props;
     const msg = { type: 1 };
     this.props.socket.emit("draw", match.params.lobbyID, msg);
+
+    this.sketch.clear();
     this.sketch.background("#ffffff");
-  }
+  };
 
   render() {
     return (

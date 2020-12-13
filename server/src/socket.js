@@ -93,7 +93,9 @@ module.exports = function (Manager, io) {
     socket.on("draw", (lobby_id, msg) => {
       // console.log("draw: ", msg);
       const strokes = Manager.addStroke(lobby_id, msg);
-      socket.to(lobby_id).emit("draw", msg, strokes);
+      if (strokes) {
+        socket.to(lobby_id).emit("draw", msg, strokes);
+      }
     });
 
     socket.on("chat", async (lobby_id, msg) => {
@@ -101,18 +103,19 @@ module.exports = function (Manager, io) {
         if (!result.success) {
           console.error(result.message);
         } else if (result.correctGuess) {
-          socket.to(lobby_id).emit("chat",'Inky',`${result.name} guessed correctly`)
-          socket.emit("chat", result.name, msg)
-          socket.emit("chat",'Inky',`You guessed correctly`)
+          socket
+            .to(lobby_id)
+            .emit("chat", "Inky", `${result.name} guessed correctly`);
+          socket.emit("chat", result.name, msg);
+          socket.emit("chat", "Inky", `You guessed correctly`);
           io.in(lobby_id).emit("score", Manager.getScore(lobby_id, socket.id));
         } else {
-          io.to(lobby_id).emit("chat", result.name, msg)
-          console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`)
+          io.to(lobby_id).emit("chat", result.name, msg);
+          console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`);
         }
       });
     });
 
-    
     socket.on("report", async (lobby_id, user_id, name, reason) => {
       const status = Manager.addReport(lobby_id, user_id, name, reason).then(
         (result) => {
