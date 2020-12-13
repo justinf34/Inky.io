@@ -20,7 +20,7 @@ class Lobby {
     this.round_state = 0;
     this.players_guessed = []; //Number of players that correctly guessed the word
 
-    this.drawing_time = 2;
+    this.drawing_time = 30;
     this.timer = null; // Timer for the game
 
     this.drawer = null; // user_id of drawer
@@ -116,10 +116,6 @@ class Lobby {
   async endTurn() {
     clearInterval(this.interval); // Clear interval
 
-    // Clear canvas
-    this.strokes.length = 0; // Clear the canvas
-    this.io.to(this.id).emit("draw", { type: 1 }, this.strokes);
-
     let endGame = false;
 
     //check if all the players already had a turn to draw
@@ -134,6 +130,10 @@ class Lobby {
         this.drawer_order = Array.from(this.connected_players.values());
       }
     }
+
+    // Clear canvas
+    this.strokes.length = 0; // Clear the canvas
+    this.io.to(this.id).emit("draw", { type: 1 }, this.strokes);
 
     if (!endGame) {
       this.newTurn();
@@ -381,14 +381,16 @@ class Lobby {
   }
 
   saveStroke(stroke) {
-    if (stroke.type === 1) {
-      this.strokes = [];
-      console.log("should be 1");
+    if (this.round_state === 1) {
+      if (stroke.type === 1) {
+        this.strokes = [];
+      } else {
+        this.strokes.push(stroke);
+      }
+      return this.strokes;
     } else {
-      this.strokes.push(stroke);
+      return undefined;
     }
-
-    return this.strokes;
   }
 
   // returns random int between min and max

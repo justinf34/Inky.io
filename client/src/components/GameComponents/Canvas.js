@@ -15,16 +15,12 @@ class Canvas extends Component {
 
     this.myRef = React.createRef();
     this.start = true;
+    this.strokes = this.props.strokes;
 
     this.state = {
       color: "#000000",
       weight: 1,
     };
-
-    this.colorOptionOnClick = this.colorOptionOnClick.bind(this);
-    this.strokeOptionClick = this.strokeOptionClick.bind(this);
-    this.eraser = this.eraser.bind(this);
-    this.clearCanvas = this.clearCanvas.bind(this);
   }
 
   componentDidMount() {
@@ -43,13 +39,13 @@ class Canvas extends Component {
         this.myRef.current.offsetHeight
       );
       sketch.background("#ffffff");
-      sketch.frameRate(20);
+      sketch.strokeCap(p5.ROUND);
+      // sketch.frameRate(20);
     };
 
     sketch.draw = () => {
       if (this.start) {
-        // console.log("Drawin old stuff");
-        // console.log(this.props.strokes);
+        console.log("Redrawing...");
         this.props.strokes.forEach((stroke) => {
           sketch.strokeWeight(stroke.weight);
           sketch.stroke(stroke.color);
@@ -87,20 +83,24 @@ class Canvas extends Component {
 
     sketch.onNewDrawing = (data, strokes) => {
       if (data.type === 1) {
+        sketch.clear();
         sketch.background("#ffffff");
       } else {
         sketch.strokeWeight(data.weight);
         sketch.stroke(data.color);
         sketch.line(data.x1, data.y1, data.x2, data.y2);
       }
+      this.strokes = strokes;
     };
 
     sketch.windowResized = () => {
-      if (this.myRef && this.myRef.current)
+      console.log("Resized...");
+      if (this.myRef.current)
         sketch.resizeCanvas(
           this.myRef.current.offsetWidth,
           this.myRef.current.offsetHeight
         );
+      sketch.clear();
       sketch.background("#ffffff");
       this.start = true;
     };
@@ -145,27 +145,28 @@ class Canvas extends Component {
     return options;
   }
 
-  colorOptionOnClick(color) {
+  colorOptionOnClick = (color) => {
     console.log(`Changing pen color to ${color}`);
     this.setState({ color: color });
-  }
+  };
 
-  strokeOptionClick(event) {
+  strokeOptionClick = (event) => {
     event.preventDefault();
     console.log(`Changing stroke weight to ${event.target.value}`);
     this.setState({ weight: parseInt(event.target.value) });
-  }
+  };
 
-  eraser() {
+  eraser = () => {
     this.setState({ color: "#FFFFFF" });
-  }
+  };
 
-  clearCanvas() {
+  clearCanvas = () => {
     const { match } = this.props;
     const msg = { type: 1 };
-    this.props.socket.emit("draw", match.params.lobbyID, msg);
+    // this.props.socket.emit("draw", match.params.lobbyID, msg);
+    this.sketch.clear();
     this.sketch.background("#ffffff");
-  }
+  };
 
   render() {
     return (
