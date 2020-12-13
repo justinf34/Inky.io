@@ -9,7 +9,21 @@ router.get("/", (req, res) => {
 
 router.get("/matches", (req, res) => {
   const user_id = req.query.userID;
-  const user = db.collection("Users").doc(user_id);
+  const user = db.collection("Users")
+    .doc(user_id)
+    .get()
+    .then((doc) => {
+      console.log(doc);
+      if(doc.exists) {
+        doc.ref.collection("Games")
+        .get()
+        .then((gameIds) => {
+          if(gameIds.exists) {
+            console.log(gameIds);
+          }
+        });
+      }
+    });
   // TODO: setup db for this
   // get all games from db and send them in res
   // matchHistory: [{lobbyCode, hostId, games[]}]
