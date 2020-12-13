@@ -33,6 +33,8 @@ class Lobby {
     this.word_list = []; //word options given to drawer. 3 words
     this.hint = []; //hint to display to all
     this.numberOfHints = 0;
+
+    this.playing = false;
   }
 
   init_sock(notifier_func, io) {
@@ -54,6 +56,7 @@ class Lobby {
       hint: this.hint,
       strokes: this.strokes,
       timer: this.timer,
+      playing: this.playing,
     };
   }
 
@@ -78,6 +81,7 @@ class Lobby {
     this.players_guessed.clear();
 
     // Restart timer but do not start it
+    this.playing = false;
     this.timer = this.drawing_time;
   }
 
@@ -89,15 +93,17 @@ class Lobby {
     this.setHints(word);
 
     setTimeout(() => {
+      this.playing = true;
       this.startTimer(); // Start timer
       this.notifier(); // Let everyone know
     }, 1000);
   }
 
   startTimer() {
+    this.io.to(this.id).emit("startTimer");
     this.interval = setInterval(() => {
       if (this.timer > 0) {
-        this.timer -= 1;
+        this.timer -= 0.5;
         this.io.to(this.id).emit("time-update", this.timer);
         this.generateHint();
         // console.log("timer now:", this.timer);
@@ -105,7 +111,7 @@ class Lobby {
         clearInterval(this.interval);
         this.endTurn();
       }
-    }, 1000);
+    }, 500);
   }
 
   /**
@@ -115,7 +121,7 @@ class Lobby {
    */
   async endTurn() {
     clearInterval(this.interval); // Clear interval
-
+    this.io.to(this.id).emit("stopTimer");
     let endGame = false;
 
     //check if all the players already had a turn to draw
@@ -125,6 +131,7 @@ class Lobby {
       if (this.curr_round >= this.rounds) {
         console.log(`Ending game...`);
         endGame = true;
+        this.playing = false;
       } else {
         this.curr_round += 1;
         this.drawer_order = Array.from(this.connected_players.values());
