@@ -14,12 +14,40 @@ class MatchHistoryPage extends React.Component {
       // games: [{date, numRounds, scores[{playerName, score}]}]
       matchHistory: [],
     };
+
+    this.getLobbies = this.getLobbies.bind(this);
   }
 
   componentDidMount() {
     const user = this.props.authCreds.auth.user;
     // TODO: get all lobbies from db that user was in
     // is this what were using this function to do idk
+  }
+
+  getLobbies() {
+    fetch(
+      `http://localhost:8888/profile/matches?userID=${this.props.authCreds.auth.user.id}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        if (response.status === 200) return response.json();
+        throw new Error("failed get match history");
+      })
+      .then((responseJson) => {
+        console.log(responseJson);
+        // TODO: populate state
+      })
+      .catch((error) => {
+        console.log(error);
+        this.dialog.showAlert("Something went wrong getting match history.");
+      });
   }
 
   render() {
