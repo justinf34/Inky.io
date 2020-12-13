@@ -58,6 +58,7 @@ class HomePage extends React.Component {
       })
       .then((responseJson) => {
         // redirect to lobby
+
         const location = {
           pathname: `/game/${responseJson.code}`,
         };
@@ -69,6 +70,7 @@ class HomePage extends React.Component {
   }
 
   handleJoinGameClicked() {
+    const user = this.props.authCreds.auth.user;
     if (this.state.gameCode === "") return;
     fetch(SERVER_URL + `/lobby/join2`, {
       method: "POST",
@@ -76,7 +78,7 @@ class HomePage extends React.Component {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ id: this.state.gameCode }),
+      body: JSON.stringify({ id: this.state.gameCode, userID: user.id }),
     })
       .then((res) => {
         if (res.status === 200) return res.json();
@@ -90,9 +92,11 @@ class HomePage extends React.Component {
           this.props.history.push(location);
         } else {
           //TODO: show error message
+
           this.setState({
             showRoomNotFound: true,
             gameCode: "",
+            gameErrorMessage: res_json.message,
           });
         }
       })
@@ -156,9 +160,7 @@ class HomePage extends React.Component {
               autohide
               style={{ maxHeight: 50 }}
             >
-              <Toast.Body>
-                Couldn't find the room you're looking for. Sorry!
-              </Toast.Body>
+              <Toast.Body>{this.state.gameErrorMessage}</Toast.Body>
             </Toast>
 
             <Accordion defaultActiveKey="0" className="info">

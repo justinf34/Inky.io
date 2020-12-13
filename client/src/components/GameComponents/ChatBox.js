@@ -13,6 +13,7 @@ class ChatBox extends Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    // this.fetchChats = this.fetchChats.bind(this);
   }
 
   handleChange(event) {
@@ -30,7 +31,23 @@ class ChatBox extends Component {
     this.setState({ currentMessage: "" });
   }
 
-  componentDidMount() {
+  async fetchChats() {
+    let response = await fetch(`http://localhost:8888/lobby/chatHistory?lobbycode=${this.props.lobby}`)
+    if (response.ok) {
+      return response.json()
+    } else {
+      return Promise.reject(response)
+    }
+  }
+
+  
+  componentDidMount() {  
+    this.fetchChats()
+      .then(response => this.setState({messageLog : response.chatLog}))
+      .catch(error => console.error(error))
+      console.log(this.state.messageLog)
+
+
     this.props.socket.on("chat", (name, msg) => {
       console.log(`received "${name}: ${msg}"`);
       this.setState({

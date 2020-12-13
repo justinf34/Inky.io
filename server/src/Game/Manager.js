@@ -55,6 +55,13 @@ module.exports = function () {
     };
   }
 
+  function kickPlayer(lobby_id, playerId) {
+    const lobby = Lobbies.get(lobby_id);
+    const playerSocketId = lobby.kickPlayer(playerId);
+    lobby.dbKickPlayer(playerId);
+    return playerSocketId;
+  }
+
   function changeLobbySetting(lobby_id, setting) {
     const lobby = Lobbies.get(lobby_id);
     lobby.changeSetting(setting);
@@ -81,7 +88,13 @@ module.exports = function () {
     }
   }
 
+  function dcGame(lobby_id) {
+    const lobby = Lobbies.get(lobby_id);
+    Lobbies.delete(lobby_id);
 
+    // Tell lobby instance to handle disconnect
+    const res = lobby.dcLobby();
+  }
 
   async function addChat(lobby_id, socket_id, message) {
     try {
@@ -89,15 +102,15 @@ module.exports = function () {
       let user_id = lobby.connected_players.get(socket_id);
       let name = lobby.players.get(user_id).name;
       let correctGuess = lobby.checkGuess(user_id, message);
-      
+
       db.collection("Chats").add({
-        'name': name,
-        'lobbyID': lobby_id,
-        'message': message,
-        'correctGuess' : correctGuess,
-        'timestamp' : Date.now()
+        name: name,
+        lobbyID: lobby_id,
+        message: message,
+        correctGuess: correctGuess,
+        timestamp: admin.firestore.Timestamp.now(),
       });
-      return {success: true, 'name': name, 'correctGuess': correctGuess};
+      return { success: true, name: name, correctGuess: correctGuess };
     } catch (error) {
       return { success: false, message: error };
     }
@@ -108,26 +121,11 @@ module.exports = function () {
       lobby = Lobbies.get(lobby_id);
       let user_id = lobby.connected_players.get(socket_id);
       let score = lobby.players.get(user_id).score;
-      let results = {user_id : user_id, score: score}
-      console.log(results)
-      return results
+      let results = { user_id: user_id, score: score };
+      return results;
     } catch (error) {
-      console.log(error)
+      console.error(error);
     }
-  }
-
-  async function getChatLog(lobby_id) {
-    let chatLog = []
-    db.collection('Chats')
-      .where('lobbyID', '==', lobby_id)
-      .where('isCorrect','==', false)
-      .orderBy('timestamp')
-      .get().then((snapshot) => {
-        snapshot.forEach(doc => {
-          chatLog.push({'name': doc.name(), 'message': doc.message()});
-        })
-      })
-    return chatLog  
   }
 
   async function addReport(lobby_id, user_id, name, reason) {
@@ -190,13 +188,15 @@ module.exports = function () {
     addCustomWords,
     changeLobbyState,
     addChat,
-    getChatLog,
+    // getChatLog,
     addReport,
     addStroke,
     initNotifier,
     getGameStatus,
     getSyncTime,
     startTurn,
-    getScore
+    dcGame,
+    kickPlayer,
+    getScore,
   };
 };

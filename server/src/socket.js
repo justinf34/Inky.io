@@ -17,6 +17,10 @@ module.exports = function (Manager, io) {
         socket.emit("join", { success: false });
       }
     });
+    socket.on("kickPlayer", (lobby_id, playerId) => {
+      const playerSocketId = Manager.kickPlayer(lobby_id, playerId);
+      io.to(playerSocketId).emit("kick", "");
+    });
 
     socket.on("leave", (lobby_id, player) => {
       console.log(`socket: ${player.id} is leaving ${lobby_id}`);
@@ -66,6 +70,15 @@ module.exports = function (Manager, io) {
       });
     });
 
+    socket.on("dc-game", (lobby_id) => {
+      console.log(`Closing lobby ${lobby_id}`);
+
+      Manager.dcGame(lobby_id); // Tell manager to handle event
+
+      //let every client
+      io.to(lobby_id).emit("state-change", constants.GAME_DISCONNECTED);
+    });
+
     socket.on("add-words", (lobby_id, customWords) => {
       Manager.addCustomWords(lobby_id, customWords);
     });
@@ -91,14 +104,11 @@ module.exports = function (Manager, io) {
     });
 
     socket.on("draw", (lobby_id, msg) => {
-      // console.log("draw: ", msg);
       const strokes = Manager.addStroke(lobby_id, msg);
-      if (strokes) {
-        socket.to(lobby_id).emit("draw", msg, strokes);
-      }
+      socket.to(lobby_id).emit("draw", msg, strokes);
     });
 
-    socket.on("chat", async (lobby_id, msg) => {
+    socket.on("chat", (lobby_id, msg) => {
       Manager.addChat(lobby_id, socket.id, msg).then((result) => {
         if (!result.success) {
           console.error(result.message);
@@ -111,7 +121,6 @@ module.exports = function (Manager, io) {
           io.in(lobby_id).emit("score", Manager.getScore(lobby_id, socket.id));
         } else {
           io.to(lobby_id).emit("chat", result.name, msg);
-          console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`);
         }
       });
     });

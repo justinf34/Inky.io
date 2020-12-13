@@ -17,6 +17,7 @@ const profileRouter = require("./routes/profile-route");
 const reportRouter = require("./routes/report-route");
 const session = require("express-session");
 const path = require("path");
+const constants = require("./src/Constants");
 
 const keys = require("./config/keys");
 const cors = require("cors");
@@ -87,6 +88,16 @@ app.use("/profile", profileRouter);
 app.use("/report", reportRouter);
 
 io.on("connection", socket_handler(LobbyManager, io));
+
+// any uncaught exceptions will kick everyone out of the games.
+// if there is time we should handle exceptions before they get to
+// this point. If you are havin weird errors it may be here.
+process.on("uncaughtException", function (err) {
+  console.log(
+    `Caught exception: ${err}, sending disconnect state change to all clients`
+  );
+  io.emit("state-change", constants.GAME_DISCONNECTED);
+});
 
 let port = process.env.PORT || 8888;
 http.listen(port, (err) => {
