@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import { SERVER_URL } from "../Utils/Constants";
 const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
@@ -11,14 +12,14 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = () => {
-    window.open("http://localhost:8888/auth/logout", "_self");
+    window.open(SERVER_URL + "/auth/logout", "_self");
     setAuth({
       authenticated: false,
     });
   };
 
   const getUserInfo = () => {
-    fetch("http://localhost:8888/auth/login/success", {
+    fetch(SERVER_URL + "/auth/login/success", {
       method: "GET",
       credentials: "include",
       headers: {
