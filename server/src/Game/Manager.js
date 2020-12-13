@@ -36,7 +36,14 @@ module.exports = function () {
 
   async function leaveRoom(socket_id, lobby_id) {
     const lobby = Lobbies.get(lobby_id);
-    lobby.dbLeavePlayer(socket_id);
+    if(lobby) {
+      try {
+        lobby.dbLeavePlayer(socket_id);
+      } catch {
+        console.log(err)
+      }
+    }
+      
 
     const res = lobby.leavePlayer(socket_id);
 

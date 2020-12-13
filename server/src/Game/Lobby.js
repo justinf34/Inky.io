@@ -294,7 +294,7 @@ class Lobby {
           return constants.DISCONNECTED;
         });
     } catch (err) {
-      return err;
+      return err.message;
     }
   }
 
