@@ -17,6 +17,7 @@ class GamePage extends Component {
 
     this.state = {
       strokes: [],
+      hint: [],
     };
 
     // this.getTime = this.getTime.bind(this);
@@ -80,11 +81,17 @@ class GamePage extends Component {
         <Link to="/" className="leave-lobby-btn">
           <Button variant="outline-secondary">Leave Lobby</Button>
         </Link>
-        <div className="game-contents">
-          <div className="hints">{/* TODO */}</div>
-          <div className="timer">
-            <Timer socket={this.props.socket} timer={this.state.timer} />
+        <div className="game-header">
+          <div className="empty-placeholder" style={{width:"15%"}}></div>
+          <div className="canvas-header">
+            <h3 style={{width:"max-content", margin:"auto"}}>{this.state.hint}</h3>
+            <div className="timer">
+              <Timer socket={this.props.socket} timer={this.state.timer} />
+            </div>
           </div>
+          <div className="empty-placeholder" style={{width:"25%"}}></div>
+        </div>
+        <div className="game-contents">
           <div className="players-container">
             <PlayerSidebar
               className="players-container"
@@ -104,7 +111,10 @@ class GamePage extends Component {
             strokes={this.state.strokes}
           />
           <div className="chat-container">
-            <ChatBox socket={this.props.socket} />
+            <ChatBox 
+              socket={this.props.socket}
+              lobby={this.props.match.params.lobbyID}
+            />
           </div>
         </div>
       </div>

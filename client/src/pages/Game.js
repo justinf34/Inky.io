@@ -54,6 +54,13 @@ class Game extends Component {
       });
     });
 
+    // listen for score updates
+    this.state.socket.on("score", (res) => {
+      this.setState( prevState =>({
+        players: prevState.players.map(obj => obj.id === res.user_id ? Object.assign(obj, {score: res.score}) : obj)
+      }));
+    });
+
     // Join socket room
     this.state.socket.emit("join", {
       lobby_id: lobby_id,
@@ -69,6 +76,7 @@ class Game extends Component {
       this.setState({
         state: new_state,
       });
+      console.log(`Changing game state to ${this.state.state}`)
     });
 
     this.state.socket.on("disconnect", (reason) => {
@@ -79,7 +87,7 @@ class Game extends Component {
         reason === "transport close" ||
         reason === "transport error"
       ) {
-        console.log("Handle these properly");
+        console.log(`Disconnection reason: ${reason}`);
       }
     });
   }

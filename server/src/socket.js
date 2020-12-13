@@ -104,12 +104,11 @@ module.exports = function (Manager, io) {
     });
 
     socket.on("draw", (lobby_id, msg) => {
-      // console.log("draw: ", msg);
       const strokes = Manager.addStroke(lobby_id, msg);
       socket.to(lobby_id).emit("draw", msg, strokes);
     });
 
-    socket.on("chat", async (lobby_id, msg) => {
+    socket.on("chat", (lobby_id, msg) => {
       Manager.addChat(lobby_id, socket.id, msg).then((result) => {
         if (!result.success) {
           console.error(result.message);
@@ -122,7 +121,6 @@ module.exports = function (Manager, io) {
           io.in(lobby_id).emit("score", Manager.getScore(lobby_id, socket.id));
         } else {
           io.to(lobby_id).emit("chat", result.name, msg);
-          console.log(`Sending "${result.name}: ${msg}" to lobby ${lobby_id}`);
         }
       });
     });

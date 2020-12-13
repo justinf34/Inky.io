@@ -36,3 +36,22 @@
 .game-page .leave-lobby-btn{
   margin: 10px auto 10px 20px;
 }
+
+.game-header {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin: auto;
+  justify-content: center;
+}
+
+.canvas-header {
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.empty-placeholder {
+  margin: 10px;
+}
