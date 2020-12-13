@@ -74,6 +74,7 @@ class Game extends Component {
       this.setState({
         state: new_state,
       });
+      console.log(`Changing game state to ${this.state.state}`)
     });
 
     this.state.socket.on("disconnect", (reason) => {
@@ -84,7 +85,7 @@ class Game extends Component {
         reason === "transport close" ||
         reason === "transport error"
       ) {
-        console.log("Handle these properly");
+        console.log(`Disconnection reason: ${reason}`);
       }
     });
   }
