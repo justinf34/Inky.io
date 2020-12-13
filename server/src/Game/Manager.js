@@ -55,6 +55,13 @@ module.exports = function () {
     };
   }
 
+  function kickPlayer(lobby_id, playerId) {
+    const lobby = Lobbies.get(lobby_id);
+    const playerSocketId = lobby.kickPlayer(playerId);
+    lobby.dbKickPlayer(playerId);
+    return playerSocketId;
+  }
+
   function changeLobbySetting(lobby_id, setting) {
     const lobby = Lobbies.get(lobby_id);
     lobby.changeSetting(setting);
@@ -81,21 +88,29 @@ module.exports = function () {
     }
   }
 
+  function dcGame(lobby_id) {
+    const lobby = Lobbies.get(lobby_id);
+    Lobbies.delete(lobby_id);
+
+    // Tell lobby instance to handle disconnect
+    const res = lobby.dcLobby();
+  }
+
   async function addChat(lobby_id, socket_id, message) {
     try {
       lobby = Lobbies.get(lobby_id);
       let user_id = lobby.connected_players.get(socket_id);
       let name = lobby.players.get(user_id).name;
       let correctGuess = lobby.checkGuess(user_id, message);
-      
+
       db.collection("Chats").add({
-        'name': name,
-        'lobbyID': lobby_id,
-        'message': message,
-        'correctGuess' : correctGuess,
-        'timestamp' : admin.firestore.Timestamp.now()
+        name: name,
+        lobbyID: lobby_id,
+        message: message,
+        correctGuess: correctGuess,
+        timestamp: admin.firestore.Timestamp.now(),
       });
-      return {success: true, 'name': name, 'correctGuess': correctGuess};
+      return { success: true, name: name, correctGuess: correctGuess };
     } catch (error) {
       return { success: false, message: error };
     }
@@ -106,10 +121,10 @@ module.exports = function () {
       lobby = Lobbies.get(lobby_id);
       let user_id = lobby.connected_players.get(socket_id);
       let score = lobby.players.get(user_id).score;
-      let results = {user_id : user_id, score: score}
-      return results
+      let results = { user_id: user_id, score: score };
+      return results;
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   }
 
@@ -180,6 +195,8 @@ module.exports = function () {
     getGameStatus,
     getSyncTime,
     startTurn,
-    getScore
+    dcGame,
+    kickPlayer,
+    getScore,
   };
 };

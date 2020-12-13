@@ -26,7 +26,7 @@ export default class PlayerContainer extends React.Component {
       case constants.CONNECTED:
         return "primary";
       case constants.KICKED:
-        return "dark";
+        return "danger";
       case constants.DISCONNECTED:
         return "secondary";
       default:

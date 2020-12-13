@@ -17,6 +17,10 @@ module.exports = function (Manager, io) {
         socket.emit("join", { success: false });
       }
     });
+    socket.on("kickPlayer", (lobby_id, playerId) => {
+      const playerSocketId = Manager.kickPlayer(lobby_id, playerId);
+      io.to(playerSocketId).emit("kick", "");
+    });
 
     socket.on("leave", (lobby_id, player) => {
       console.log(`socket: ${player.id} is leaving ${lobby_id}`);
@@ -66,6 +70,15 @@ module.exports = function (Manager, io) {
       });
     });
 
+    socket.on("dc-game", (lobby_id) => {
+      console.log(`Closing lobby ${lobby_id}`);
+
+      Manager.dcGame(lobby_id); // Tell manager to handle event
+
+      //let every client
+      io.to(lobby_id).emit("state-change", constants.GAME_DISCONNECTED);
+    });
+
     socket.on("add-words", (lobby_id, customWords) => {
       Manager.addCustomWords(lobby_id, customWords);
     });
@@ -96,19 +109,20 @@ module.exports = function (Manager, io) {
     });
 
     socket.on("chat", (lobby_id, msg) => {
-      Manager.addChat(lobby_id, socket.id, msg)
-        .then((result) => {
-            if (!result.success) {
-              console.error(result.message);
-            } else if (result.correctGuess) {
-              socket.to(lobby_id).emit("chat",'Inky',`${result.name} guessed correctly`)
-              socket.emit("chat", result.name, msg)
-              socket.emit("chat",'Inky',`You guessed correctly`)
-              io.in(lobby_id).emit("score", Manager.getScore(lobby_id, socket.id));
-            } else {
-              io.to(lobby_id).emit("chat", result.name, msg)
-            }
-        })
+      Manager.addChat(lobby_id, socket.id, msg).then((result) => {
+        if (!result.success) {
+          console.error(result.message);
+        } else if (result.correctGuess) {
+          socket
+            .to(lobby_id)
+            .emit("chat", "Inky", `${result.name} guessed correctly`);
+          socket.emit("chat", result.name, msg);
+          socket.emit("chat", "Inky", `You guessed correctly`);
+          io.in(lobby_id).emit("score", Manager.getScore(lobby_id, socket.id));
+        } else {
+          io.to(lobby_id).emit("chat", result.name, msg);
+        }
+      });
     });
 
     socket.on("report", async (lobby_id, user_id, name, reason) => {

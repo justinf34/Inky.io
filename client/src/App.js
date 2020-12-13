@@ -8,7 +8,7 @@ import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
 import Game from "./pages/Game";
 import AdminPage from "./pages/AdminPage";
-import BanPage from "./pages/BanPage"
+import BanPage from "./pages/BanPage";
 
 export default class App extends Component {
   render() {

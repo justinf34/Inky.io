@@ -2,8 +2,8 @@ import React from "react";
 import "../styles/GameLobbyPage.css";
 import { Form, InputGroup, Col, Button } from "react-bootstrap";
 import constants from "../Utils/Constants";
-
-import { withRouter, Link } from "react-router-dom";
+import Modal from "react-bootstrap/Modal";
+import { withRouter, Link, Redirect } from "react-router-dom";
 
 //takes in prop isHost: bool
 class GameLobbyPage extends React.Component {
@@ -34,12 +34,15 @@ class GameLobbyPage extends React.Component {
         230,
       ],
       roomLinkValue: "hover to see lobby link",
+      modalShow: false,
     };
     this.handleNumRoundsChange = this.handleNumRoundsChange.bind(this);
     this.handleDrawingTimeChange = this.handleDrawingTimeChange.bind(this);
     this.handleCustomWordChange = this.handleCustomWordChange.bind(this);
     this.handleCopyClicked = this.handleCopyClicked.bind(this);
     this.startGame = this.startGame.bind(this);
+    this.kickPlayerClicked = this.kickPlayerClicked.bind(this);
+    this.kick = this.kick.bind(this);
   }
 
   componentDidMount() {
@@ -49,6 +52,14 @@ class GameLobbyPage extends React.Component {
         numRounds: setting.rounds,
         drawingTime: setting.draw_time,
       });
+    });
+    this.props.socket.on("kick", (playerId) => {
+      this.kick();
+    });
+  }
+  kick() {
+    this.setState({
+      modalShow: true,
     });
   }
 
@@ -117,6 +128,11 @@ class GameLobbyPage extends React.Component {
       if (!player.disconnected) count++;
     });
     return count;
+  }
+  kickPlayerClicked(event) {
+    const playerID = event.target.parentNode.id;
+    const lobby_id = this.props.match.params.lobbyID;
+    this.props.socket.emit("kickPlayer", lobby_id, playerID);
   }
 
   render() {
@@ -232,7 +248,23 @@ class GameLobbyPage extends React.Component {
                   return "";
                 }
                 return (
-                  <div key={index} className="player-container">
+                  <div key={index} className="player-container" id={player.id}>
+                    {this.props.isHost ? (
+                      player.id !== this.props.hostId ? (
+                        <Button
+                          variant="danger"
+                          onClick={this.kickPlayerClicked}
+                          className="kickButton"
+                        >
+                          X
+                        </Button>
+                      ) : (
+                        ""
+                      )
+                    ) : (
+                      ""
+                    )}
+
                     <img
                       className="player-pfp"
                       src={
@@ -248,6 +280,16 @@ class GameLobbyPage extends React.Component {
               })}
             </div>
           </div>
+          <Modal show={this.state.modalShow}>
+            <Modal.Header>Kicked</Modal.Header>
+            <Modal.Body>You have been kicked from this room.</Modal.Body>
+
+            <Modal.Footer>
+              <Button onClick={() => this.props.history.push("/")}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </div>
     );
