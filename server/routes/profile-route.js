@@ -60,14 +60,13 @@ router.get("/matches", async (req, res) => {
     });
   }
 
-  res.json({
+  res.send({
     success: true,
     message: "successfully gathered game history",
     gameHistory: gameHistory
   });
     //gamehistory isnt updated by the time this sends
     //gameHistory is  empty
-  console.log(gameHistory);
 });
 
 router.post("/change/name", async (req, res) => {
