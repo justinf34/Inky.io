@@ -62,7 +62,7 @@ class Lobby {
     if (state === constants.IN_GAME) {
       //Init game settings
       this.curr_round = 1;
-      
+
       this.timer = this.drawing_time;
       // Setting draw order
       this.drawer_order = Array.from(this.connected_players.values());
@@ -76,7 +76,7 @@ class Lobby {
     this.word_list = this.getWordOptions(); // Generate word choices
     this.round_state = 0; // State to choosing
     this.players_guessed.clear();
-    
+
     // Restart timer but do not start it
     this.timer = this.drawing_time;
   }
@@ -154,34 +154,36 @@ class Lobby {
 
       try {
         // Create new new Game document
-        const docRef = await db
-          .collection("Lobbies")
-          .doc(this.id)
-          .collection("Games")
-          .add({
-            date: new Date(),
-            rounds: this.rounds,
-          });
+        const game = await db.collection("Games").add({
+          date: new Date(),
+          rounds: this.rounds,
+        });
 
-        const scores = db
-          .collection("Lobbies")
-          .doc(this.id)
+        console.log(`New game id ${game.id}`);
+
+        const game_col = db
           .collection("Games")
-          .doc(docRef.id)
+          .doc(game.id)
           .collection("Scores");
 
+        const users = db.collection("Users");
+
         const batch = db.batch();
+
         const players = Array.from(this.players.values());
         players.forEach((player) => {
-          const playerRef = scores.doc(player.id);
+          const playerRef = game_col.doc(player.id);
           batch.set(playerRef, { name: player.name, score: player.score });
+
+          const gameRef = users.doc(player.id).collection("Games").doc(game.id);
+          batch.set(gameRef, { gameID: game.id });
         });
 
         const res = await batch.commit();
         console.log("Successfully upload scores to db");
       } catch (error) {
         //TODO: Handle properly
-        console.log("Something went wrong in uploading score... ");
+        console.log(`Something went wrong in uploading score... ${error}`);
       }
     }
   }
@@ -471,7 +473,9 @@ class Lobby {
   }
 
   calculatePoints() {
-    return Math.round( (1 - (1.0*this.drawing_time - this.timer) / this.drawing_time) * 250);
+    return Math.round(
+      (1 - (1.0 * this.drawing_time - this.timer) / this.drawing_time) * 250
+    );
   }
 
   handleCorrectGuess(user_id) {
