@@ -16,6 +16,7 @@ const lobbyRouter = require("./routes/lobby-route");
 const profileRouter = require("./routes/profile-route");
 const reportRouter = require("./routes/report-route");
 const session = require("express-session");
+const path = require("path");
 
 const keys = require("./config/keys");
 const cors = require("cors");
@@ -49,6 +50,8 @@ app.use(
   })
 );
 
+app.use(cors());
+
 const authCheck = (req, res, next) => {
   if (!req.user) {
     res.status(401).json({
@@ -60,13 +63,18 @@ const authCheck = (req, res, next) => {
   }
 };
 
-app.get("/", authCheck, (req, res) => {
-  res.status(200).json({
-    authenticated: true,
-    message: "user successfully authenticated",
-    user: req.user,
-    cookies: req.cookies,
-  });
+// app.get("/", authCheck, (req, res) => {
+//   res.status(200).json({
+//     authenticated: true,
+//     message: "user successfully authenticated",
+//     user: req.user,
+//     cookies: req.cookies,
+//   });
+// });
+app.use(express.static(path.join(__dirname, "build")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
 app.use("/auth", authRouter);
