@@ -77,6 +77,10 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
 app.use("/auth", authRouter);
 app.use("/lobby", lobbyRouter(LobbyManager));
 app.use("/profile", profileRouter);

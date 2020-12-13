@@ -29,7 +29,7 @@ router.get("/login/failed", (req, res) => {
 // When logout, redirect to client
 router.get("/logout", (req, res) => {
   req.logout();
-  res.redirect(CLIENT_HOME_PAGE_URL);
+  res.redirect(process.env.CLIENT_HOME_PAGE || CLIENT_HOME_PAGE_URL);
 });
 
 router.get(
@@ -44,7 +44,7 @@ router.get(
     failureRedirect: "/auth/login/falied",
   }),
   (req, res) => {
-    res.redirect(CLIENT_HOME_PAGE_URL);
+    res.redirect(process.env.CLIENT_HOME_PAGE || CLIENT_HOME_PAGE_URL);
   }
 );
 
