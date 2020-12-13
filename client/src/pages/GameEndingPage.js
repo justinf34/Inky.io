@@ -63,7 +63,7 @@ class GameEndingPage extends React.Component {
       this.props.socket.emit("dc-game", lobby_id);
     }
 
-    return <Redirect to={"/"} />;
+    this.props.history.push("/");
   }
 
   render() {
