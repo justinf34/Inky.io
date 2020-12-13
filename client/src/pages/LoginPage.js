@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import AuthContext, { useAuth } from "../context/AuthContext";
 import "../styles/loginPage.css";
 import logo from "../images/INKY.png";
+import { SERVER_URL } from "../Utils/Constants";
 class LoginPage extends Component {
   constructor(props) {
     super(props);
@@ -20,7 +21,7 @@ class LoginPage extends Component {
               <Button
                 className="login-button"
                 onClick={() =>
-                  window.open("http://localhost:8888/auth/google", "_self")
+                  window.open(SERVER_URL + "/auth/google", "_self")
                 }
               >
                 Sign in With Google

@@ -27,3 +27,6 @@ const constants = {
 };
 
 export default constants;
+
+export const SERVER_URL =
+  process.env.NODE_ENV !== "production" ? "http://localhost:8888" : "";

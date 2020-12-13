@@ -6,7 +6,7 @@ import { Redirect, withRouter } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import DeviceDetect from "../Utils/DeviceDetect";
 import io from "socket.io-client";
-import constants from "../Utils/Constants";
+import constants, { SERVER_URL } from "../Utils/Constants";
 
 function mobileChecker(Component) {
   const { isMobile } = DeviceDetect();
@@ -27,7 +27,7 @@ class Game extends Component {
 
     this.state = {
       host: false,
-      socket: io.connect("http://localhost:8888"), // Set up reconnections
+      socket: io.connect(SERVER_URL), // Set up reconnections
     };
 
     this.onJoin = this.onJoin.bind(this);
@@ -55,8 +55,12 @@ class Game extends Component {
 
     // listen for score updates
     this.state.socket.on("score", (res) => {
-      this.setState( prevState =>({
-        players: prevState.players.map(obj => obj.id === res.user_id ? Object.assign(obj, {score: res.score}) : obj)
+      this.setState((prevState) => ({
+        players: prevState.players.map((obj) =>
+          obj.id === res.user_id
+            ? Object.assign(obj, { score: res.score })
+            : obj
+        ),
       }));
     });
 

@@ -5,6 +5,8 @@ import NavBar from "../components/NavBar";
 import "../styles/ProfilePage.css";
 import AuthContext from "../context/AuthContext";
 import Dialog from "react-bootstrap-dialog";
+import { SERVER_URL } from "../Utils/Constants";
+
 class ProfilePage extends React.Component {
   constructor(props) {
     super(props);
@@ -58,7 +60,8 @@ class ProfilePage extends React.Component {
   }
   handleSubmit() {
     fetch(
-      `http://localhost:8888/profile/change/name?userID=${this.props.authCreds.auth.user.id}&newName=${this.state.userUsername}&userPicture=${this.state.userImageDisplayIndex}`,
+      SERVER_URL +
+        `/profile/change/name?userID=${this.props.authCreds.auth.user.id}&newName=${this.state.userUsername}&userPicture=${this.state.userImageDisplayIndex}`,
       {
         method: "POST",
         credentials: "include",
