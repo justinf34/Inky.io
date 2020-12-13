@@ -383,7 +383,7 @@ class Lobby {
   saveStroke(stroke) {
     if (this.round_state === 1) {
       if (stroke.type === 1) {
-        this.strokes = [];
+        this.strokes.length = 0;
       } else {
         this.strokes.push(stroke);
       }

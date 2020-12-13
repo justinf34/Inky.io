@@ -1,7 +1,7 @@
 const weights = [
   {
-    name: "1",
-    value: 1,
+    name: "2.5",
+    value: 2.5,
   },
 
   {

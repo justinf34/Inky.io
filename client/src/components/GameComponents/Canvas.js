@@ -15,20 +15,23 @@ class Canvas extends Component {
 
     this.myRef = React.createRef();
     this.strokes = this.props.strokes;
+    this.start = true;
+    this.color = "#000000";
+    this.weight = 1;
 
-    this.state = {
-      color: "#000000",
-      weight: 1,
-    };
+    // this.state = {
+    //   weight: 1,
+    // };
   }
 
   componentDidMount() {
+    console.log(`Mounting canvas ${this.start}`);
     this.myP5 = new p5(this.Sketch, this.myRef.current);
     this.props.socket.on("draw", this.sketch.onNewDrawing);
   }
 
   componentWillUnmount() {
-    // this.start = true;
+    console.log("Unmounting canvas");
   }
 
   Sketch = (sketch) => {
@@ -38,10 +41,28 @@ class Canvas extends Component {
         this.myRef.current.offsetHeight
       );
       // sketch.frameRate(20);
-      sketch.background("#ffffff");
     };
 
-    sketch.draw = () => {};
+    sketch.draw = () => {
+      if (this.start) {
+        sketch.background("#ffffff");
+
+        const w = sketch.width;
+        const h = sketch.height;
+
+        this.props.strokes.forEach((stroke) => {
+          sketch.strokeWeight(stroke.weight);
+          sketch.stroke(stroke.color);
+          sketch.line(
+            stroke.x1 * w,
+            stroke.y1 * h,
+            stroke.x2 * w,
+            stroke.y2 * h
+          );
+        });
+        this.start = false;
+      }
+    };
 
     sketch.reset = () => {
       console.log("Clearing canvas..");
@@ -71,8 +92,8 @@ class Canvas extends Component {
           y1: sketch.pmouseY / h,
           x2: sketch.mouseX / w,
           y2: sketch.mouseY / h,
-          color: this.state.color,
-          weight: this.state.weight,
+          color: this.color,
+          weight: this.weight,
         };
 
         this.strokes.push(msg);
@@ -80,17 +101,14 @@ class Canvas extends Component {
         const { match } = this.props;
         this.props.socket.emit("draw", match.params.lobbyID, msg);
 
-        sketch.strokeWeight(this.state.weight);
-        sketch.stroke(this.state.color);
+        sketch.strokeWeight(this.weight);
+        sketch.stroke(this.color);
         sketch.line(
           sketch.pmouseX,
           sketch.pmouseY,
           sketch.mouseX,
           sketch.mouseY
         );
-
-        // console.log(`${this.strokes}`);
-        // sketch.reset();
       }
     };
 
@@ -160,23 +178,27 @@ class Canvas extends Component {
 
   colorOptionOnClick = (color) => {
     console.log(`Changing pen color to ${color}`);
-    this.setState({ color: color });
+    // this.setState({ color: color });
+    this.color = color;
   };
 
   strokeOptionClick = (event) => {
     event.preventDefault();
     console.log(`Changing stroke weight to ${event.target.value}`);
-    this.setState({ weight: parseInt(event.target.value) });
+    // this.setState({ weight: parseInt(event.target.value) });
+    this.weight = parseInt(event.target.value);
   };
 
   eraser = () => {
-    this.setState({ color: "#FFFFFF" });
+    // this.setState({ color: "#FFFFFF" });
+    this.color = "#FFFFF";
   };
 
   clearCanvas = () => {
     const { match } = this.props;
     const msg = { type: 1 };
-    // this.props.socket.emit("draw", match.params.lobbyID, msg);
+    this.props.socket.emit("draw", match.params.lobbyID, msg);
+
     this.sketch.clear();
     this.sketch.background("#ffffff");
   };
