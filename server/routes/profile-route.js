@@ -7,27 +7,67 @@ router.get("/", (req, res) => {
   res.send("This is the profile endpoint gateway");
 });
 
-router.get("/matches", (req, res) => {
+router.get("/matches", async (req, res) => {
   const user_id = req.query.userID;
-  const user = db.collection("Users")
+  const gameIds = [];
+  const gameHistory = [];
+  const getGameIDs = db.collection("Users")
     .doc(user_id)
-    .get()
-    .then((doc) => {
-      console.log(doc);
-      if(doc.exists) {
-        doc.ref.collection("Games")
-        .get()
-        .then((gameIds) => {
-          if(gameIds.exists) {
-            console.log(gameIds);
-          }
+    .collection("Games")
+
+  try {
+    await getGameIDs.get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          //docs of each game
+          gameIds.push(doc.data().gameID);
         });
-      }
+      });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error,
     });
-  // TODO: setup db for this
-  // get all games from db and send them in res
-  // matchHistory: [{lobbyCode, hostId, games[]}]
-  // games: [{date, numRounds, scores[{playerName, score}]}]
+  }
+
+  try {
+    gameIds.forEach((game) => {
+      db.collection("Games")
+      .doc(game)
+      .get()
+      .then((doc) => {
+        let gameInfo = {
+          rounds: doc.data().rounds,
+          date: doc.data().date
+        }
+        doc.ref.collection("Scores")
+        .get()
+        .then((scores) => {
+          scores.forEach((player) => {
+            gameInfo[player.id] = {
+              name: player.data().name,
+              score: player.data().score
+            }
+          });
+        });
+        gameHistory.push(gameInfo);
+      });
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error,
+    });
+  }
+
+  res.json({
+    success: true,
+    message: "successfully gathered game history",
+    gameHistory: gameHistory
+  });
+    //gamehistory isnt updated by the time this sends
+    //gameHistory is  empty
+  console.log(gameHistory);
 });
 
 router.post("/change/name", async (req, res) => {
