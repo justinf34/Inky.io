@@ -267,7 +267,8 @@ class GameLobbyPage extends React.Component {
                     <img
                       className="player-pfp"
                       src={
-                        player.profileKey
+                        player.profileKey &&
+                        (player.profileKey > 0 && player.profileKey <= 10)
                           ? `https://pokeres.bastionbot.org/images/pokemon/${player.profileKey}.png`
                           : "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
                       }

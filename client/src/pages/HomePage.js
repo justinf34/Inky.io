@@ -1,12 +1,13 @@
-import React from "react";
+import React, { createRef } from "react";
 import "../styles/HomePage.css";
 import {
   Accordion,
   Card,
   InputGroup,
   FormControl,
-  Toast,
+  Overlay,
   Button,
+  Popover,
 } from "react-bootstrap";
 import NavBar from "../components/NavBar";
 import { Redirect, withRouter } from "react-router-dom";
@@ -21,6 +22,7 @@ class HomePage extends React.Component {
       gameCode: "",
       showRoomNotFound: false,
     };
+    this.joinButtonTarget = new createRef();
     this.handleGameCodeChange = this.handleGameCodeChange.bind(this);
     this.handleJoinGameClicked = this.handleJoinGameClicked.bind(this);
     this.handleCreateGameClicked = this.handleCreateGameClicked.bind(this);
@@ -89,13 +91,15 @@ class HomePage extends React.Component {
           };
           this.props.history.push(location);
         } else {
-          //TODO: show error message
-
           this.setState({
             showRoomNotFound: true,
             gameCode: "",
             gameErrorMessage: res_json.message,
           });
+          // hide popover after 5 sec
+          setTimeout(() => {
+            this.setState({ showRoomNotFound: false });
+          }, 5000);
         }
       })
       .catch((err) => {
@@ -121,7 +125,8 @@ class HomePage extends React.Component {
             <img
               className="profile-picture"
               src={
-                user.profileKey
+                user.profileKey &&
+                (user.profileKey > 0 && user.profileKey <= 10)
                   ? `https://pokeres.bastionbot.org/images/pokemon/${user.profileKey}.png`
                   : "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
               }
@@ -142,6 +147,7 @@ class HomePage extends React.Component {
               />
               <InputGroup.Append>
                 <Button
+                  ref={this.joinButtonTarget}
                   disabled={this.props.mobile}
                   variant="success"
                   onClick={this.handleJoinGameClicked}
@@ -151,15 +157,16 @@ class HomePage extends React.Component {
               </InputGroup.Append>
             </InputGroup>
 
-            <Toast
-              onClose={() => this.setState({ showRoomNotFound: false })}
+            <Overlay
+              target={this.joinButtonTarget}
               show={this.state.showRoomNotFound}
-              delay={3000}
-              autohide
-              style={{ maxHeight: 50 }}
+              placement="top"
+              onClose={() => this.setState({ showRoomNotFound: false })}
             >
-              <Toast.Body>{this.state.gameErrorMessage}</Toast.Body>
-            </Toast>
+              <Popover>
+                <Popover.Content>{this.state.gameErrorMessage}</Popover.Content>
+              </Popover>
+            </Overlay>
 
             <Accordion defaultActiveKey="0" className="info">
               <Card>
