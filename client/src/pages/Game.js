@@ -51,13 +51,13 @@ class Game extends Component {
         host_info: lobby.host,
         players: lobby.players,
       });
- 
-      // listen for score updates
-      this.state.socket.on("score", (res) => {
-        this.setState( prevState =>({
-          players: prevState.players.map(obj => obj.id === res.user_id ? Object.assign(obj, {score: res.score}) : obj)
-        }))
-      })
+    });
+
+    // listen for score updates
+    this.state.socket.on("score", (res) => {
+      this.setState( prevState =>({
+        players: prevState.players.map(obj => obj.id === res.user_id ? Object.assign(obj, {score: res.score}) : obj)
+      }));
     });
 
     // Join socket room
