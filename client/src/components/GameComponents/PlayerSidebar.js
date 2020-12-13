@@ -5,8 +5,8 @@ import PlayerContainer from "./PlayerContainer";
 export default class PlayerSidebar extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
   }
+
 
   render() {
     return (

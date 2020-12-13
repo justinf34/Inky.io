@@ -53,6 +53,13 @@ class Game extends Component {
       });
     });
 
+    // listen for score updates
+    this.state.socket.on("score", (res) => {
+      this.setState( prevState =>({
+        players: prevState.players.map(obj => obj.id === res.user_id ? Object.assign(obj, {score: res.score}) : obj)
+      }));
+    });
+
     // Join socket room
     this.state.socket.emit("join", {
       lobby_id: lobby_id,
