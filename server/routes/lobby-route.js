@@ -319,7 +319,7 @@ module.exports = function (Manager) {
     db.collection("Chats")
       .where('lobbyID', '==', req.query.lobbycode)
       .where('correctGuess','==', false)
-      .orderBy('timestamp','desc')
+      .orderBy('timestamp','asc')
       .get()
       .then((snapshot)=>{
         snapshot.forEach( doc => {
