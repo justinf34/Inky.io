@@ -313,5 +313,26 @@ module.exports = function (Manager) {
       });
   });
 
+  router.get("/chatHistory", (req, res) => {
+    let chatLog = [];
+    console.log(req.query.lobbycode)
+    db.collection("Chats")
+      .where('lobbyID', '==', req.query.lobbycode)
+      .where('correctGuess','==', false)
+      .orderBy('timestamp','desc')
+      .get()
+      .then((snapshot)=>{
+        snapshot.forEach( doc => {
+          chatLog.push({'name': doc.data().name, 'content': doc.data().message});
+        })
+      })
+      .then(() => {
+        res.json({
+          success: true,
+          chatLog : chatLog
+        })
+      })
+  })
+
   return router;
 };

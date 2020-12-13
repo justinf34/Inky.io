@@ -93,7 +93,7 @@ module.exports = function () {
         'lobbyID': lobby_id,
         'message': message,
         'correctGuess' : correctGuess,
-        'timestamp' : Date.now()
+        'timestamp' : admin.firestore.Timestamp.now()
       });
       return {success: true, 'name': name, 'correctGuess': correctGuess};
     } catch (error) {

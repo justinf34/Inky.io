@@ -104,7 +104,10 @@ class GamePage extends Component {
             strokes={this.state.strokes}
           />
           <div className="chat-container">
-            <ChatBox socket={this.props.socket} />
+            <ChatBox 
+              socket={this.props.socket}
+              lobby={this.props.match.params.lobbyID}
+            />
           </div>
         </div>
       </div>
