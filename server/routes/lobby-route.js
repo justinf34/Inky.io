@@ -70,7 +70,7 @@ module.exports = function (Manager) {
             if (player_data.state === 2) {
               res.json({
                 success: false,
-                message: "You have been kicked",
+                message: "You have been kicked from this lobby",
               });
             } else {
               res.json({

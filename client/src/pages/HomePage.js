@@ -84,16 +84,17 @@ class HomePage extends React.Component {
       })
       .then((res_json) => {
         if (res_json.success) {
-          console.log(res_json);
           const location = {
             pathname: `/game/${res_json.code}`,
           };
           this.props.history.push(location);
         } else {
           //TODO: show error message
+
           this.setState({
             showRoomNotFound: true,
             gameCode: "",
+            gameErrorMessage: res_json.message,
           });
         }
       })
@@ -157,9 +158,7 @@ class HomePage extends React.Component {
               autohide
               style={{ maxHeight: 50 }}
             >
-              <Toast.Body>
-                Couldn't find the room you're looking for. Sorry!
-              </Toast.Body>
+              <Toast.Body>{this.state.gameErrorMessage}</Toast.Body>
             </Toast>
 
             <Accordion defaultActiveKey="0" className="info">

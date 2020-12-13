@@ -18,8 +18,6 @@ module.exports = function (Manager, io) {
       }
     });
     socket.on("kickPlayer", (lobby_id, playerId) => {
-      console.log("kicking works");
-
       const playerSocketId = Manager.kickPlayer(lobby_id, playerId);
       io.to(playerSocketId).emit("kick", "");
     });

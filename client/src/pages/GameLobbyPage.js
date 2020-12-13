@@ -2,7 +2,7 @@ import React from "react";
 import "../styles/GameLobbyPage.css";
 import { Form, InputGroup, Col, Button } from "react-bootstrap";
 import constants from "../Utils/Constants";
-
+import Modal from "react-bootstrap/Modal";
 import { withRouter, Link, Redirect } from "react-router-dom";
 
 //takes in prop isHost: bool
@@ -33,6 +33,7 @@ class GameLobbyPage extends React.Component {
         230,
       ],
       roomLinkValue: "hover to see lobby link",
+      modalShow: false,
     };
     this.handleNumRoundsChange = this.handleNumRoundsChange.bind(this);
     this.handleDrawingTimeChange = this.handleDrawingTimeChange.bind(this);
@@ -52,12 +53,13 @@ class GameLobbyPage extends React.Component {
       });
     });
     this.props.socket.on("kick", (playerId) => {
-      console.log("we are getting here to kick");
       this.kick();
     });
   }
   kick() {
-    this.props.history.push("/");
+    this.setState({
+      modalShow: true,
+    });
   }
 
   componentWillUnmount() {
@@ -277,6 +279,16 @@ class GameLobbyPage extends React.Component {
               })}
             </div>
           </div>
+          <Modal show={this.state.modalShow}>
+            <Modal.Header>Kicked</Modal.Header>
+            <Modal.Body>You have been kicked from this room.</Modal.Body>
+
+            <Modal.Footer>
+              <Button onClick={() => this.props.history.push("/")}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </div>
     );
