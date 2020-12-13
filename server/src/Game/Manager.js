@@ -81,8 +81,6 @@ module.exports = function () {
     }
   }
 
-
-
   async function addChat(lobby_id, socket_id, message) {
     try {
       lobby = Lobbies.get(lobby_id);
@@ -95,7 +93,7 @@ module.exports = function () {
         'lobbyID': lobby_id,
         'message': message,
         'correctGuess' : correctGuess,
-        'timestamp' : Date.now()
+        'timestamp' : admin.firestore.Timestamp.now()
       });
       return {success: true, 'name': name, 'correctGuess': correctGuess};
     } catch (error) {
@@ -109,25 +107,10 @@ module.exports = function () {
       let user_id = lobby.connected_players.get(socket_id);
       let score = lobby.players.get(user_id).score;
       let results = {user_id : user_id, score: score}
-      console.log(results)
       return results
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
-  }
-
-  async function getChatLog(lobby_id) {
-    let chatLog = []
-    db.collection('Chats')
-      .where('lobbyID', '==', lobby_id)
-      .where('isCorrect','==', false)
-      .orderBy('timestamp')
-      .get().then((snapshot) => {
-        snapshot.forEach(doc => {
-          chatLog.push({'name': doc.name(), 'message': doc.message()});
-        })
-      })
-    return chatLog  
   }
 
   async function addReport(lobby_id, user_id, name, reason) {
@@ -190,7 +173,7 @@ module.exports = function () {
     addCustomWords,
     changeLobbyState,
     addChat,
-    getChatLog,
+    // getChatLog,
     addReport,
     addStroke,
     initNotifier,
