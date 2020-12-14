@@ -56,6 +56,10 @@ class ChatBox extends Component {
     });
   }
 
+  componentWillUnmount() {
+    this.props.socket.removeListener("chat");
+  }
+
   render() {
     return (
       <Card style={{ height: "100%" }}>
