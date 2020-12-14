@@ -1,7 +1,7 @@
 const { collection } = require("../../config/db");
 const db = require("../../config/db");
 const constants = require("../Constants");
-let word_list = require("./word-list");
+const word_list = require("./word-list");
 
 class Lobby {
   constructor(id, host) {
@@ -484,7 +484,6 @@ class Lobby {
 
   // takes in array of words to add to wordlist
   addToWords(newWords) {
-    console.log("adding new words");
     let wordsToAdd = [];
     for (let word in newWords) {
       newWords[word] = newWords[word].trim().toLowerCase();
