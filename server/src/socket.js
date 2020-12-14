@@ -94,11 +94,6 @@ module.exports = function (Manager, io) {
       Manager.startTurn(lobby_id, word);
     });
 
-    socket.on("game-status", (lobby_id, user_id) => {
-      const status = Manager.getGameStatus(lobby_id, user_id);
-      socket.emit("game-status", status);
-    });
-
     socket.on("timesync", (lobby_id, user_id) => {
       socket.emit("timesync", Manager.getSyncTime(lobby_id, user_id));
     });
@@ -124,6 +119,11 @@ module.exports = function (Manager, io) {
           io.to(lobby_id).emit("chat", result.name, msg);
         }
       });
+    });
+    
+    socket.on("game-status", (lobby_id, user_id) => {
+      const status = Manager.getGameStatus(lobby_id, user_id);
+      socket.emit("game-status", status);
     });
 
     socket.on("report", async (lobby_id, user_id, name, reason) => {
