@@ -266,6 +266,10 @@ class Lobby {
       if (this.drawer === user_id) {
         //TODO: Test on case were last person leaves or last drawer leaves
         this.endTurn();
+      } else {
+        if (this.players_guessed.size === this.connected_players.size - 1) {
+          this.endTurn();
+        }
       }
     }
 
@@ -283,7 +287,7 @@ class Lobby {
     return user_id;
   }
 
-  /**
+  /**G
    * sets player state in db to disconnected
    * @param {id: string, username: string} player_info
    */
@@ -495,6 +499,10 @@ class Lobby {
     if (!this.players_guessed.has(user_id)) {
       this.players.get(user_id).score += this.calculatePoints();
       this.players_guessed.add(user_id);
+
+      if (this.players_guessed.size === this.connected_players.size - 1) {
+        this.endTurn();
+      }
     }
   }
 
