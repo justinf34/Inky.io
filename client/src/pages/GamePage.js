@@ -20,18 +20,24 @@ class GamePage extends Component {
       hint: [],
     };
 
-    // this.getTime = this.getTime.bind(this);
-    // this.interval = null;
-    // this.syncInterval = null;
+    this.getTime = this.getTime.bind(this);
+    this.interval = null;
+    this.syncInterval = null;
+  }
+  componentWillUnmount() {
+    if (this.interval !== null) {
+      clearInterval(this.interval);
+      clearInterval(this.syncInterval);
+      this.interval = null;
+      this.syncInterval = null;
+    }
   }
 
   componentDidMount() {
     this.props.socket.on("game-status", (status) => {
       this.setState({ ...status });
-<<<<<<< Updated upstream
-=======
-      if (this.state.playing && this.interval === null) { 
-        this.interval = setInterval(() => { 
+      if (this.state.playing && this.interval === null) {
+        this.interval = setInterval(() => {
           if (this.state.timer > 0) {
             this.setState({
               timer: this.state.timer - 0.5,
@@ -47,41 +53,47 @@ class GamePage extends Component {
           this.getTime();
         }, 5000);
       }
->>>>>>> Stashed changes
+
     });
 
     this.getRoundStatus();
 
-    this.props.socket.on("new-round-status", () => this.getRoundStatus());
+    this.props.socket.on("new-round-status", () => {
+      this.getRoundStatus();
+    });
 
-    // this.props.socket.on("new-round-status", () => {
-    //   if (this.interval === null) {
-    //     console.log("new round statssssssssss");
-    //     this.interval = setInterval(() => {
-    //       if (this.state.timer > 0) {
-    //         this.setState({
-    //           timer: this.state.timer - 1,
-    //         });
-    //       } else {
-    //         clearInterval(this.interval);
-    //         clearInterval(this.syncInterval);
-    //         this.interval = null;
-    //         this.syncInterval = null;
-    //       }
-    //     }, 1000);
-    //     this.syncInterval = setInterval(() => {
-    //       this.getTime();
-    //     }, 5000);
-    //     this.getRoundStatus();
-    //   }
-    // });
+    this.props.socket.on("startTimer", () => {
+      this.interval = setInterval(() => {
+        if (this.state.timer > 0) {
+          this.setState({
+            timer: this.state.timer - 0.5,
+          });
+        } else {
+          clearInterval(this.interval);
+          clearInterval(this.syncInterval);
+          this.interval = null;
+          this.syncInterval = null;
+        }
+      }, 500);
 
-    // this.props.socket.on("timesync", (data) => {
-    //   console.log("Server time now", data, "off set:", this.state.timer - data);
-    //   this.setState({
-    //     timer: data,
-    //   });
-    // });
+      this.syncInterval = setInterval(() => {
+        this.getTime();
+      }, 5000);
+    });
+
+    this.props.socket.on("stopTimer", () => {
+      clearInterval(this.interval);
+      clearInterval(this.syncInterval);
+      this.interval = null;
+      this.syncInterval = null;
+    });
+
+    this.props.socket.on("timesync", (data) => {
+      //console.log("Server time now", data, "off set:", this.state.timer - data);
+      this.setState({
+        timer: data,
+      });
+    });
   }
 
   getTime() {
@@ -102,14 +114,16 @@ class GamePage extends Component {
           <Button variant="outline-secondary">Leave Lobby</Button>
         </Link>
         <div className="game-header">
-          <div className="empty-placeholder" style={{width:"15%"}}></div>
+          <div className="empty-placeholder" style={{ width: "15%" }}></div>
           <div className="canvas-header">
-            <h3 style={{width:"max-content", margin:"auto"}}>{this.state.hint}</h3>
+            <h3 style={{ width: "max-content", margin: "auto" }}>
+              {this.state.hint}
+            </h3>
             <div className="timer">
               <Timer socket={this.props.socket} timer={this.state.timer} />
             </div>
           </div>
-          <div className="empty-placeholder" style={{width:"25%"}}></div>
+          <div className="empty-placeholder" style={{ width: "25%" }}></div>
         </div>
         <div className="game-contents">
           <div className="players-container">

@@ -25,6 +25,10 @@
   margin: 0px 10px;
 }
 
+.chat-container .card-body {
+  overflow: auto;
+}
+
 .players-container {
   height: 90%;
   width: 15%;
