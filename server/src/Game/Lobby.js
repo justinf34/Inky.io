@@ -160,8 +160,10 @@ class Lobby {
         const res = db.collection("Lobbies").doc(this.id).update({
           state: constants.GAME_ENDED,
         });
-
-        this.io.to(this.id).emit("state-change", constants.GAME_ENDED);
+        setTimeout(() => {
+          this.io.to(this.id).emit("state-change", constants.GAME_ENDED);
+        }, 1000);
+        //this.io.to(this.id).emit("state-change", constants.GAME_ENDED);
       } catch (error) {
         //TODO: Handle properly
         console.log("Cannot update lobby state in db ");
