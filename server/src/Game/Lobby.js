@@ -197,14 +197,14 @@ class Lobby {
 
         const res = await batch.commit();
         console.log("Successfully upload scores to db");
-        for (const value of players.values()) {
-          value.score = 0;
-        }
-        
       } catch (error) {
         //TODO: Handle properly
         console.log(`Something went wrong in uploading score... ${error}`);
       }
+      
+      for (const value of players.values()) {
+        value.score = 0;
+      }      
     }
   }
 
