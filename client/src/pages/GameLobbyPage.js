@@ -16,6 +16,7 @@ class GameLobbyPage extends React.Component {
       roomLink: this.props.match.params.lobbyID,
       numRoundsOptions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       drawingTimeOptions: [
+        5,
         30,
         45,
         60,
@@ -268,7 +269,8 @@ class GameLobbyPage extends React.Component {
                       className="player-pfp"
                       src={
                         player.profileKey &&
-                        (player.profileKey > 0 && player.profileKey <= 10)
+                        player.profileKey > 0 &&
+                        player.profileKey <= 10
                           ? `https://pokeres.bastionbot.org/images/pokemon/${player.profileKey}.png`
                           : "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
                       }
