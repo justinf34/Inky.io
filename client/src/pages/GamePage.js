@@ -24,17 +24,6 @@ class GamePage extends Component {
     this.interval = null;
     this.syncInterval = null;
   }
-  componentWillUnmount() {
-    if (this.interval !== null) {
-      clearInterval(this.interval);
-      clearInterval(this.syncInterval);
-      this.interval = null;
-      this.syncInterval = null;
-    }
-    this.props.socket.removeListenr("startTimer");
-    this.props.socket.removeListenr("stopTimer");
-    this.props.socket.removeListenr("timesync");
-  }
 
   componentDidMount() {
     this.props.socket.on("game-status", (status) => {
@@ -56,7 +45,6 @@ class GamePage extends Component {
           this.getTime();
         }, 5000);
       }
-
     });
 
     this.getRoundStatus();
@@ -97,6 +85,23 @@ class GamePage extends Component {
         timer: data,
       });
     });
+  }
+
+  componentWillUnmount() {
+    if (this.interval !== null) {
+      clearInterval(this.interval);
+      clearInterval(this.syncInterval);
+      this.interval = null;
+      this.syncInterval = null;
+    }
+
+    this.props.socket.offAny([
+      "startTimer",
+      "stopTimer",
+      "timesync",
+      "game-status",
+      "new-round-status",
+    ]);
   }
 
   getTime() {
@@ -148,7 +153,7 @@ class GamePage extends Component {
             strokes={this.state.strokes}
           />
           <div className="chat-container">
-            <ChatBox 
+            <ChatBox
               socket={this.props.socket}
               lobby={this.props.match.params.lobbyID}
             />
