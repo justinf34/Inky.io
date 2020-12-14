@@ -92,6 +92,7 @@ class Game extends Component {
         reason === "transport error"
       ) {
         console.log(`Disconnection reason: ${reason}`);
+        this.props.history.push("/");
       }
     });
   }
