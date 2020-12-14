@@ -28,6 +28,26 @@ class GamePage extends Component {
   componentDidMount() {
     this.props.socket.on("game-status", (status) => {
       this.setState({ ...status });
+<<<<<<< Updated upstream
+=======
+      if (this.state.playing && this.interval === null) { 
+        this.interval = setInterval(() => { 
+          if (this.state.timer > 0) {
+            this.setState({
+              timer: this.state.timer - 0.5,
+            });
+          } else {
+            clearInterval(this.interval);
+            clearInterval(this.syncInterval);
+            this.interval = null;
+            this.syncInterval = null;
+          }
+        }, 500);
+        this.syncInterval = setInterval(() => {
+          this.getTime();
+        }, 5000);
+      }
+>>>>>>> Stashed changes
     });
 
     this.getRoundStatus();

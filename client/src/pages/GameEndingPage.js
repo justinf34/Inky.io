@@ -2,8 +2,7 @@ import React from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import "../styles/EndOfGamePage.css";
-//import AuthContext from "../context/AuthContext";
-import { Redirect, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import constants from "../Utils/Constants";
 
 class GameEndingPage extends React.Component {
@@ -36,7 +35,7 @@ class GameEndingPage extends React.Component {
           <Card.Img
             variant="top"
             src={
-              arr[i].profileKey
+              arr[i].profileKey && (arr[i].profileKey > 0 && arr[i].profileKey <= 10)
                 ? `https://pokeres.bastionbot.org/images/pokemon/${arr[i].profileKey}.png`
                 : "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
             }
