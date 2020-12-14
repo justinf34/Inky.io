@@ -15,18 +15,20 @@ async function getGameInfo(gameID) {
     .then(async (doc) => {
       let gameInfo = {
         rounds: doc.data().rounds,
-        date: doc.data().date
+        date: doc.data().date,
+        scores: []
       }
       await doc.ref.collection("Scores")
       .get()
-      .then((scores) => {
-        scores.forEach((player) => {
-          gameInfo[player.id] = {
+      .then((col) => {
+        col.forEach((player) => {
+          gameInfo.scores.push({
             name: player.data().name,
             score: player.data().score
-          }
+          });
         });
       });
+
       res(gameInfo);
     });
   });
