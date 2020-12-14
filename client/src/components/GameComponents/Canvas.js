@@ -15,13 +15,12 @@ class Canvas extends Component {
 
     this.myRef = React.createRef();
     this.strokes = this.props.strokes;
+
     this.start = true;
+    this.prevCall = new Date().getTime;
+
     this.color = "#000000";
     this.weight = 1;
-
-    // this.state = {
-    //   weight: 1,
-    // };
   }
 
   componentDidMount() {
@@ -84,33 +83,37 @@ class Canvas extends Component {
     };
 
     sketch.mouseDragged = () => {
-      const w = sketch.width;
-      const h = sketch.height;
+      const time = new Date().getTime();
+      if (time - this.prevCall >= 10) {
+        const w = sketch.width;
+        const h = sketch.height;
 
-      if (this.props.drawing && this.props.round_state !== 0) {
-        const msg = {
-          type: 0,
-          x1: sketch.pmouseX / w,
-          y1: sketch.pmouseY / h,
-          x2: sketch.mouseX / w,
-          y2: sketch.mouseY / h,
-          color: this.color,
-          weight: this.weight,
-        };
+        if (this.props.drawing && this.props.round_state !== 0) {
+          const msg = {
+            type: 0,
+            x1: sketch.pmouseX / w,
+            y1: sketch.pmouseY / h,
+            x2: sketch.mouseX / w,
+            y2: sketch.mouseY / h,
+            color: this.color,
+            weight: this.weight,
+          };
 
-        this.strokes.push(msg);
+          this.strokes.push(msg);
 
-        const { match } = this.props;
-        this.props.socket.emit("draw", match.params.lobbyID, msg);
+          const { match } = this.props;
+          this.props.socket.emit("draw", match.params.lobbyID, msg);
 
-        sketch.strokeWeight(this.weight);
-        sketch.stroke(this.color);
-        sketch.line(
-          sketch.pmouseX,
-          sketch.pmouseY,
-          sketch.mouseX,
-          sketch.mouseY
-        );
+          sketch.strokeWeight(this.weight);
+          sketch.stroke(this.color);
+          sketch.line(
+            sketch.pmouseX,
+            sketch.pmouseY,
+            sketch.mouseX,
+            sketch.mouseY
+          );
+          this.prevCall = time;
+        }
       }
     };
 
