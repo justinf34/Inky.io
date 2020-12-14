@@ -45,8 +45,6 @@ class ChatBox extends Component {
     this.fetchChats()
       .then(response => this.setState({messageLog : response.chatLog}))
       .catch(error => console.error(error))
-      console.log(this.state.messageLog)
-
 
     this.props.socket.on("chat", (name, msg) => {
       console.log(`received "${name}: ${msg}"`);
