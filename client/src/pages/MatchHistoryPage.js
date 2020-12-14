@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import AuthContext from "../context/AuthContext";
 import NavBar from "../components/NavBar";
 import "../styles/MatchHistoryPage.css";
+import { SERVER_URL } from "../Utils/Constants";
 
 class MatchHistoryPage extends React.Component {
   constructor(props) {
@@ -25,7 +26,7 @@ class MatchHistoryPage extends React.Component {
 
   getLobbies() {
     fetch(
-      `http://localhost:8888/profile/matches?userID=${this.props.authCreds.auth.user.id}`,
+      `${SERVER_URL}/profile/matches?userID=${this.props.authCreds.auth.user.id}`,
       {
         method: "GET",
         credentials: "include",

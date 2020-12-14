@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
+import { SERVER_URL } from "../../Utils/Constants";
 
 import { Card, Form } from "react-bootstrap";
-
 import ChatMessage from "./ChatMessage";
+
 class ChatBox extends Component {
   constructor(props) {
     super(props);
@@ -32,19 +33,20 @@ class ChatBox extends Component {
   }
 
   async fetchChats() {
-    let response = await fetch(`http://localhost:8888/lobby/chatHistory?lobbycode=${this.props.lobby}`)
+    let response = await fetch(
+      `${SERVER_URL}/lobby/chatHistory?lobbycode=${this.props.lobby}`
+    );
     if (response.ok) {
-      return response.json()
+      return response.json();
     } else {
-      return Promise.reject(response)
+      return Promise.reject(response);
     }
   }
 
-  
-  componentDidMount() {  
+  componentDidMount() {
     this.fetchChats()
-      .then(response => this.setState({messageLog : response.chatLog}))
-      .catch(error => console.error(error))
+      .then((response) => this.setState({ messageLog: response.chatLog }))
+      .catch((error) => console.error(error));
 
     this.props.socket.on("chat", (name, msg) => {
       console.log(`received "${name}: ${msg}"`);
