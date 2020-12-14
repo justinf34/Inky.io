@@ -33,6 +33,8 @@ class Lobby {
     this.word_list = []; //word options given to drawer. 3 words
     this.hint = []; //hint to display to all
     this.numberOfHints = 0;
+
+    this.playing = false;
   }
   findSocketId(playerID) {
     let sockedIdofPlayer;
@@ -62,6 +64,7 @@ class Lobby {
       hint: this.hint,
       strokes: this.strokes,
       timer: this.timer,
+      playing: this.playing,
     };
   }
 
@@ -86,6 +89,7 @@ class Lobby {
     this.players_guessed.clear();
 
     // Restart timer but do not start it
+    this.playing = false;
     this.timer = this.drawing_time;
   }
 
@@ -97,15 +101,17 @@ class Lobby {
     this.setHints(word);
 
     setTimeout(() => {
+      this.playing = true;
       this.startTimer(); // Start timer
       this.notifier(); // Let everyone know
     }, 1000);
   }
 
   startTimer() {
+    this.io.to(this.id).emit("startTimer");
     this.interval = setInterval(() => {
       if (this.timer > 0) {
-        this.timer -= 1;
+        this.timer -= 0.5;
         this.io.to(this.id).emit("time-update", this.timer);
         this.generateHint();
         // console.log("timer now:", this.timer);
@@ -113,7 +119,7 @@ class Lobby {
         clearInterval(this.interval);
         this.endTurn();
       }
-    }, 1000);
+    }, 500);
   }
 
   /**
@@ -123,7 +129,7 @@ class Lobby {
    */
   async endTurn() {
     clearInterval(this.interval); // Clear interval
-
+    this.io.to(this.id).emit("stopTimer");
     let endGame = false;
 
     //check if all the players already had a turn to draw
@@ -133,6 +139,7 @@ class Lobby {
       if (this.curr_round >= this.rounds) {
         console.log(`Ending game...`);
         endGame = true;
+        this.playing = false;
       } else {
         this.curr_round += 1;
         this.drawer_order = Array.from(this.connected_players.values());
@@ -276,6 +283,10 @@ class Lobby {
       if (this.drawer === user_id) {
         //TODO: Test on case were last person leaves or last drawer leaves
         this.endTurn();
+      } else {
+        if (this.players_guessed.size === this.connected_players.size - 1) {
+          this.endTurn();
+        }
       }
     }
 
@@ -293,7 +304,7 @@ class Lobby {
     return user_id;
   }
 
-  /**
+  /**G
    * sets player state in db to disconnected
    * @param {id: string, username: string} player_info
    */
@@ -530,6 +541,10 @@ class Lobby {
     if (!this.players_guessed.has(user_id)) {
       this.players.get(user_id).score += this.calculatePoints();
       this.players_guessed.add(user_id);
+
+      if (this.players_guessed.size === this.connected_players.size - 1) {
+        this.endTurn();
+      }
     }
   }
 
