@@ -15,6 +15,7 @@ const authRouter = require("./routes/auth-route");
 const lobbyRouter = require("./routes/lobby-route");
 const profileRouter = require("./routes/profile-route");
 const reportRouter = require("./routes/report-route");
+const testsRouter = require("./routes/test-routes");
 const session = require("express-session");
 const path = require("path");
 const constants = require("./src/Constants");
@@ -86,6 +87,7 @@ app.use("/auth", authRouter);
 app.use("/lobby", lobbyRouter(LobbyManager));
 app.use("/profile", profileRouter);
 app.use("/report", reportRouter);
+app.use("/test", testsRouter);
 
 io.on("connection", socket_handler(LobbyManager, io));
 

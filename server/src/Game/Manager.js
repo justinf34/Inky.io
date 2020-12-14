@@ -109,6 +109,7 @@ module.exports = function () {
         message: message,
         correctGuess: correctGuess,
         timestamp: admin.firestore.Timestamp.now(),
+        userID: user_id,
       });
       return { success: true, name: name, correctGuess: correctGuess };
     } catch (error) {

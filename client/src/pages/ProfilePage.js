@@ -56,7 +56,13 @@ class ProfilePage extends React.Component {
     });
   }
   imageWebLink(id) {
-    return `https://pokeres.bastionbot.org/images/pokemon/${id}.png`;
+    if (id && id > 0 && id <= 10) {
+      return `https://pokeres.bastionbot.org/images/pokemon/${id}.png`;
+    }
+    else {
+      return "https://play.nintendo.com/images/profile-kirby-kirby.7bf2a8f2.aead314d58b63e27.png"
+    }
+
   }
   handleSubmit() {
     fetch(
