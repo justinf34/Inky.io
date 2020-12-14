@@ -124,13 +124,22 @@ module.exports = function () {
     }
   }
 
+  function getDrawerScore(lobby_id) {
+    try {
+      lobby = Lobbies.get(lobby_id);
+      let score = lobby.players.get(drawer_id).score;
+      return { user_id: user_id, score: score };
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   function getScore(lobby_id, socket_id) {
     try {
       lobby = Lobbies.get(lobby_id);
       let user_id = lobby.connected_players.get(socket_id);
       let score = lobby.players.get(user_id).score;
-      let results = { user_id: user_id, score: score };
-      return results;
+      return { user_id: user_id, score: score };
     } catch (error) {
       console.error(error);
     }

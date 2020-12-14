@@ -119,6 +119,7 @@ module.exports = function (Manager, io) {
           socket.emit("chat", result.name, msg);
           socket.emit("chat", "Inky", `You guessed correctly`);
           io.in(lobby_id).emit("score", Manager.getScore(lobby_id, socket.id));
+          io.in(lobby_id).emit("score", Manager.getDrawerScore(lobby_id));
         } else {
           io.to(lobby_id).emit("chat", result.name, msg);
         }
