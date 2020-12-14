@@ -32,6 +32,7 @@ class Canvas extends Component {
 
   componentWillUnmount() {
     console.log("Unmounting canvas");
+    this.sketch.remove();
   }
 
   Sketch = (sketch) => {
