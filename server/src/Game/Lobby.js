@@ -201,8 +201,7 @@ class Lobby {
         //TODO: Handle properly
         console.log(`Something went wrong in uploading score... ${error}`);
       }
-      
-      for (const value of players.values()) {
+      for (const value of this.players.values()) {
         value.score = 0;
       }      
     }
@@ -546,6 +545,7 @@ class Lobby {
     if (!this.players_guessed.has(user_id)) {
       this.players.get(user_id).score += this.calculatePoints();
       this.players_guessed.add(user_id);
+      this.players.get(this.drawer).score += Math.round(100/this.players.size);
 
       if (this.players_guessed.size === this.connected_players.size - 1) {
         this.endTurn();

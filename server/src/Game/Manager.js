@@ -126,9 +126,11 @@ module.exports = function () {
 
   function getDrawerScore(lobby_id) {
     try {
-      lobby = Lobbies.get(lobby_id);
-      let score = lobby.players.get(drawer_id).score;
-      return { user_id: user_id, score: score };
+      let lobby = Lobbies.get(lobby_id);
+      let score = lobby.players.get(lobby.drawer).score;
+      let result = {user_id: lobby.drawer, score: score };
+      console.log(result)
+      return result
     } catch (error) {
       console.error(error);
     }
@@ -136,7 +138,7 @@ module.exports = function () {
 
   function getScore(lobby_id, socket_id) {
     try {
-      lobby = Lobbies.get(lobby_id);
+      let lobby = Lobbies.get(lobby_id);
       let user_id = lobby.connected_players.get(socket_id);
       let score = lobby.players.get(user_id).score;
       return { user_id: user_id, score: score };
@@ -215,5 +217,6 @@ module.exports = function () {
     dcGame,
     kickPlayer,
     getScore,
+    getDrawerScore
   };
 };
