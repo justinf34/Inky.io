@@ -53,6 +53,7 @@ class GamePage extends Component {
           this.getTime();
         }, 5000);
       }
+
     });
 
     this.getRoundStatus();

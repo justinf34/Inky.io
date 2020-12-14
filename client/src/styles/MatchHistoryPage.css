@@ -20,3 +20,8 @@
   border: 1px solid;
   border-radius: 10px;
 }
+
+.score-table {
+  width: 85%;
+  margin: auto;
+}

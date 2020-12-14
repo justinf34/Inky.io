@@ -82,7 +82,7 @@ class MatchHistoryPage extends React.Component {
                           <Accordion.Toggle
                             as={Button}
                             variant="Link"
-                            eventKey="0"
+                            eventKey={index+1}
                           >
                             {new Date(
                               match.date._seconds * 1000
@@ -95,11 +95,12 @@ class MatchHistoryPage extends React.Component {
                             })}
                           </Accordion.Toggle>
                         </Card.Header>
-                        <Accordion.Collapse eventKey="0">
+                        <Accordion.Collapse eventKey={index+1}>
                           <Card.Body>
                             <div className="game-overview" key={index}>
                               <div className="game-record">
                                 <h2>
+                                  You placed:{" "}
                                   {this.getUserPlacementString(
                                     match,
                                     user.name
@@ -110,7 +111,7 @@ class MatchHistoryPage extends React.Component {
                                   {this.getUserScore(match, user.name)}
                                 </p>
                                 <p>Rounds: {match.rounds}</p>
-                                <Table responsive>
+                                <Table responsive className="score-table">
                                   <thead>
                                     <tr>
                                       <th></th>
