@@ -99,6 +99,7 @@ class MatchHistoryPage extends React.Component {
                             <div className="game-overview" key={index}>
                               <div className="game-record">
                                 <h2>
+                                  You placed:{" "}
                                   {this.getUserPlacementString(
                                     match,
                                     user.name
