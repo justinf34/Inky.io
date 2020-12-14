@@ -34,21 +34,29 @@
   border-bottom: 40px solid #5bc0de;
   align-items: flex-end;
 }
+
 .podium2 {
   background-color: #98b1c3;
-  width: 200px;
-  height: 200px;
+  width: 15vw;
+  max-width: 200px;
+  height: 15vh; 
+  max-height: 200px
 }
+
 .podium1 {
   background-color: #dfbb00;
-  width: 200px;
-  height: 300px;
+  width: 15vw;
+  max-width: 200px;
+  height: 25vh;
+  max-height: 300px;
 }
 
 .podium3 {
   background-color: #d46737;
-  width: 200px;
-  height: 100px;
+  width: 15vw;
+  max-width: 200px;
+  height: 10vh;
+  max-height: 100px;
 }
 .player {
   text-align: center;
