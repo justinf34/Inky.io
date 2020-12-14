@@ -2,7 +2,7 @@ const router = require("express").Router();
 const db = require("../config/db");
 
 function gettingReportFromDB(req, res){
-    const reports = db.collection("Reports").get().then(snapshot=>{
+    const reports = db.collection("Reports").orderBy("date").get().then(snapshot=>{
         var documents = [];
         var players = [];
         var reasons = [];

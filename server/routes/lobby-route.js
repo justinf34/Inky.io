@@ -38,39 +38,61 @@ module.exports = function (Manager) {
       });
   });
 
-  router.post("/join2", (req, res) => {
+  router.post("/join2", async (req, res) => {
     const lobbies = db.collection("Lobbies");
-    lobbies
-      .doc(req.body.id)
-      .get()
-      .then((lobby) => {
-        if (!lobby.exists) {
-          res.json({
-            success: false,
-            message: "Cannot find lobby",
-          });
-        } else {
-          const data = lobby.data();
-          if (data.state !== constants.GAME_DISCONNECTED) {
+    try {
+      const lobby = await lobbies.doc(req.body.id).get();
+      // First check if lobby exists
+      if (!lobby.exists) {
+        res.json({
+          success: false,
+          message: "Cannot find lobby",
+        });
+      } else {
+        const data = lobby.data();
+        // Check if we are disconnected
+        if (data.state !== constants.GAME_DISCONNECTED) {
+          const player = await lobbies
+            .doc(req.body.id)
+            .collection("Players")
+            .doc(req.body.userID)
+            .get();
+          // Check if first time joining
+          if (!player.exists) {
             res.json({
               success: true,
               message: "found lobby",
               ...data,
             });
           } else {
-            res.json({
-              success: false,
-              message: "Cannot connect to the lobby",
-            });
+            const player_data = player.data();
+            //Check if player kicked
+            if (player_data.state === 2) {
+              res.json({
+                success: false,
+                message: "You have been kicked from this lobby",
+              });
+            } else {
+              res.json({
+                success: true,
+                message: "found lobby",
+                ...data,
+              });
+            }
           }
+        } else {
+          res.json({
+            success: false,
+            message: "Lobby disconnected",
+          });
         }
-      })
-      .catch((err) => {
-        res.json({
-          success: false,
-          message: err.message,
-        });
+      }
+    } catch (error) {
+      res.json({
+        success: false,
+        message: error.message,
       });
+    }
   });
 
   /**
@@ -312,6 +334,27 @@ module.exports = function (Manager) {
         });
       });
   });
+
+  router.get("/chatHistory", (req, res) => {
+    let chatLog = [];
+    console.log(req.query.lobbycode)
+    db.collection("Chats")
+      .where('lobbyID', '==', req.query.lobbycode)
+      .where('correctGuess','==', false)
+      .orderBy('timestamp','asc')
+      .get()
+      .then((snapshot)=>{
+        snapshot.forEach( doc => {
+          chatLog.push({'name': doc.data().name, 'content': doc.data().message});
+        })
+      })
+      .then(() => {
+        res.json({
+          success: true,
+          chatLog : chatLog
+        })
+      })
+  })
 
   return router;
 };

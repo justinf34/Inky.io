@@ -69,5 +69,12 @@
 
 .player-grid {
   display: grid;
-  grid-template-columns: repeat( auto-fill, minmax(140px, 1fr) );
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+.kickButton {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  padding: 0 !important;
+  border-radius: 50% !important;
 }

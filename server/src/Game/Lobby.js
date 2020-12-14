@@ -12,7 +12,7 @@ class Lobby {
     this.notifier = null;
     this.io = null;
 
-    this.players = new Map(); // Keep track of the players(key = id, value = {socket_id, name, score})
+    this.players = new Map(); // Keep track of the players(key = id, value = {id, name, state,profilekey,score})
     this.connected_players = new Map(); // key = socket id, value = player id
 
     this.rounds = 1; // Number of rounds in the game
@@ -35,6 +35,14 @@ class Lobby {
     this.numberOfHints = 0;
 
     this.playing = false;
+  }
+  findSocketId(playerID) {
+    let sockedIdofPlayer;
+    for (let [key, value] of this.connected_players.entries()) {
+      if (value === playerID) sockedIdofPlayer = key;
+    }
+
+    return sockedIdofPlayer;
   }
 
   init_sock(notifier_func, io) {
@@ -146,14 +154,14 @@ class Lobby {
       this.newTurn();
       this.notifier(); // Let all the players know that turn ended
     } else {
-      this.state = constants.IN_LOBBY;
+      this.state = constants.GAME_ENDED;
       this.round_state = 3;
       try {
         const res = db.collection("Lobbies").doc(this.id).update({
-          state: constants.IN_LOBBY,
+          state: constants.GAME_ENDED,
         });
 
-        this.io.to(this.id).emit("state-change", constants.IN_LOBBY);
+        this.io.to(this.id).emit("state-change", constants.GAME_ENDED);
       } catch (error) {
         //TODO: Handle properly
         console.log("Cannot update lobby state in db ");
@@ -206,14 +214,17 @@ class Lobby {
         score: 0,
       });
     } else {
-      this.players.get(player_info.id).state = constants.CONNECTED;
+      if (this.players.get(player_info.id).state !== constants.KICKED) {
+        this.players.get(player_info.id).state = constants.CONNECTED;
+      }
     }
+    if (this.players.get(player_info.id).state !== constants.KICKED) {
+      this.connected_players.set(socket_id, player_info.id);
 
-    this.connected_players.set(socket_id, player_info.id);
-
-    // Adding player to draw order when in game
-    if (this.state === constants.IN_GAME)
-      this.drawer_order.push(player_info.id);
+      // Adding player to draw order when in game
+      if (this.state === constants.IN_GAME)
+        this.drawer_order.push(player_info.id);
+    }
   }
 
   /**
@@ -251,10 +262,16 @@ class Lobby {
       return constants.ERR;
     }
   }
-
+  kickPlayer(playerId) {
+    const playerSocketId = this.findSocketId(playerId);
+    const user_id = this.connected_players.get(playerSocketId);
+    this.players.get(user_id).state = constants.KICKED;
+    return playerSocketId;
+  }
   leavePlayer(socket_id) {
     const user_id = this.connected_players.get(socket_id);
-    this.players.get(user_id).state = constants.DISCONNECTED;
+    if (this.players.get(user_id).state !== constants.KICKED)
+      this.players.get(user_id).state = constants.DISCONNECTED;
     this.connected_players.delete(socket_id);
 
     //TODO: If in game, and only 1 player -> black to lobby
@@ -292,20 +309,25 @@ class Lobby {
    * @param {id: string, username: string} player_info
    */
   dbLeavePlayer(socket_id) {
-    let player = this.connected_players.get(socket_id);
-    try {
-      db.collection("Lobbies")
-        .doc(this.id)
-        .collection("Players")
-        .doc(player)
-        .update({
-          state: constants.DISCONNECTED,
-        })
-        .then(() => {
-          return constants.DISCONNECTED;
-        });
-    } catch (err) {
-      return err;
+    let playerID = this.connected_players.get(socket_id);
+    let playerState = this.players.get(playerID).state;
+    console.log(this.players.get(playerID).state);
+    if (playerState !== constants.KICKED) {
+      console.log("getting to storing state");
+      try {
+        db.collection("Lobbies")
+          .doc(this.id)
+          .collection("Players")
+          .doc(playerID)
+          .update({
+            state: constants.DISCONNECTED,
+          })
+          .then(() => {
+            return constants.DISCONNECTED;
+          });
+      } catch (err) {
+        return err;
+      }
     }
   }
 
@@ -341,6 +363,26 @@ class Lobby {
     };
   }
 
+  dcLobby() {
+    this.state = constants.GAME_DISCONNECTED; // set the correct
+    // update db
+    db.collection("Lobbies")
+      .doc(this.id)
+      .update({
+        state: constants.GAME_DISCONNECTED,
+      })
+      .then((_) => {
+        return true;
+      })
+      .catch((err) => {
+        console.log(
+          `Cannot update lobby ${this.id} to GAME_DISCONNECTED with ${err}`
+        );
+        return false;
+      });
+    // return if true or false if db was updated successfully
+  }
+
   getLobbyStatus() {
     return {
       state: this.state,
@@ -374,15 +416,15 @@ class Lobby {
 
   /**
    * sets player state in db to kicked
-   * @param {id: string, username: string} player_info
+   * @param {id: string} player_info
    */
   dbKickPlayer(player_info) {
     try {
       db.collection("Lobbies")
         .doc(this.id)
         .collection("Players")
-        .doc(player_info.id)
-        .set({
+        .doc(player_info + "")
+        .update({
           state: constants.KICKED,
         })
         .then(() => {

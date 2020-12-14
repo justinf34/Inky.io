@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import GameLobbyPage from "./GameLobbyPage";
 import GamePage from "./GamePage";
+import GameEndingPage from "./GameEndingPage";
 
 import { Redirect, withRouter } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
@@ -71,9 +72,11 @@ class Game extends Component {
     });
 
     this.state.socket.on("state-change", (new_state) => {
+      console.log(`Changing state to ${new_state}`);
       this.setState({
         state: new_state,
       });
+      console.log(`Changing game state to ${this.state.state}`)
     });
 
     this.state.socket.on("disconnect", (reason) => {
@@ -84,7 +87,7 @@ class Game extends Component {
         reason === "transport close" ||
         reason === "transport error"
       ) {
-        console.log("Handle these properly");
+        console.log(`Disconnection reason: ${reason}`);
       }
     });
   }
@@ -117,12 +120,21 @@ class Game extends Component {
           isHost={this.state.host}
           players={this.state.players}
           settings={this.state.settings}
+          hostId={this.state.host_info.id}
         />
       );
 
     if (this.state.state === constants.IN_GAME)
       return (
         <GamePage players={this.state.players} socket={this.state.socket} />
+      );
+    if (this.state.state === constants.GAME_ENDED)
+      return (
+        <GameEndingPage
+          players={this.state.players}
+          socket={this.state.socket}
+          isHost={this.state.host}
+        />
       );
 
     if (this.state.state === constants.GAME_DISCONNECTED)
