@@ -17,7 +17,7 @@ class Canvas extends Component {
     this.strokes = this.props.strokes;
 
     this.start = true;
-    this.prevCall = new Date().getTime;
+    this.prevCall = new Date().getTime();
 
     this.color = "#000000";
     this.weight = 1;
