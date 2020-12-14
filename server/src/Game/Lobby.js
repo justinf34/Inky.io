@@ -128,6 +128,7 @@ class Lobby {
    * the drawer disconnects
    */
   async endTurn() {
+    await this.sleep(1000);
     clearInterval(this.interval); // Clear interval
     this.io.to(this.id).emit("stopTimer");
     let endGame = false;
@@ -196,6 +197,10 @@ class Lobby {
 
         const res = await batch.commit();
         console.log("Successfully upload scores to db");
+        for (const value of players.values()) {
+          value.score = 0;
+        }
+        
       } catch (error) {
         //TODO: Handle properly
         console.log(`Something went wrong in uploading score... ${error}`);
@@ -555,6 +560,10 @@ class Lobby {
       return true;
     }
     return false;
+  }
+
+  sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
   }
 }
 
