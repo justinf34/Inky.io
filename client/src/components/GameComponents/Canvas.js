@@ -31,7 +31,8 @@ class Canvas extends Component {
   }
 
   componentWillUnmount() {
-    console.log("Unmounting canvas");
+    console.log("Unmounting canvas...");
+    this.props.socket.removeListener("draw");
     this.sketch.remove();
   }
 

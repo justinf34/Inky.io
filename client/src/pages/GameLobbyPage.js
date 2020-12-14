@@ -65,7 +65,7 @@ class GameLobbyPage extends React.Component {
 
   componentWillUnmount() {
     // unsubscribe to setting change subscription
-    this.props.socket.off("setting-change");
+    this.props.socket.offAny(["setting-change", "kick"]);
   }
 
   handleNumRoundsChange(e) {

@@ -80,7 +80,7 @@ class Game extends Component {
       this.setState({
         state: new_state,
       });
-      console.log(`Changing game state to ${this.state.state}`)
+      console.log(`Changing game state to ${this.state.state}`);
     });
 
     this.state.socket.on("disconnect", (reason) => {
@@ -97,6 +97,13 @@ class Game extends Component {
   }
 
   componentWillUnmount() {
+    this.state.socket.offAny([
+      "state-change",
+      "join",
+      "score",
+      "player-list-update",
+      "disconnect",
+    ]);
     this.state.socket.disconnect();
   }
 
