@@ -31,6 +31,9 @@ class GamePage extends Component {
       this.interval = null;
       this.syncInterval = null;
     }
+    this.props.socket.removeListenr("startTimer");
+    this.props.socket.removeListenr("stopTimer");
+    this.props.socket.removeListenr("timesync");
   }
 
   componentDidMount() {
