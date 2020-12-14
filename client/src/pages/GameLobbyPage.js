@@ -183,10 +183,6 @@ class GameLobbyPage extends React.Component {
                 <Form.Label column sm={5}>
                   Customs Words
                 </Form.Label>
-                {/* TODO: file handling - remove file, add words from file to text area separated with commas */}
-                <Form.File style={{ padding: "15px 0px" }}>
-                  <Form.File.Input />
-                </Form.File>
                 <Form.Control
                   as="textarea"
                   disabled={!this.props.isHost}
