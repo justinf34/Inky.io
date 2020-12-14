@@ -129,7 +129,6 @@ module.exports = function () {
       let lobby = Lobbies.get(lobby_id);
       let score = lobby.players.get(lobby.drawer).score;
       let result = {user_id: lobby.drawer, score: score };
-      console.log(result)
       return result
     } catch (error) {
       console.error(error);
