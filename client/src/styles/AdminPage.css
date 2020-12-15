@@ -18,6 +18,24 @@
   width: 55%;
 }
 .home {
-  float: right;
-  width: 10%;
+  width: max-content;
+}
+@media(max-width: 500px){
+  .report-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+.admin-button-group {
+  padding: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.wrapper{
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
